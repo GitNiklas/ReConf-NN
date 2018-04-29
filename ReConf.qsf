@@ -38,7 +38,7 @@
 
 set_global_assignment -name FAMILY "Cyclone II"
 set_global_assignment -name DEVICE auto
-set_global_assignment -name TOP_LEVEL_ENTITY e_serial
+set_global_assignment -name TOP_LEVEL_ENTITY e_test_tle
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 11.1
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "13:15:27  APRIL 27, 2018"
 set_global_assignment -name LAST_QUARTUS_VERSION 11.0
@@ -46,15 +46,16 @@ set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (VHDL)"
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT VHDL -section_id eda_simulation
 set_global_assignment -name VHDL_INPUT_VERSION VHDL_1993
 set_global_assignment -name VHDL_SHOW_LMF_MAPPING_MESSAGES OFF
-set_global_assignment -name VHDL_FILE test/tb_timer.vhd
-set_global_assignment -name VHDL_FILE test/tb_shift_reg.vhd
-set_global_assignment -name VHDL_FILE test/tb_serial.vhd
-set_global_assignment -name VHDL_FILE src/pkg_tools.vhd
-set_global_assignment -name VHDL_FILE src/e_timer.vhd
-set_global_assignment -name VHDL_FILE src/e_shift_reg.vhd
+set_global_assignment -name VHDL_FILE src/e_test_tle.vhd
+set_global_assignment -name VHDL_FILE src/e_serial.vhd
 set_global_assignment -name VHDL_FILE src/e_serial_send.vhd
 set_global_assignment -name VHDL_FILE src/e_serial_receive.vhd
-set_global_assignment -name VHDL_FILE src/e_serial.vhd
+set_global_assignment -name VHDL_FILE src/e_timer.vhd
+set_global_assignment -name VHDL_FILE src/e_shift_reg.vhd
+set_global_assignment -name VHDL_FILE src/pkg_tools.vhd
+set_global_assignment -name VHDL_FILE test/tb_serial.vhd
+set_global_assignment -name VHDL_FILE test/tb_timer.vhd
+set_global_assignment -name VHDL_FILE test/tb_shift_reg.vhd
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top

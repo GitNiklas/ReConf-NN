@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------------------------
--- Modul zur Empfangen von Daten über die serielle Schnittstelle.
--- Die Kommunikation erfolgt mit: 8 Datenbits, 1 Stoppbit, Keine Parität
+-- Modul zur Empfangen von Daten ueber die serielle Schnittstelle.
+-- Die Kommunikation erfolgt mit: 8 Datenbits, 1 Stoppbit, Keine Paritaet
 -- Die Baudrate ist variabel.
 --
 --  Generics:

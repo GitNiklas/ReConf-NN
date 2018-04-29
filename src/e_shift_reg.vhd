@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------------------------------------
---  Schieberegister, das zusätzlich parallel geladen und gelesen werden kann.
+--  Schieberegister, das zusaetzlich parallel geladen und gelesen werden kann.
 --
 --  Generics:
 --      n               : Breite des Datenwortes (Anzahl der FFs)
