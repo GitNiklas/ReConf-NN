@@ -1,0 +1,39 @@
+1                                   | r0 = w2, r1 = scores, r2 = hlrelu, r3 = xtrain, r4 = w1, r5 = b1, r6 = b2
+w2_t = trans(w2)                    | r7 = w2_t 
+db2 = some_op(scores)               | r8 = db2
+                                    |
+2                                   |
+dhidden = mul(w2_t, scores)         | r9 = dhidden
+hlrelu_t = trans(hlrelu)            | r10 = hlrelu_t
+tmp6 = scalarmul(db2)               | r11 = tmp6
+                                    |
+3                                   | r2 r7 r8 free
+xtrain_t = trans(xtrain)            | r2 = dhidden'
+dhidden' = max(dhidden)             | r7 = dw2
+dw2 = mul(hlrelu_t, scores)         | r8 = tmp3
+tmp3 = scalarmul(w2)                |
+                                    |
+4                                   | r1 r9 r10 free
+dw1 = mul(xtrain_t, dhidden')       | r1 = dw1
+tmp1 = scalarmul(w1)                | r9 = tmp1
+dw2' = add(dw2, tmp3)               | r10 = dw2'
+                                    |
+5                                   | r7 r8 free
+dw1' = add(dw1, tmp1)               | r7 = dw1'
+tmp4 = scalarmul(dw2')              | r8 = tmp4
+                                    |
+6                                   | r1 r9 r10 free
+tmp2 = scalarmul(dw1')              |
+w2' = add(w2, tmp4)                 |
+db1 = some_op(dhidden')             |
+                                    |
+7                                   | r2 r7 r8 free
+w1' = add(w1, tmp2)                 |
+tmp5 = scalarmul(db1)               |
+                                    |
+8                                   |
+b1' = add(b1, tmp5)                 |
+                                    |
+9                                   |
+b2' = add(b2, tmp6)                 |
+

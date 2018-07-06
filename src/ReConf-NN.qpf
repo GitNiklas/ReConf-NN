@@ -16,15 +16,15 @@
 #
 # -------------------------------------------------------------------------- #
 #
-# Quartus II
-# Version 11.0 Build 157 04/27/2011 SJ Web Edition
-# Date created = 10:32:07  April 29, 2018
+# Quartus II 64-Bit
+# Version 11.1 Build 173 11/01/2011 SJ Full Version
+# Date created = 15:06:23  May 16, 2018
 #
 # -------------------------------------------------------------------------- #
 
-QUARTUS_VERSION = "11.0"
-DATE = "10:32:07  April 29, 2018"
+QUARTUS_VERSION = "11.1"
+DATE = "15:06:23  May 16, 2018"
 
 # Revisions
 
-PROJECT_REVISION = "ReConf"
+PROJECT_REVISION = "ReConf-NN"

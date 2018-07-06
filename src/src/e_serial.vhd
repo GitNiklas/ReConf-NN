@@ -28,6 +28,7 @@
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;
+USE work.pkg_tools.ALL;
 
 ----------------------------------------------------------------------------------------------------
 --  Entity
@@ -45,11 +46,11 @@ ENTITY e_serial IS
         p_tx_o              : OUT STD_LOGIC;
 
         p_new_data_o        : OUT STD_LOGIC;
-        p_data_o            : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        p_data_o            : OUT t_byte;
         p_data_read_i       : IN STD_LOGIC;
         p_rx_err_o          : OUT STD_LOGIC;
     
-        p_data_i            : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+        p_data_i            : IN t_byte;
         p_send_i            : IN STD_LOGIC;
         p_busy_send_o       : OUT STD_LOGIC
     );
@@ -76,7 +77,7 @@ COMPONENT e_serial_send
         
         p_tx_o                  : OUT STD_LOGIC;
         
-        p_data_i                : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+        p_data_i                : IN t_byte;
         p_send_i                : IN STD_LOGIC;
         p_busy_send_o           : OUT STD_LOGIC
     );
@@ -94,7 +95,7 @@ COMPONENT e_serial_receive
         p_rx_i                  : IN STD_LOGIC;
         
         p_new_data_o            : OUT STD_LOGIC;
-        p_data_o                : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        p_data_o                : OUT t_byte;
         p_data_read_i           : IN STD_LOGIC;
         p_rx_err_o              : OUT STD_LOGIC
     );

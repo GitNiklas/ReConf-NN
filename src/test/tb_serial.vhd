@@ -7,8 +7,7 @@
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;
-use work.pkg_tools.c_clk_per;
-USE work.pkg_tools.f_calc_serial_wait_time;
+USE work.pkg_tools.ALL;
 
 ENTITY tb_serial IS
 END ENTITY tb_serial;
@@ -31,11 +30,11 @@ COMPONENT e_serial
         p_tx_o              : OUT STD_LOGIC;
 
         p_new_data_o        : OUT STD_LOGIC;
-        p_data_o            : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        p_data_o            : OUT t_byte;
         p_data_read_i       : IN STD_LOGIC;
         p_rx_err_o          : OUT STD_LOGIC;
     
-        p_data_i            : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+        p_data_i            : IN t_byte;
         p_send_i            : IN STD_LOGIC;
         p_busy_send_o       : OUT STD_LOGIC
     );
@@ -49,11 +48,11 @@ END COMPONENT;
 --  Procedure test_send
 ----------------------------------------------------------------------------------------------------
 PROCEDURE test_send(
-    SIGNAL s_data_i         : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL s_data_i         : OUT t_byte;
     SIGNAL s_send           : OUT STD_LOGIC; 
     SIGNAL s_busy_send      : IN STD_LOGIC;
     SIGNAL s_tx             : IN STD_LOGIC;
-    constant c_data_to_send : IN STD_LOGIC_VECTOR(7 DOWNTO 0)
+    constant c_data_to_send : IN t_byte
     ) IS 
 BEGIN
     REPORT "Test: Sende Datenwort";
@@ -101,12 +100,12 @@ END test_send;
 ----------------------------------------------------------------------------------------------------
 PROCEDURE test_receive(
     SIGNAL s_rst            : OUT STD_LOGIC;
-    SIGNAL s_data_o         : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL s_data_o         : IN t_byte;
     SIGNAL s_new_data       : IN STD_LOGIC; 
     SIGNAL s_data_read      : OUT STD_LOGIC; 
     SIGNAL s_rx_err         : IN STD_LOGIC;
     SIGNAL s_rx             : OUT STD_LOGIC;
-    constant c_data_to_rec  : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+    constant c_data_to_rec  : IN t_byte;
     constant c_test_err     : IN BOOLEAN
     ) IS 
 BEGIN
@@ -159,9 +158,9 @@ END test_receive;
 
 SIGNAL s_clk, s_rst, s_rx, s_tx : STD_LOGIC;
 SIGNAL s_new_data, s_data_read, s_rx_err: STD_LOGIC;
-SIGNAL s_data_o: STD_LOGIC_VECTOR(7 DOWNTO 0);
+SIGNAL s_data_o: t_byte;
 SIGNAL s_send, s_busy_send: STD_LOGIC;
-SIGNAL s_data_i: STD_LOGIC_VECTOR(7 DOWNTO 0);
+SIGNAL s_data_i: t_byte;
 
 ---------------------------------------------
 --  Port Maps

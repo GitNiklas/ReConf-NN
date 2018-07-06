@@ -1,0 +1,13 @@
+Protokoll:
+
+Die Bytewerte sind mehr oder weniger zufällig gewählt, wenn dir da sinnvollere einfallen kannst du die gerne anpassen.
+
+1. Übertrage Startbyte: 0xAB
+2. Für alle Bilder des Batch:
+	Übertrage Bilddaten: 64 Bytes
+	Übertrage Trennbyte: 0xDC [Nur wenn ein weiteres Bild folgt]
+3. Übertrage Endbyte: 0xEF
+4. Warte auf Byte 0xFA von FPGA
+5. Entweder
+ 	- Startbyte 0xAB (beginne neuen Batch) => weiter mit 2.
+ 	- 0xBD => Signal an FPGA, Ergebnis auszugeben

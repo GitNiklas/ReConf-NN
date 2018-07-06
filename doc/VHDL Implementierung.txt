@@ -1,0 +1,19 @@
+Konzept der VHDL-Implemntierung
+
+Speicherung der Matrizen
+
+Die Speicherung erfolgt in M4K Blöcken, das Cyclone II besitzt 105 M4K Blöcke (420K). Bei 10 zu speicherndes Matrizen bleiben abgerundet auf eine 2er Potenz 32K Speicher pro Matrix. Dies erlaubt die Speicherung von 64x64 Matrizen, bei 8 Bit pro Matrixelement. Die Matrixelemente werden als vorzeichenbehaftete Festkommawerte interpretiert (4 Bit Vorkomma, 4 Bit Nachkomma). Bei 32K pro Matrix können jeweils 256 Bit gelesen/geschrieben werden, somit können 32 Matrix-Element parallel verarbeitet werden.
+
+
+Matrix-Operationen
+
+Notwendige Operationen:
+    - Matrix Initialisieren
+    - Matrix transponieren  
+    - Skalare Multiplikation (benötigt 32 9-Bit-Multiplizierer)
+    - Skalare Division (2er Potenz)
+    - Skalare Max-Funktion
+    - Matrixaddition
+    - Matrixmultiplikation (benötigt 32 9-Bit-Multiplizierer)
+
+Die Matrix-Operationen werden in einer "Matrix-ALU" zusammengefasst. Das Routing zwischen RAM und Matrix-ALU ist relativ aufwändig. Für die Auswahl der 2 Operanden werden pro Operand 256 10-auf-1 Multiplexer benötigt. Die Auswahl des Resultats benötigt 256 7-auf-1 Multiplexer. Ein 256 10-auf-1 MUX belegt etwa 5% der verfügbaren Logikzellen, somit wird für das Routing der Datenleitungen insgesamt 15% benötigt.

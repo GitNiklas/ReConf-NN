@@ -22,16 +22,15 @@
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;
 
-
 ----------------------------------------------------------------------------------------------------
 --  Entity
 ----------------------------------------------------------------------------------------------------
 ENTITY e_timer IS
     GENERIC( 
-        g_clk_periode       : TIME;
-        g_t0                : TIME;
-        g_t1                : TIME;
-        g_t2                : TIME
+        g_clk_periode       : TIME := 20 ns;
+        g_t0                : TIME := 1 us;
+        g_t1                : TIME := 10 us;
+        g_t2                : TIME := 20 us
     );         
     PORT (    
         p_rst_i             : IN STD_LOGIC;

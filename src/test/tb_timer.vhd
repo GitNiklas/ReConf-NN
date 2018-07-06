@@ -7,7 +7,7 @@
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;
-use work.pkg_tools.c_clk_per;
+USE work.pkg_tools.ALL;
 
 ENTITY tb_timer IS
 END ENTITY tb_timer;

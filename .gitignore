@@ -32,3 +32,8 @@ ReConf\.map\.rpt
 ReConf\.sof
 
 ReConf\.pof
+src/modelsim/
+*.done
+src/ReConf-NN.map.summary
+src/ReConf-NN.map.rpt
+src/ReConf-NN.flow.rpt

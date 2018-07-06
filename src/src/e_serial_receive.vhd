@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------------------------------------
--- Modul zum Senden von Daten ueber die serielle Schnittstelle.
+-- Modul zur Empfangen von Daten ueber die serielle Schnittstelle.
 -- Die Kommunikation erfolgt mit: 8 Datenbits, 1 Stoppbit, Keine Paritaet
 -- Die Baudrate ist variabel.
 --
@@ -11,23 +11,24 @@
 --      p_rst_i         : Asynchroner Reset
 --      p_clk_i         : Takt
 --       
---      p_tx_o          : Sendekanal TxD
---    
---      p_data_i        : Zu sendende Daten
---      p_send_i        : Signalisiert, dass die Daten gesendet werden sollen
---      p_busy_send_o   : Signalisiert, dass gerade Daten gesendet werden
+--      p_rx_i          : Empfangskanal RxD
+--
+--      p_data_o        : Gelesene Daten
+--      p_new_data_o    : Signalisiert, dass neue Daten vorliegen
+--      p_d_data_read_o : Signalisiert, dass die Daten geleseen worden sind
+--      p_rx_err_o      : Signalisiert, dass beim Empfangen ein Fehler aufgetreten ist
 --
 --  Autor: Niklas Kuehl
 --  Datum: 26.04.2018
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;
-USE work.pkg_tools.f_calc_serial_wait_time;
+USE work.pkg_tools.ALL;
 
 ----------------------------------------------------------------------------------------------------
 --  Entity
 ----------------------------------------------------------------------------------------------------
-ENTITY e_serial_send IS
+ENTITY e_serial_receive IS
     GENERIC(
         g_clk_periode       : TIME      := 20 ns;
         g_baudrate          : POSITIVE  := 115200 
@@ -36,19 +37,20 @@ ENTITY e_serial_send IS
         p_rst_i             : IN STD_LOGIC;
         p_clk_i             : IN STD_LOGIC;
 
-        p_tx_o              : OUT STD_LOGIC;
-    
-        p_data_i            : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-        p_send_i            : IN STD_LOGIC;
-        p_busy_send_o       : OUT STD_LOGIC
+        p_rx_i              : IN STD_LOGIC;
+
+        p_new_data_o        : OUT STD_LOGIC;
+        p_data_o            : OUT t_byte;
+        p_data_read_i       : IN STD_LOGIC;
+        p_rx_err_o          : OUT STD_LOGIC
     );
-END ENTITY e_serial_send;
+END ENTITY e_serial_receive;
 
 
 ----------------------------------------------------------------------------------------------------
 --  Architecture
 ----------------------------------------------------------------------------------------------------
-ARCHITECTURE a_serial_send OF e_serial_send IS
+ARCHITECTURE a_serial_receive OF e_serial_receive IS
 
 ----------------------------------------------------------------------------------------------------
 --  Komponenten
@@ -97,11 +99,11 @@ CONSTANT frame_len          : POSITIVE  := 10;
 CONSTANT serial_wait_time   : TIME      := f_calc_serial_wait_time(g_baudrate);
 
 -- Zustaende
-TYPE state IS (st_init, st_send, st_shift); 
-SIGNAL s_cur_state, s_next_state : state;
+TYPE t_state IS (st_init, st_rec, st_wait, st_new_data, st_err); 
+SIGNAL s_cur_state, s_next_state : t_state;
 
 SIGNAL s_ena_shift, s_load_data, s_reg_shift_o: STD_LOGIC;
-SIGNAL s_reg_data_o, s_reg_data_i : STD_LOGIC_VECTOR(frame_len-1 DOWNTO 0);
+SIGNAL s_reg_data_o : STD_LOGIC_VECTOR(frame_len-1 DOWNTO 0);
 
 SIGNAL s_start_timer, s_timer_finished : STD_LOGIC;
 
@@ -132,10 +134,10 @@ PORT MAP(
     p_rst_i             => p_rst_i,
     p_clk_i             => p_clk_i,
                 
-    p_data_i            => s_reg_data_i,
+    p_data_i            => b"1_1111_1111_1",
     p_data_o            => s_reg_data_o,
 
-    p_data_shift_i      => '0',
+    p_data_shift_i      => p_rx_i,
     p_data_shift_o      => s_reg_shift_o,
     
     p_load_data_i       => s_load_data,
@@ -146,7 +148,7 @@ PORT MAP(
 --  Zuweisungen
 ----------------------------------------------------------------------------------------------------
 
-s_reg_data_i <= '1' & p_data_i & '0';
+p_data_o <= s_reg_data_o(8 DOWNTO 1);
 
 ----------------------------------------------------------------------------------------------------
 --  Zustandsautomat
@@ -162,52 +164,77 @@ BEGIN
 END PROCESS proc_change_state;
   
   
-proc_calc_next_state : PROCESS(s_cur_state, p_send_i, s_reg_data_o, s_timer_finished)
+proc_calc_next_state : PROCESS(s_cur_state, p_rx_i, s_reg_shift_o, s_timer_finished, s_reg_data_o, p_data_read_i)
 BEGIN
     CASE s_cur_state IS
                   
-        WHEN st_init =>     IF p_send_i = '1' THEN 
-                                s_next_state <= st_send;
+        WHEN st_init =>     IF p_rx_i = '0' THEN 
+                                s_next_state <= st_rec;
                             ELSE 
                                 s_next_state <= s_cur_state;
                             END IF;
     
-        WHEN st_send =>     IF s_reg_data_o = b"0_0000_0000_0" THEN 
+        WHEN st_rec =>      s_next_state <= st_wait;
+        
+        WHEN st_wait =>     IF s_reg_shift_o /= '0' THEN
+                                IF s_timer_finished = '1' THEN
+                                    s_next_state <= st_rec;
+                                ELSE
+                                    s_next_state <= s_cur_state;
+                                END IF;
+                            ELSE
+                                IF s_reg_data_o(s_reg_data_o'HIGH(1)) = '1' THEN
+                                    s_next_state <= st_new_data;
+                                ELSE
+                                    s_next_state <= st_err;
+                                END IF;                   
+                            END IF;
+                               
+        WHEN st_new_data => IF p_data_read_i = '1' THEN 
                                 s_next_state <= st_init;
-                            ELSIF s_timer_finished = '1' THEN
-                                s_next_state <= st_shift;
                             ELSE 
                                 s_next_state <= s_cur_state;
-                            END IF;   
-                          
-        WHEN st_shift =>    s_next_state <= st_send;   
-
+                            END IF;
+                            
+        WHEN st_err =>      s_next_state <= s_cur_state;  
+        
     END CASE;
 END PROCESS proc_calc_next_state;
 
-proc_calc_output : PROCESS(s_cur_state, s_reg_shift_o)
+proc_calc_output : PROCESS(s_cur_state)
 BEGIN
     CASE s_cur_state is
                           
-        WHEN st_init =>     p_busy_send_o   <= '0';
-                            p_tx_o          <= '1';
+        WHEN st_init =>     p_new_data_o    <= '0';
+                            p_rx_err_o      <= '0';
                             s_start_timer   <= '1';
                             s_load_data     <= '1';
                             s_ena_shift     <= '0';
                   
-        WHEN st_send =>     p_busy_send_o   <= '1';
-                            p_tx_o          <= s_reg_shift_o;
-                            s_start_timer   <= '0';
-                            s_load_data     <= '0';
-                            s_ena_shift     <= '0';
-                          
-        WHEN st_shift =>    p_busy_send_o   <= '1';
-                            p_tx_o          <= s_reg_shift_o;
+        WHEN st_rec =>      p_new_data_o    <= '0';
+                            p_rx_err_o      <= '0';
                             s_start_timer   <= '1';
                             s_load_data     <= '0';
                             s_ena_shift     <= '1';
-
+                            
+        WHEN st_wait =>     p_new_data_o    <= '0';
+                            p_rx_err_o      <= '0';
+                            s_start_timer   <= '0';
+                            s_load_data     <= '0';
+                            s_ena_shift     <= '0';
+                            
+        WHEN st_new_data => p_new_data_o    <= '1';
+                            p_rx_err_o      <= '0';
+                            s_start_timer   <= '0';
+                            s_load_data     <= '0';
+                            s_ena_shift     <= '0';
+                            
+        WHEN st_err =>      p_new_data_o    <= '0';
+                            p_rx_err_o      <= '1';
+                            s_start_timer   <= '0';
+                            s_load_data     <= '0';
+                            s_ena_shift     <= '0';
     END CASE;
 END PROCESS proc_calc_output;
 
-END ARCHITECTURE a_serial_send;
+END ARCHITECTURE a_serial_receive;
