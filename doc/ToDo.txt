@@ -1,0 +1,48 @@
+1
+    - TB für CPU Mul
+        - Alle Tests aus mat_mul übernehmen
+        - Einen Test ergänzen, für korrekte Spaltenweise Speicherung
+2
+    - TB für CPU Add
+        - Entsprechende Tests
+        - Desktruktive Variante (a=c)
+        - Spaltenweise Addition
+        - Spaltenweise Speicherung
+
+2.1
+    - Eventuelle Fehler korrigieren
+        - ix gen anpassen für spaltenweise speicherung
+        - set word elem anpassen
+3
+    - TB für Trans
+        - Entsprechende Tests
+        - Spalten/Zeilenweise Eingabe
+        - Spalten/Zeilenweise Speicherung
+4
+    - Restliche TBs
+        - MatDel, ScalarMul, ScalarDiv, ScalarMax
+        - Desktruktive Variante (a=c)
+        - Spalten/Zeilenweise Eingabe
+        - Spalten/Zeilenweise Speicherung
+5
+    - Parallel TB
+        - Parallele Verarbeitung von 2 Kommandos
+6
+    - Master TB
+        - Alle einzel-TBs zusammen kopiert
+7
+    - Restliche Operationen
+        - VecAdd
+        - RowSum
+        - ScalarSubIx
+8 [Optional] 
+    - Umwandlung 2 General Op Cores => 4 Specific Op Cores
+
+
+
+- Fragen an Timm
+    - Code durchgehen, Optimierungsmöglichkeiten, ...
+    - Spezifika meines Designs
+        => Was kann meine Implementierung leisten wenn auf einem besseren/schnelleren FPGA ausgeführt
+        - Maximale Taktrate
+        - ...
