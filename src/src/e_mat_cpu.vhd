@@ -13,7 +13,7 @@ ENTITY e_mat_cpu IS
         
         p_finished_o            : OUT STD_LOGIC;
         p_opcode_i              : IN t_opcodes;
-        p_scalar_i              : IN t_mat_elem;
+        p_scalar_i              : IN t_mat_elems;
 
         p_sel_a_i               : IN t_mat_reg_ixs;
         p_sel_b_i               : IN t_mat_reg_ixs;
@@ -51,7 +51,7 @@ COMPONENT e_mat_alu
         p_finished_o            : OUT STD_LOGIC;
         
         p_opcode_i              : IN t_opcodes;
-        p_scalar_i              : IN t_mat_elem;
+        p_scalar_i              : IN t_mat_elems;
         
         p_mat_a_size_i          : IN t_mat_sizes;
         p_mat_a_ix_o            : OUT t_mat_ixs;

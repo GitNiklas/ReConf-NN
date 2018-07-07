@@ -130,12 +130,6 @@ BEGIN
             WHEN TO_UNSIGNED( 9, 4)  => s_a_word_i(i)           <= p_reg_word_i(9); 
                                         s_a_size_i(i)           <= p_reg_mat_size_i(9);
                                         s_reg_row_by_row_i(i)   <= p_reg_row_by_row_i(9);
-            WHEN TO_UNSIGNED(10, 4)  => s_a_word_i(i)           <= p_reg_word_i(10); 
-                                        s_a_size_i(i)           <= p_reg_mat_size_i(10);
-                                        s_reg_row_by_row_i(i)   <= p_reg_row_by_row_i(10);
-            WHEN TO_UNSIGNED(11, 4)  => s_a_word_i(i)           <= p_reg_word_i(11); 
-                                        s_a_size_i(i)           <= p_reg_mat_size_i(11);
-                                        s_reg_row_by_row_i(i)   <= p_reg_row_by_row_i(11);
             WHEN OTHERS             =>  s_a_word_i(i)           <= p_reg_word_i(0);  
                                         s_a_size_i(i)           <= p_reg_mat_size_i(0);
                                         s_reg_row_by_row_i(i)   <= p_reg_row_by_row_i(0);
@@ -177,12 +171,6 @@ BEGIN
             WHEN TO_UNSIGNED( 9, 4)  => p_alu_b_data_o(i)       <= p_reg_word_i(9); 
                                         p_alu_b_size_o(i)       <= p_reg_mat_size_i(9);
                                         p_alu_b_row_by_row_o(i) <= p_reg_row_by_row_i(9);
-            WHEN TO_UNSIGNED(10, 4)  => p_alu_b_data_o(i)       <= p_reg_word_i(10); 
-                                        p_alu_b_size_o(i)       <= p_reg_mat_size_i(10);
-                                        p_alu_b_row_by_row_o(i) <= p_reg_row_by_row_i(10);
-            WHEN TO_UNSIGNED(11, 4)  => p_alu_b_data_o(i)       <= p_reg_word_i(11); 
-                                        p_alu_b_size_o(i)       <= p_reg_mat_size_i(11);
-                                        p_alu_b_row_by_row_o(i) <= p_reg_row_by_row_i(11);
             WHEN OTHERS             =>  p_alu_b_data_o(i)       <= p_reg_word_i(0);  
                                         p_alu_b_size_o(i)       <= p_reg_mat_size_i(0);
                                         p_alu_b_row_by_row_o(i) <= p_reg_row_by_row_i(0);

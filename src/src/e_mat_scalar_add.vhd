@@ -4,7 +4,7 @@ use IEEE.NUMERIC_STD.all;
 USE work.fixed_pkg.ALL;
 USE work.pkg_tools.ALL;
 
-ENTITY e_mat_add IS       
+ENTITY e_mat_scalar_add IS       
     PORT (    
         p_rst_i                 : IN STD_LOGIC;
         p_clk_i                 : IN STD_LOGIC;
@@ -12,23 +12,22 @@ ENTITY e_mat_add IS
         p_syn_rst_i             : IN STD_LOGIC;
         p_finished_o            : OUT STD_LOGIC;
         
+        p_scalar_i              : IN t_mat_elem;
+        
         p_mat_a_size_i          : IN t_mat_size;
         p_mat_a_ix_o            : OUT t_mat_ix;
         p_mat_a_data_i          : IN t_mat_word;
         
-        p_mat_b_ix_o            : OUT t_mat_ix;
-        p_mat_b_data_i          : IN t_mat_word;
-
         p_mat_c_ix_o            : OUT t_mat_ix; 
         p_mat_c_data_o          : OUT t_mat_word;
         p_mat_c_size_o          : OUT t_mat_size
     );
-END ENTITY e_mat_add;
+END ENTITY e_mat_scalar_add;
 
 ----------------------------------------------------------------------------------------------------
 --  Architecture
 ----------------------------------------------------------------------------------------------------
-ARCHITECTURE a_mat_add OF e_mat_add IS
+ARCHITECTURE a_mat_scalar_add OF e_mat_scalar_add IS
 
 ----------------------------------------------------------------------------------------------------
 --  Komponenten
@@ -80,18 +79,17 @@ PORT MAP(
 --  Zuweisungen
 ----------------------------------------------------------------------------------------------------
 p_mat_a_ix_o <= s_mat_ab_ix;
-p_mat_b_ix_o <= s_mat_ab_ix;
 p_mat_c_size_o <= p_mat_a_size_i;
 
 ----------------------------------------------------------------------------------------------------
 --  Prozesse
 ----------------------------------------------------------------------------------------------------
 
-proc_add : PROCESS(p_mat_a_data_i, p_mat_b_data_i)
+proc_calc : PROCESS(p_mat_a_data_i, p_scalar_i)
 BEGIN
     FOR i IN p_mat_a_data_i'RANGE LOOP
-        p_mat_c_data_o(i) <= to_mat_elem(p_mat_a_data_i(i) + p_mat_b_data_i(i));
+        p_mat_c_data_o(i) <= to_mat_elem(p_mat_a_data_i(i) + p_scalar_i);
     END LOOP;
-END PROCESS proc_add;
+END PROCESS proc_calc;
 
-END ARCHITECTURE a_mat_add;
+END ARCHITECTURE a_mat_scalar_add;
