@@ -22,8 +22,8 @@ PACKAGE pkg_tools IS
 ----------------------------------------------------------------------------------------------------
     CONSTANT c_max_mat_dim : INTEGER := 64; 
     CONSTANT c_batch_size : INTEGER := c_max_mat_dim;
-    CONSTANT c_num_mat_regs : INTEGER := 10; 
-    CONSTANT c_num_parallel_op : INTEGER := 2; -- Anzahl parallel ausfuehrbarer Matrix-Operationen
+    CONSTANT c_num_mat_regs : INTEGER := 12; 
+    CONSTANT c_num_parallel_op : INTEGER := 4; -- Anzahl parallel ausfuehrbarer Matrix-Operationen
     
     SUBTYPE t_mat_reg_ix IS UNSIGNED(3 DOWNTO 0); -- Range 0 to 11 used
         
@@ -48,7 +48,7 @@ PACKAGE pkg_tools IS
     TYPE t_mat_word_arr IS ARRAY(c_num_mat_regs-1 DOWNTO 0) OF t_mat_word; -- Typ fuer die Datenleitungen aller register
     TYPE t_mat_logic_arr IS ARRAY(c_num_mat_regs-1 DOWNTO 0) OF STD_LOGIC;
 
-    TYPE t_opcode IS (MatDel, MatMul, MatAdd, MatTrans, ScalarAdd, ScalarMul, ScalarDiv, ScalarMax, NoOp);
+    TYPE t_opcode IS (MatDel, MatMul, MatAdd, VecAdd, MatTrans, ScalarMul, ScalarDiv, ScalarMax, NoOp);
     
     -- Typen fuer alle Parallel ausgefuehrten Operationen
     TYPE t_opcodes IS ARRAY(c_num_parallel_op-1 DOWNTO 0) OF t_opcode;
