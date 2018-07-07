@@ -11,7 +11,7 @@ tmp6 = scalarmul(db2)               | r11 = tmp6
 xtrain_t = trans(xtrain)            | r2 = dhidden'
 dhidden' = max(dhidden)             | r7 = dw2
 dw2 = mul(hlrelu_t, scores)         | r8 = tmp3
-tmp3 = scalarmul(w2)                |
+tmp3 = scalarmul(w2)                |                                   => ES Fehlt: scores muss noch umgedrht werden
                                     |
 4                                   | r1 r9 r10 free
 dw1 = mul(xtrain_t, dhidden')       | r1 = dw1
