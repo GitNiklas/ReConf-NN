@@ -26,7 +26,7 @@ COMPONENT e_mat_cpu
         
         p_finished_o            : OUT STD_LOGIC;
         p_opcode_i              : IN t_opcodes;
-        p_scalar_i              : IN t_mat_elems;
+        p_scalar_i              : IN t_mat_elem;
 
         p_sel_a_i               : IN t_mat_reg_ixs;
         p_sel_b_i               : IN t_mat_reg_ixs;
@@ -52,7 +52,7 @@ SIGNAL s_clk, s_rst, s_syn_rst, s_wren : STD_LOGIC;
 SIGNAL s_finished : STD_LOGIC;
 SIGNAL s_c_row_by_row : t_op_std_logics;
 SIGNAL s_opcode : t_opcodes;
-SIGNAL s_scalar : t_mat_elems;
+SIGNAL s_scalar : t_mat_elem;
 
 SIGNAL s_sel_a, s_sel_b, s_sel_c : t_mat_reg_ixs;
 
@@ -124,9 +124,9 @@ BEGIN
         s_sel_b(i) <= to_mat_reg_ix(0);
         s_sel_c(i) <= to_mat_reg_ix(0);
         s_c_row_by_row(i) <= '1';
-        s_scalar(i) <= to_mat_elem(0.0);
     END LOOP;
-    s_sel_c(1) <= to_mat_reg_ix(9);     -- 2. Operation soll nicht beim Schreiben stören    
+    s_scalar <= to_mat_elem(0.0);
+    s_sel_c(1) <= to_mat_reg_ix(9);     -- 2. Operation soll nicht beim Schreiben stoeren
     
     s_write_a0 <= '0';
     s_read_a0 <= '0';
@@ -355,9 +355,9 @@ BEGIN
 ----------------------------------------------------------------------------------------------------
 --  Test 3
 ----------------------------------------------------------------------------------------------------
-    REPORT infomsg(" ----- Test 3: A(36x1) * B(1x1) (C Spaltenweise)");
+    REPORT infomsg(" ----- Test 3: A(36x1) * B(1x2) (C Spaltenweise)");
 
-     REPORT infomsg("Loesche Register 0");
+    REPORT infomsg("Loesche Register 0");
     s_sel_a(0) <= to_mat_reg_ix(0); 
     delete_mat(s_write_a0, s_data_a0_i, s_ix_a0);
     REPORT infomsg("Initialisiere Register 0");
@@ -480,13 +480,18 @@ BEGIN
     s_sel_a(0) <= to_mat_reg_ix(1); 
     delete_mat(s_write_a0, s_data_a0_i, s_ix_a0);
     REPORT infomsg("Initialisiere Register 1 (Spaltenweise)");
-    -- [2]
+    -- [2, 1]
     s_write_a0 <= '1';
-    s_size_a0_i <= to_mat_size(1, 1);
+    s_size_a0_i <= to_mat_size(1, 2);
     s_row_by_row_a0_i <= '0';
 
-    s_ix_a0 <= to_mat_ix(0, 0); -- Es koennen die Spalten 0-31 gleichzeitig 
+    s_ix_a0 <= to_mat_ix(0, 0);
     s_data_a0_i <= to_mat_word((2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                               0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+    WAIT FOR c_clk_per;
+    
+    s_ix_a0 <= to_mat_ix(0, 1);
+    s_data_a0_i <= to_mat_word((1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
     WAIT FOR c_clk_per;
     
@@ -519,8 +524,9 @@ BEGIN
     delete_mat(s_write_a0, s_data_a0_i, s_ix_a0);
     REPORT infomsg("Initialisiere Register 3 mit erwartetem Ergebnis");
     -- [0.5], [0.25], [0.0], [2.0], [0.25], [1.0], [2.0], [4.0], [0.125], [1.0], [0.25], [2.0], [1.25], [1.75], [4.0], [1.0], [1.125], [0.625], [0.5], [0.25], [0.0], [2.0], [0.25], [1.0], [2.0], [4.0], [0.125], [1.0], [0.25], [2.0], [1.25], [1.75], [4.0], [1.0], [1.125], [0.625]
+    -- [0.25], [0.125], [0.0], [1.0], [0.125], [0.5], [1.0], [2.0], [0.0625], [0.5], [0.125], [1.0], [0.625], [0.875], [2.0], [0.5], [0.5625], [0.3125], [0.25], [0.125], [0.0], [1.0], [0.125], [0.5], [1.0], [2.0], [0.0625], [0.5], [0.125], [1.0], [0.625], [0.875], [2.0], [0.5], [0.5625], [0.3125]
     s_write_a0 <= '1';
-    s_size_a0_i <= to_mat_size(36, 1);
+    s_size_a0_i <= to_mat_size(36, 2);
     s_row_by_row_a0_i <= '0';
     WAIT FOR c_clk_per;
     
@@ -534,7 +540,19 @@ BEGIN
                                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
     WAIT FOR c_clk_per;
     
+    s_ix_a0 <= to_mat_ix(0, 1);
+    s_data_a0_i <= to_mat_word(( 0.25, 0.125, 0.0, 1.0, 0.125, 0.5, 1.0, 2.0, 0.0625, 0.5, 0.125, 1.0, 0.625, 0.875, 2.0, 0.5, 
+                                0.5625, 0.3125, 0.25, 0.125, 0.0, 1.0, 0.125, 0.5, 1.0, 2.0, 0.0625, 0.5, 0.125, 1.0, 0.625, 0.875));
+    WAIT FOR c_clk_per;
+    
+    s_ix_a0 <= to_mat_ix(32, 1);
+    s_data_a0_i <= to_mat_word((2.0, 0.5, 0.5625, 0.3125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                               0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+    WAIT FOR c_clk_per;
     s_write_a0 <= '0';
+    
+    print_mat_reg(2, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    print_mat_reg(3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
     assert_mat_reg_eq(2, 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
     
     REPORT infomsg("Testende");

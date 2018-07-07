@@ -55,7 +55,7 @@ COMPONENT e_set_word_elem
 END COMPONENT;
 
 COMPONENT e_mat_ix_gen
-    GENERIC (inc_by_wordlen : BOOLEAN := TRUE);  
+    GENERIC (inc_by_wordlen : BOOLEAN := TRUE);
     PORT (    
         p_rst_i                 : IN STD_LOGIC;
         p_clk_i                 : IN STD_LOGIC;
@@ -65,6 +65,7 @@ COMPONENT e_mat_ix_gen
         p_word_done_i           : IN STD_LOGIC;
         
         p_size_i                : IN t_mat_size;
+        p_row_by_row_i          : IN STD_LOGIC;
         p_mat_ix_t0_o           : OUT t_mat_ix;
         p_mat_ix_t2_o           : OUT t_mat_ix;
         p_first_elem_t1_o       : OUT STD_LOGIC
@@ -144,6 +145,7 @@ PORT MAP(
     p_word_done_i       => s_last_col_a_row_b_t1,
 
     p_size_i            => s_c_size,
+    p_row_by_row_i      => p_mat_c_row_by_row_i,
     p_mat_ix_t0_o       => s_ix_c_t0,
     p_mat_ix_t2_o       => s_ix_c_t2,
     p_first_elem_t1_o   => s_first_elem_t1

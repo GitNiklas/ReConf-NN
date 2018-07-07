@@ -17,7 +17,7 @@ ENTITY e_mat_alu IS
         p_finished_o            : OUT STD_LOGIC;
         
         p_opcode_i              : IN t_opcodes;
-        p_scalar_i              : IN t_mat_elems;
+        p_scalar_i              : IN t_mat_elem;
         
         p_mat_a_size_i          : IN t_mat_sizes;
         p_mat_a_ix_o            : OUT t_mat_ixs;
@@ -87,6 +87,7 @@ COMPONENT e_mat_add
 
         p_mat_c_ix_o            : OUT t_mat_ix; 
         p_mat_c_data_o          : OUT t_mat_word;
+        p_mat_c_row_by_row_i    : IN STD_LOGIC;
         p_mat_c_size_o          : OUT t_mat_size
     );
 END COMPONENT;
@@ -101,6 +102,7 @@ COMPONENT e_mat_del
         
         p_mat_c_ix_o            : OUT t_mat_ix; 
         p_mat_c_data_o          : OUT t_mat_word;
+        p_mat_c_row_by_row_i    : IN STD_LOGIC;
         p_mat_c_size_o          : OUT t_mat_size
     );
 END COMPONENT;
@@ -125,26 +127,6 @@ COMPONENT e_mat_trans
     );
 END COMPONENT;
 
-COMPONENT e_mat_scalar_add       
-    PORT (    
-        p_rst_i                 : IN STD_LOGIC;
-        p_clk_i                 : IN STD_LOGIC;
-        
-        p_syn_rst_i             : IN STD_LOGIC;
-        p_finished_o            : OUT STD_LOGIC;
-        
-        p_scalar_i              : IN t_mat_elem;
-        
-        p_mat_a_size_i          : IN t_mat_size;
-        p_mat_a_ix_o            : OUT t_mat_ix;
-        p_mat_a_data_i          : IN t_mat_word;
-        
-        p_mat_c_ix_o            : OUT t_mat_ix; 
-        p_mat_c_data_o          : OUT t_mat_word;
-        p_mat_c_size_o          : OUT t_mat_size
-    );
-END COMPONENT;
-
 COMPONENT e_mat_scalar_mul    
     PORT (    
         p_rst_i                 : IN STD_LOGIC;
@@ -161,6 +143,7 @@ COMPONENT e_mat_scalar_mul
         
         p_mat_c_ix_o            : OUT t_mat_ix; 
         p_mat_c_data_o          : OUT t_mat_word;
+        p_mat_c_row_by_row_i    : IN STD_LOGIC;
         p_mat_c_size_o          : OUT t_mat_size
     );
 END COMPONENT;
@@ -180,6 +163,7 @@ COMPONENT e_mat_scalar_div
         
         p_mat_c_ix_o            : OUT t_mat_ix; 
         p_mat_c_data_o          : OUT t_mat_word;
+        p_mat_c_row_by_row_i    : IN STD_LOGIC;
         p_mat_c_size_o          : OUT t_mat_size
     );
 END COMPONENT;
@@ -199,6 +183,7 @@ COMPONENT e_mat_scalar_max
         
         p_mat_c_ix_o            : OUT t_mat_ix; 
         p_mat_c_data_o          : OUT t_mat_word;
+        p_mat_c_row_by_row_i    : IN STD_LOGIC;
         p_mat_c_size_o          : OUT t_mat_size
     );
 END COMPONENT;
@@ -208,20 +193,19 @@ END COMPONENT;
 ----------------------------------------------------------------------------------------------------
 SIGNAL s_finished_t1, s_finished_t2, s_finished_t3 : t_op_std_logics;
 
-SIGNAL s_mul_a_ix, s_add_a_ix, s_trans_a_ix, s_scalar_add_a_ix, s_scalar_mul_a_ix, s_scalar_div_a_ix, s_scalar_max_a_ix : t_mat_ix; 
+SIGNAL s_mul_a_ix, s_add_a_ix, s_trans_a_ix, s_scalar_mul_a_ix, s_scalar_div_a_ix, s_scalar_max_a_ix : t_mat_ix; 
 SIGNAL s_mul_b_ix, s_add_b_ix : t_mat_ix;  
-SIGNAL s_mul_c_ix, s_add_c_ix, s_del_c_ix, s_trans_c_ix, s_scalar_add_c_ix, s_scalar_mul_c_ix, s_scalar_div_c_ix, s_scalar_max_c_ix : t_mat_ix;
-SIGNAL s_mul_c_data, s_add_c_data, s_del_c_data, s_trans_c_data, s_scalar_add_c_data, s_scalar_mul_c_data, s_scalar_div_c_data, s_scalar_max_c_data : t_mat_word;
-SIGNAL s_mul_finished, s_add_finished, s_del_finished, s_trans_finished, s_scalar_add_finished, s_scalar_mul_finished, s_scalar_div_finished, s_scalar_max_finished : STD_LOGIC;
-SIGNAL s_mul_c_size, s_add_c_size, s_del_c_size, s_trans_c_size, s_scalar_add_c_size, s_scalar_mul_c_size, s_scalar_div_c_size, s_scalar_max_c_size : t_mat_size;
+SIGNAL s_mul_c_ix, s_add_c_ix, s_del_c_ix, s_trans_c_ix, s_scalar_mul_c_ix, s_scalar_div_c_ix, s_scalar_max_c_ix : t_mat_ix;
+SIGNAL s_mul_c_data, s_add_c_data, s_del_c_data, s_trans_c_data, s_scalar_mul_c_data, s_scalar_div_c_data, s_scalar_max_c_data : t_mat_word;
+SIGNAL s_mul_finished, s_add_finished, s_del_finished, s_trans_finished, s_scalar_mul_finished, s_scalar_div_finished, s_scalar_max_finished : STD_LOGIC;
+SIGNAL s_mul_c_size, s_add_c_size, s_del_c_size, s_trans_c_size, s_scalar_mul_c_size, s_scalar_div_c_size, s_scalar_max_c_size : t_mat_size;
 
-SIGNAL s_mul_mat_a_size, s_add_mat_a_size, s_trans_mat_a_size, s_scalar_add_mat_a_size, s_scalar_mul_mat_a_size, s_scalar_div_mat_a_size, s_scalar_max_mat_a_size : t_mat_size;
+SIGNAL s_mul_mat_a_size, s_add_mat_a_size, s_trans_mat_a_size, s_scalar_mul_mat_a_size, s_scalar_div_mat_a_size, s_scalar_max_mat_a_size : t_mat_size;
 SIGNAL s_trans_mat_a_row_by_row : STD_LOGIC;
-SIGNAL s_mul_mat_a_data, s_add_mat_a_data, s_trans_mat_a_data, s_scalar_add_mat_a_data, s_scalar_mul_mat_a_data, s_scalar_div_mat_a_data, s_scalar_max_mat_a_data : t_mat_word;
+SIGNAL s_mul_mat_a_data, s_add_mat_a_data, s_trans_mat_a_data, s_scalar_mul_mat_a_data, s_scalar_div_mat_a_data, s_scalar_max_mat_a_data : t_mat_word;
 SIGNAL s_mul_mat_b_size : t_mat_size;
 SIGNAL s_mul_mat_b_data, s_add_mat_b_data : t_mat_word;
-SIGNAL s_mul_mat_c_row_by_row, s_trans_mat_c_row_by_row : STD_LOGIC;
-SIGNAL s_add_scalar, s_mul_scalar : t_mat_elem;
+SIGNAL s_mul_mat_c_row_by_row, s_add_mat_c_row_by_row, s_del_mat_c_row_by_row, s_trans_mat_c_row_by_row, s_scalar_mul_mat_c_row_by_row, s_scalar_div_mat_c_row_by_row, s_scalar_max_mat_c_row_by_row : STD_LOGIC;
 
 ----------------------------------------------------------------------------------------------------
 --  Port Maps
@@ -267,6 +251,7 @@ PORT MAP(
 
     p_mat_c_ix_o            => s_add_c_ix,
     p_mat_c_data_o          => s_add_c_data,
+    p_mat_c_row_by_row_i    => s_add_mat_c_row_by_row,
     p_mat_c_size_o          => s_add_c_size
 );
 
@@ -280,6 +265,7 @@ PORT MAP(
     
     p_mat_c_ix_o            => s_del_c_ix,
     p_mat_c_data_o          => s_del_c_data,
+    p_mat_c_row_by_row_i    => s_del_mat_c_row_by_row,
     p_mat_c_size_o          => s_del_c_size
 );
 
@@ -302,25 +288,6 @@ PORT MAP(
     p_mat_c_size_o          => s_trans_c_size
 );
 
-mat_scalar_add : e_mat_scalar_add
-PORT MAP(
-    p_rst_i                 => p_rst_i,
-    p_clk_i                 => p_clk_i,
-        
-    p_syn_rst_i             => p_syn_rst_i,
-    p_finished_o            => s_scalar_add_finished,
-    
-    p_scalar_i              => s_add_scalar,
-    
-    p_mat_a_size_i          => s_scalar_add_mat_a_size,
-    p_mat_a_ix_o            => s_scalar_add_a_ix,
-    p_mat_a_data_i          => s_scalar_add_mat_a_data,
-    
-    p_mat_c_ix_o            => s_scalar_add_c_ix,
-    p_mat_c_data_o          => s_scalar_add_c_data,
-    p_mat_c_size_o          => s_scalar_add_c_size
-);
-
 mat_scalar_mul : e_mat_scalar_mul
 PORT MAP(
     p_rst_i                 => p_rst_i,
@@ -329,7 +296,7 @@ PORT MAP(
     p_syn_rst_i             => p_syn_rst_i,
     p_finished_o            => s_scalar_mul_finished,
     
-    p_scalar_i              => s_mul_scalar,
+    p_scalar_i              => p_scalar_i,
     
     p_mat_a_size_i          => s_scalar_mul_mat_a_size,
     p_mat_a_ix_o            => s_scalar_mul_a_ix,
@@ -337,6 +304,7 @@ PORT MAP(
     
     p_mat_c_ix_o            => s_scalar_mul_c_ix,
     p_mat_c_data_o          => s_scalar_mul_c_data,
+    p_mat_c_row_by_row_i    => s_scalar_mul_mat_c_row_by_row,
     p_mat_c_size_o          => s_scalar_mul_c_size
 );
 
@@ -354,6 +322,7 @@ PORT MAP(
     
     p_mat_c_ix_o            => s_scalar_div_c_ix,
     p_mat_c_data_o          => s_scalar_div_c_data,
+    p_mat_c_row_by_row_i    => s_scalar_div_mat_c_row_by_row,
     p_mat_c_size_o          => s_scalar_div_c_size
 );
 
@@ -371,6 +340,7 @@ PORT MAP(
     
     p_mat_c_ix_o            => s_scalar_max_c_ix,
     p_mat_c_data_o          => s_scalar_max_c_data,
+    p_mat_c_row_by_row_i    => s_scalar_max_mat_c_row_by_row,
     p_mat_c_size_o          => s_scalar_max_c_size
 );
 
@@ -407,7 +377,6 @@ BEGIN
     s_mul_mat_a_size <= p_mat_a_size_i(0);
     s_add_mat_a_size <= p_mat_a_size_i(0);
     s_trans_mat_a_size <= p_mat_a_size_i(0);
-    s_scalar_add_mat_a_size <= p_mat_a_size_i(0);
     s_scalar_mul_mat_a_size <= p_mat_a_size_i(0);
     s_scalar_div_mat_a_size <= p_mat_a_size_i(0);
     s_scalar_max_mat_a_size <= p_mat_a_size_i(0);
@@ -417,7 +386,6 @@ BEGIN
     s_mul_mat_a_data <= p_mat_a_data_i(0);
     s_add_mat_a_data <= p_mat_a_data_i(0);
     s_trans_mat_a_data <= p_mat_a_data_i(0);
-    s_scalar_add_mat_a_data <= p_mat_a_data_i(0);
     s_scalar_mul_mat_a_data <= p_mat_a_data_i(0);
     s_scalar_div_mat_a_data <= p_mat_a_data_i(0);
     s_scalar_max_mat_a_data <= p_mat_a_data_i(0);
@@ -428,41 +396,44 @@ BEGIN
     s_add_mat_b_data <= p_mat_a_data_i(0);
     
     s_mul_mat_c_row_by_row <= p_mat_c_row_by_row_i(0);
+    s_add_mat_c_row_by_row <= p_mat_c_row_by_row_i(0);
+    s_del_mat_c_row_by_row <= p_mat_c_row_by_row_i(0);
     s_trans_mat_c_row_by_row <= p_mat_c_row_by_row_i(0);
+    s_scalar_mul_mat_c_row_by_row <= p_mat_c_row_by_row_i(0);
+    s_scalar_div_mat_c_row_by_row <= p_mat_c_row_by_row_i(0);
+    s_scalar_max_mat_c_row_by_row <= p_mat_c_row_by_row_i(0);
+
     
-    s_add_scalar <= p_scalar_i(0);
-    s_mul_scalar <= p_scalar_i(0);
     
     FOR i IN c_num_parallel_op-1 DOWNTO 0 LOOP
         CASE p_opcode_i(i) IS
-            WHEN MatMul     =>  s_mul_mat_a_size            <= p_mat_a_size_i(i);
-                                s_mul_mat_a_data            <= p_mat_a_data_i(i);
-                                s_mul_mat_b_size            <= p_mat_b_size_i(i);
-                                s_mul_mat_b_data            <= p_mat_b_data_i(i);
-                                s_mul_mat_c_row_by_row      <= p_mat_c_row_by_row_i(i);
+            WHEN MatMul     =>  s_mul_mat_a_size                <= p_mat_a_size_i(i);
+                                s_mul_mat_a_data                <= p_mat_a_data_i(i);
+                                s_mul_mat_b_size                <= p_mat_b_size_i(i);
+                                s_mul_mat_b_data                <= p_mat_b_data_i(i);
+                                s_mul_mat_c_row_by_row          <= p_mat_c_row_by_row_i(i);
                                 
-            WHEN MatAdd     =>  s_add_mat_a_size            <= p_mat_a_size_i(i);
-                                s_add_mat_a_data            <= p_mat_a_data_i(i);
-                                s_add_mat_b_data            <= p_mat_b_data_i(i);
+            WHEN MatAdd     =>  s_add_mat_a_size                <= p_mat_a_size_i(i);
+                                s_add_mat_a_data                <= p_mat_a_data_i(i);
+                                s_add_mat_b_data                <= p_mat_b_data_i(i);
+                                s_add_mat_c_row_by_row          <= p_mat_c_row_by_row_i(i);
                                    
-            WHEN MatTrans   =>  s_trans_mat_a_size          <= p_mat_a_size_i(i);
-                                s_trans_mat_a_row_by_row    <= p_mat_a_row_by_row_i(i);
-                                s_trans_mat_a_data         <= p_mat_a_data_i(i);
-                                s_trans_mat_c_row_by_row    <= p_mat_c_row_by_row_i(i);
+            WHEN MatTrans   =>  s_trans_mat_a_size              <= p_mat_a_size_i(i);
+                                s_trans_mat_a_row_by_row        <= p_mat_a_row_by_row_i(i);
+                                s_trans_mat_a_data              <= p_mat_a_data_i(i);
+                                s_trans_mat_c_row_by_row        <= p_mat_c_row_by_row_i(i);
                                 
-            WHEN ScalarAdd  =>  s_scalar_add_mat_a_size     <= p_mat_a_size_i(i);
-                                s_scalar_add_mat_a_data     <= p_mat_a_data_i(i);
-                                s_add_scalar                <= p_scalar_i(i);
-                                
-            WHEN ScalarMul  =>  s_scalar_mul_mat_a_size     <= p_mat_a_size_i(i);
-                                s_scalar_mul_mat_a_data     <= p_mat_a_data_i(i);
-                                s_mul_scalar                <= p_scalar_i(i);
+            WHEN ScalarMul  =>  s_scalar_mul_mat_a_size         <= p_mat_a_size_i(i);
+                                s_scalar_mul_mat_a_data         <= p_mat_a_data_i(i);
+                                s_scalar_mul_mat_c_row_by_row   <= p_mat_c_row_by_row_i(i);
      
-            WHEN ScalarDiv  =>  s_scalar_div_mat_a_size     <= p_mat_a_size_i(i);
-                                s_scalar_div_mat_a_data     <= p_mat_a_data_i(i);
+            WHEN ScalarDiv  =>  s_scalar_div_mat_a_size         <= p_mat_a_size_i(i);
+                                s_scalar_div_mat_a_data         <= p_mat_a_data_i(i);
+                                s_scalar_div_mat_c_row_by_row   <= p_mat_c_row_by_row_i(i);
                                 
-            WHEN ScalarMax  =>  s_scalar_max_mat_a_size     <= p_mat_a_size_i(i);
-                                s_scalar_max_mat_a_data     <= p_mat_a_data_i(i);    
+            WHEN ScalarMax  =>  s_scalar_max_mat_a_size         <= p_mat_a_size_i(i);
+                                s_scalar_max_mat_a_data         <= p_mat_a_data_i(i);
+                                s_scalar_max_mat_c_row_by_row   <= p_mat_c_row_by_row_i(i);
                                 
             WHEN OTHERS     =>  NULL;  
         END CASE;
@@ -474,7 +445,6 @@ proc_mux_output : PROCESS(
     s_add_finished, s_add_a_ix, s_add_b_ix, s_add_c_ix, s_add_c_data, s_add_c_size,
     s_del_finished, s_del_c_ix, s_del_c_data, s_del_c_size,
     s_trans_finished, s_trans_a_ix, s_trans_c_ix, s_trans_c_data, s_trans_c_size,
-    s_scalar_add_finished, s_scalar_add_a_ix, s_scalar_add_c_ix, s_scalar_add_c_data, s_scalar_add_c_size,
     s_scalar_mul_finished, s_scalar_mul_a_ix, s_scalar_mul_c_ix, s_scalar_mul_c_data, s_scalar_mul_c_size,
     s_scalar_div_finished, s_scalar_div_a_ix, s_scalar_div_c_ix, s_scalar_div_c_data, s_scalar_div_c_size,
     s_scalar_max_finished, s_scalar_max_a_ix, s_scalar_max_c_ix, s_scalar_max_c_data, s_scalar_max_c_size,
@@ -510,13 +480,6 @@ BEGIN
                                 p_mat_c_ix_o(i)     <= s_trans_c_ix;
                                 p_mat_c_data_o(i)   <= s_trans_c_data;
                                 p_mat_c_size_o(i)   <= s_trans_c_size;
-                                
-            WHEN ScalarAdd  =>  s_finished_t1(i)    <= s_scalar_add_finished;
-                                p_mat_a_ix_o(i)     <= s_scalar_add_a_ix;
-                                p_mat_b_ix_o(i)     <= c_mat_ix_zero;
-                                p_mat_c_ix_o(i)     <= s_scalar_add_c_ix;
-                                p_mat_c_data_o(i)   <= s_scalar_add_c_data;
-                                p_mat_c_size_o(i)   <= s_scalar_add_c_size;
                                
             WHEN ScalarMul  =>  s_finished_t1(i)    <= s_scalar_mul_finished;
                                 p_mat_a_ix_o(i)     <= s_scalar_mul_a_ix;

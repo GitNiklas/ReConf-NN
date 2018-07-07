@@ -15,6 +15,7 @@ ENTITY e_mat_ix_gen IS
         p_word_done_i           : IN STD_LOGIC;
         
         p_size_i                : IN t_mat_size;
+        p_row_by_row_i          : IN STD_LOGIC;
         p_mat_ix_t0_o           : OUT t_mat_ix;
         p_mat_ix_t2_o           : OUT t_mat_ix;
         p_first_elem_t1_o       : OUT STD_LOGIC
@@ -74,23 +75,35 @@ BEGIN
     END IF;
 END PROCESS proc_registers;
 
-proc_calc_ix : PROCESS(p_word_done_i, s_first_elem, s_last_col_t1, s_last_row_t1, s_ix_t1, c_inc_ix)
+proc_calc_ix : PROCESS(p_word_done_i, s_first_elem, s_last_col_t1, s_last_row_t1, s_ix_t1, c_inc_ix, p_row_by_row_i)
 BEGIN
-        IF s_first_elem = '1' THEN
+        IF s_first_elem = '1' THEN -- wait for 1. elem to be processed
             s_ix_t0             <= c_mat_ix_zero;
         ELSE
-            IF p_word_done_i = '0' THEN
+            IF p_word_done_i = '0' THEN -- wait for current word to be finished
                 s_ix_t0             <= s_ix_t1; 
             ELSE
-                IF s_last_col_t1 = '0' THEN
-                    s_ix_t0.col         <= s_ix_t1.col + c_inc_ix; 
-                    s_ix_t0.row         <= s_ix_t1.row; 
-                ELSIF s_last_row_t1 = '0' THEN
-                    s_ix_t0.col         <= to_mat_ix_el(0); 
-                    s_ix_t0.row         <= s_ix_t1.row + 1; 
-                ELSE
-                    s_ix_t0             <= s_ix_t1; 
-                END IF; 
+                IF p_row_by_row_i = '1' THEN
+                    IF s_last_col_t1 = '0' THEN
+                        s_ix_t0.col         <= s_ix_t1.col + c_inc_ix; 
+                        s_ix_t0.row         <= s_ix_t1.row; 
+                    ELSIF s_last_row_t1 = '0' THEN
+                        s_ix_t0.col         <= to_mat_ix_el(0); 
+                        s_ix_t0.row         <= s_ix_t1.row + 1; 
+                    ELSE
+                        s_ix_t0             <= s_ix_t1; 
+                    END IF; 
+                ELSE --swap row/col indizes
+                    IF s_last_row_t1 = '0' THEN
+                        s_ix_t0.col         <= s_ix_t1.col; 
+                        s_ix_t0.row         <= s_ix_t1.row + c_inc_ix; 
+                    ELSIF s_last_col_t1 = '0' THEN
+                        s_ix_t0.col         <= s_ix_t1.col + 1;
+                        s_ix_t0.row         <= to_mat_ix_el(0); 
+                    ELSE
+                        s_ix_t0             <= s_ix_t1; 
+                    END IF; 
+                END IF;
             END IF;
         END IF;
 END PROCESS proc_calc_ix;

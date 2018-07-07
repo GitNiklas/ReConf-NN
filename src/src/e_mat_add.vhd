@@ -21,6 +21,7 @@ ENTITY e_mat_add IS
 
         p_mat_c_ix_o            : OUT t_mat_ix; 
         p_mat_c_data_o          : OUT t_mat_word;
+        p_mat_c_row_by_row_i    : IN STD_LOGIC;
         p_mat_c_size_o          : OUT t_mat_size
     );
 END ENTITY e_mat_add;
@@ -45,6 +46,7 @@ COMPONENT e_mat_ix_gen
         p_word_done_i           : IN STD_LOGIC;
         
         p_size_i                : IN t_mat_size;
+        p_row_by_row_i          : IN STD_LOGIC;
         p_mat_ix_t0_o           : OUT t_mat_ix;
         p_mat_ix_t2_o           : OUT t_mat_ix;
         p_first_elem_t1_o       : OUT STD_LOGIC
@@ -71,6 +73,7 @@ PORT MAP(
     p_word_done_i       => '1',
 
     p_size_i            => p_mat_a_size_i,
+    p_row_by_row_i      => p_mat_c_row_by_row_i,
     p_mat_ix_t0_o       => s_mat_ab_ix,
     p_mat_ix_t2_o       => p_mat_c_ix_o,
     p_first_elem_t1_o   => OPEN

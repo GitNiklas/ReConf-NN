@@ -26,7 +26,7 @@ COMPONENT e_mat_cpu
         
         p_finished_o            : OUT STD_LOGIC;
         p_opcode_i              : IN t_opcodes;
-        p_scalar_i              : IN t_mat_elems;
+        p_scalar_i              : IN t_mat_elem;
 
         p_sel_a_i               : IN t_mat_reg_ixs;
         p_sel_b_i               : IN t_mat_reg_ixs;
@@ -52,7 +52,7 @@ SIGNAL s_clk, s_rst, s_syn_rst, s_wren : STD_LOGIC;
 SIGNAL s_finished : STD_LOGIC;
 SIGNAL s_c_row_by_row : t_op_std_logics;
 SIGNAL s_opcode : t_opcodes;
-SIGNAL s_scalar : t_mat_elems;
+SIGNAL s_scalar : t_mat_elem;
 
 SIGNAL s_sel_a, s_sel_b, s_sel_c : t_mat_reg_ixs;
 
@@ -76,7 +76,7 @@ PORT MAP(
     
     p_finished_o            => s_finished, 
     p_opcode_i              => s_opcode,
-    p_scalar_i              => s_scalar,
+    p_scalar_i              => s_scalar,  
 
     p_sel_a_i               => s_sel_a,
     p_sel_b_i               => s_sel_b,
@@ -124,9 +124,9 @@ BEGIN
         s_sel_b(i) <= to_mat_reg_ix(0);
         s_sel_c(i) <= to_mat_reg_ix(0);
         s_c_row_by_row(i) <= '1';
-        s_scalar(i) <= to_mat_elem(0.0);
     END LOOP;
-    s_sel_c(1) <= to_mat_reg_ix(9);     -- 2. Operation soll nicht beim Schreiben stören    
+    s_scalar <= to_mat_elem(0.0);
+    s_sel_c(1) <= to_mat_reg_ix(9);     -- 2. Operation soll nicht beim Schreiben stoeren
     
     s_write_a0 <= '0';
     s_read_a0 <= '0';

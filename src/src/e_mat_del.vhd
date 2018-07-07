@@ -14,6 +14,7 @@ ENTITY e_mat_del IS
         
         p_mat_c_ix_o            : OUT t_mat_ix; 
         p_mat_c_data_o          : OUT t_mat_word;
+        p_mat_c_row_by_row_i    : IN STD_LOGIC;
         p_mat_c_size_o          : OUT t_mat_size
     );
 END ENTITY e_mat_del;
@@ -38,6 +39,7 @@ COMPONENT e_mat_ix_gen
         p_word_done_i           : IN STD_LOGIC;
         
         p_size_i                : IN t_mat_size;
+        p_row_by_row_i          : IN STD_LOGIC;
         p_mat_ix_t0_o           : OUT t_mat_ix;
         p_mat_ix_t2_o           : OUT t_mat_ix;
         p_first_elem_t1_o       : OUT STD_LOGIC
@@ -59,6 +61,7 @@ PORT MAP(
     p_word_done_i       => '1',
         
     p_size_i            => to_mat_size(64, 64),
+    p_row_by_row_i      => p_mat_c_row_by_row_i,
     p_mat_ix_t0_o       => p_mat_c_ix_o, 
     p_mat_ix_t2_o       => OPEN,
     p_first_elem_t1_o   => OPEN
@@ -68,6 +71,6 @@ PORT MAP(
 --  Zuweisungen
 ----------------------------------------------------------------------------------------------------
 p_mat_c_size_o <= c_mat_size_zero;
-p_mat_c_data_o <= (OTHERS => to_mat_elem(0.0));
+p_mat_c_data_o <= c_mat_word_zero;
 
 END ARCHITECTURE a_mat_del;
