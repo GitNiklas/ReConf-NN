@@ -8,6 +8,17 @@ PACKAGE pkg_test IS
     FUNCTION infomsg(x: STRING) RETURN STRING;
     FUNCTION err(x: STRING) RETURN STRING;
     
+    PROCEDURE delete_reg(
+        CONSTANT reg: INTEGER;
+        CONSTANT opcore: INTEGER; 
+        
+        SIGNAL s_sel_c: OUT t_mat_reg_ixs;
+        SIGNAL s_opcode: OUT t_opcodes;
+        SIGNAL s_wren: OUT STD_LOGIC;
+        SIGNAL s_syn_rst: OUT STD_LOGIC; 
+        SIGNAL s_finished: IN STD_LOGIC
+    );
+    
     PROCEDURE print_mat_reg(
         CONSTANT reg            : IN INTEGER;
         
@@ -43,7 +54,8 @@ PACKAGE pkg_test IS
         SIGNAL s_c_row_by_row   : IN STD_LOGIC
     );
     
-    PROCEDURE delete_mat(
+    PROCEDURE set_mat(
+        CONSTANT c_val  : IN t_mat_elem;
         SIGNAL s_wren   : OUT STD_LOGIC;
         SIGNAL s_data_i : OUT t_mat_word;
         SIGNAL s_ix_w   : OUT t_mat_ix
@@ -66,6 +78,32 @@ PACKAGE BODY pkg_test IS
         RETURN c_err_prefix & x;
     END;
     
+    PROCEDURE delete_reg(
+        CONSTANT reg: INTEGER;
+        CONSTANT opcore: INTEGER; 
+        
+        SIGNAL s_sel_c: OUT t_mat_reg_ixs;
+        SIGNAL s_opcode: OUT t_opcodes;
+        SIGNAL s_wren: OUT STD_LOGIC;
+        SIGNAL s_syn_rst: OUT STD_LOGIC; 
+        SIGNAL s_finished: IN STD_LOGIC
+    ) IS
+    BEGIN
+        REPORT infomsg("Loesche Register " & INTEGER'IMAGE(reg));
+        s_sel_c(opcore) <= to_mat_reg_ix(reg); 
+        s_opcode(opcore) <= MatDel;
+    
+        s_wren  <= '1';
+        s_syn_rst <= '1';
+        WAIT FOR c_clk_per;
+        s_syn_rst <= '0';
+        
+        WAIT UNTIL s_finished = '1';
+        WAIT FOR c_clk_per / 2;
+        s_wren  <= '0';
+        s_opcode(opcore) <= NoOp;
+    END delete_reg;
+    
     PROCEDURE print_mat_reg(
         CONSTANT reg            : IN INTEGER;
         
@@ -83,7 +121,7 @@ PACKAGE BODY pkg_test IS
     BEGIN
         read_a <= '1';         
         sel_a <= to_mat_reg_ix(reg);
-        WAIT FOR 10*c_clk_per;        
+        WAIT FOR c_clk_per;        
         
         row_by_row := row_by_row_a;
         size := size_a;
@@ -130,12 +168,12 @@ PACKAGE BODY pkg_test IS
         read_a <= '1';  
         
         sel_a <= to_mat_reg_ix(reg_x);
-        WAIT FOR 10*c_clk_per;        
+        WAIT FOR c_clk_per;        
         row_by_row_x := row_by_row_a;
         size_x := size_a;
         
         sel_a <= to_mat_reg_ix(reg_y);
-        WAIT FOR 10*c_clk_per;         
+        WAIT FOR c_clk_per;         
         row_by_row_y := row_by_row_a;
         size_y := size_a; 
         
@@ -212,13 +250,14 @@ PACKAGE BODY pkg_test IS
         END LOOP;
     END assert_mat_eq;
 
-    PROCEDURE delete_mat(
+    PROCEDURE set_mat(
+        CONSTANT c_val  : in t_mat_elem;
         SIGNAL s_wren   : OUT STD_LOGIC;
         SIGNAL s_data_i : OUT t_mat_word;
         SIGNAL s_ix_w   : OUT t_mat_ix
     ) IS BEGIN  
         s_wren <= '1';
-        s_data_i <= (others => to_mat_elem(0.0));
+        s_data_i <= (others => c_val  );
         FOR y IN 0 TO c_max_mat_dim - 1 LOOP
             FOR x IN 0 TO c_max_mat_dim - 1 LOOP
                 s_ix_w <= to_mat_ix(y, x);
@@ -226,6 +265,6 @@ PACKAGE BODY pkg_test IS
             END LOOP;
         END LOOP;
         s_wren <= '0';
-    END delete_mat;
+    END set_mat;
 
 END PACKAGE BODY;

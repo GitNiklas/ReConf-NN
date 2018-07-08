@@ -34,7 +34,6 @@ ARCHITECTURE a_mat_trans OF e_mat_trans IS
 ----------------------------------------------------------------------------------------------------
 
 COMPONENT e_set_word_elem    
-    GENERIC (inc_by_wordlen : BOOLEAN := TRUE);  
     PORT (    
         p_rst_i             : IN STD_LOGIC;
         p_clk_i             : IN STD_LOGIC;
