@@ -11,6 +11,7 @@ use IEEE.NUMERIC_STD.all;
 USE work.pkg_tools.ALL;
 USE work.pkg_test.ALL;
 USE work.fixed_pkg.ALL;
+USE work.pkg_test_matrices.ALL;
 
 ENTITY tb_mat_cpu_mul IS
 END ENTITY tb_mat_cpu_mul;
@@ -49,360 +50,12 @@ END COMPONENT;
 --  Prozeduren
 ---------------------------------------------
 
-PROCEDURE init_mat_2x3_rbr(reg: INTEGER; opcore: INTEGER; SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC;SIGNAL s_ix_a0: OUT t_mat_ix;SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN STD_LOGIC) IS
+PROCEDURE exec_op(op: t_opcode; wait_finish: BOOLEAN; opcore: INTEGER; reg_a: INTEGER; reg_b: INTEGER; reg_c: INTEGER; row_by_row: STD_LOGIC;SIGNAL s_sel_a: OUT t_mat_reg_ixs;SIGNAL s_sel_b: OUT t_mat_reg_ixs;SIGNAL s_sel_c: OUT t_mat_reg_ixs;SIGNAL s_opcode: OUT t_opcodes;SIGNAL s_c_row_by_row: OUT t_op_std_logics;SIGNAL s_wren: OUT STD_LOGIC;SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN STD_LOGIC) IS
 BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 2x3 Matrix [Zeilenweise]");
-    -- {{0.125, 0.25, 0.625}, {-0.25, -0.3125, -0.875}}
-    --
-    -- 0.125    0.25        0.625       | 0000.0010     0000.0100       0000.1010
-    -- -0.25   -0.3125     -0.875       | 1111.1100     1111.1011       1111.0010
-    s_sel_a(0) <= to_mat_reg_ix(reg); 
-    s_write_a0 <= '1';
-    s_size_a0_i <= to_mat_size(2, 3);
-    s_row_by_row_a0_i <= '1';
-    
-    s_ix_a0 <= to_mat_ix(0, 0); -- Es koennen die Spalten 0-31 gleichzeitig geschrieben werden
-    s_data_a0_i <= to_mat_word((0.125, 0.25, 0.625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    
-    s_ix_a0 <= to_mat_ix(1, 0);
-    s_data_a0_i <= to_mat_word((-0.25, -0.3125, -0.875, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_write_a0 <= '0';
-    WAIT FOR c_clk_per;
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " fertig initialisiert");
-END init_mat_2x3_rbr;
-
-PROCEDURE init_mat_3x3_cbc(reg: INTEGER; opcore: INTEGER; SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC;SIGNAL s_ix_a0: OUT t_mat_ix;SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN STD_LOGIC) IS
-BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 3x3 Matrix [Spaltenweise]");
-    -- {{1, 1, 2.5}, {2, 3, -4}, {1, -2, -3}}
-    --
-    -- 1   1  2.5       | 0001.0000     0001.0000       0010.1000
-    -- 2   3   -4       | 0010.0000     0011.0000       1100.0000
-    -- 1  -2   -3       | 0001.0000     1110.0000       1101.0000
-    s_sel_a(0) <= to_mat_reg_ix(reg); 
-    s_write_a0 <= '1';
-    s_size_a0_i <= to_mat_size(3, 3);
-    s_row_by_row_a0_i <= '0';
-
-    s_ix_a0 <= to_mat_ix(0, 0);
-    s_data_a0_i <= to_mat_word((1.0, 2.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-
-    s_ix_a0 <= to_mat_ix(0, 1);
-    s_data_a0_i <= to_mat_word((1.0, 3.0, -2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-
-    s_ix_a0 <= to_mat_ix(0, 2);
-    s_data_a0_i <= to_mat_word((2.5, -4.0, -3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;  
-    s_write_a0 <= '0';
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " fertig initialisiert");
-END init_mat_3x3_cbc;
-
-PROCEDURE init_mat_result_2x3_3x3_rbr(reg: INTEGER; opcore: INTEGER; SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC;SIGNAL s_ix_a0: OUT t_mat_ix;SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN STD_LOGIC) IS
-BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 2x3 (Ergebnis 2x3 * 3x3) [Zeilenweise]");
-    s_sel_a(0) <= to_mat_reg_ix(reg); 
-    s_write_a0 <= '1';
-    s_size_a0_i <= to_mat_size(2, 3);
-    s_row_by_row_a0_i <= '1';
-    
-    s_ix_a0 <= to_mat_ix(0, 0);
-    s_data_a0_i <= to_mat_word((1.25, -0.375, -2.5625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-
-    s_ix_a0 <= to_mat_ix(1, 0);
-    s_data_a0_i <= to_mat_word((-1.75, 0.5625, 3.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_write_a0 <= '0';
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " fertig initialisiert");
-END init_mat_result_2x3_3x3_rbr;
-
-PROCEDURE init_mat_2x36_rbr(reg: INTEGER; opcore: INTEGER; SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC;SIGNAL s_ix_a0: OUT t_mat_ix;SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN STD_LOGIC) IS
-BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 2x36 Matrix [Zeilenweise]");
-    -- [0.25, 0.25, 1.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 0.5, 2.0]
-    -- [-0.25, -0.35, -0.875, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.5, 0.5, 0.25]    
-    s_sel_a(0) <= to_mat_reg_ix(reg); 
-    s_write_a0 <= '1';
-    s_size_a0_i <= to_mat_size(2, 36);
-    s_row_by_row_a0_i <= '1';
-    
-    s_ix_a0 <= to_mat_ix(0, 0); -- Es koennen die Spalten 0-31 gleichzeitig geschrieben werden
-    s_data_a0_i <= to_mat_word((0.25, 0.25, 1.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    
-    s_ix_a0 <= to_mat_ix(0, 32);
-    s_data_a0_i <= to_mat_word((1.0, 2.0, 0.5, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    
-    s_ix_a0 <= to_mat_ix(1, 0);
-    s_data_a0_i <= to_mat_word((-0.25, -0.35, -0.875, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    
-    s_ix_a0 <= to_mat_ix(1, 32);
-    s_data_a0_i <= to_mat_word((1.0, 1.5, 0.5, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_write_a0 <= '0';
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " fertig initialisiert");
-END init_mat_2x36_rbr;
-
-PROCEDURE init_mat_36x3_cbc(reg: INTEGER; opcore: INTEGER; SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC;SIGNAL s_ix_a0: OUT t_mat_ix;SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN STD_LOGIC) IS
-BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 36x3 Matrix [Spaltenweise]");
-    -- [1, 1, 2.0],[2, 3, -4],[1, -2, -3],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.5, 0.5, 0.5],[0.5, 0.5, 2.0],[0.5, 1.0, 0.5],[0.5, 1.5, 1.0]
-    s_sel_a(0) <= to_mat_reg_ix(reg); 
-    s_write_a0 <= '1';
-    s_size_a0_i <= to_mat_size(36, 3);
-    s_row_by_row_a0_i <= '0';
-
-    s_ix_a0 <= to_mat_ix(0, 0);
-    s_data_a0_i <= to_mat_word((1.0, 2.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                               0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(32, 0);
-    s_data_a0_i <= to_mat_word((0.5, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                               0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    
-    s_ix_a0 <= to_mat_ix(0, 1);
-    s_data_a0_i <= to_mat_word((1.0, 3.0, -2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                               0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(32, 1);
-    s_data_a0_i <= to_mat_word((0.5, 0.5, 1.0, 1.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                               0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    
-    s_ix_a0 <= to_mat_ix(0, 2);
-    s_data_a0_i <= to_mat_word((2.0, -4.0, -3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                               0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per; 
-    s_ix_a0 <= to_mat_ix(32, 2);
-    s_data_a0_i <= to_mat_word((0.5, 2.0, 0.5, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                               0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per; 
-    s_write_a0 <= '0';
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " fertig initialisiert");
-END init_mat_36x3_cbc;
-
-PROCEDURE init_mat_result_2x36_36x3_rbr(reg: INTEGER; opcore: INTEGER; SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC;SIGNAL s_ix_a0: OUT t_mat_ix;SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN STD_LOGIC) IS
-BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 2x3 (Ergebnis 2x36 * 36x3) [Zeilenweise]");
-    -- 5.0      3.0     1.75
-    -- -0.2     2.575   7.525 -- erzeugt rundungsfehler!
-    s_sel_a(0) <= to_mat_reg_ix(reg); 
-    s_write_a0 <= '1';
-    s_size_a0_i <= to_mat_size(2, 3);
-    s_row_by_row_a0_i <= '1';
-    
-    s_ix_a0 <= to_mat_ix(0, 0);
-    s_data_a0_i <= to_mat_word((5.0, 3.0, 1.75, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                               0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    
-    s_ix_a0 <= to_mat_ix(1, 0);
-    s_data_a0_i <= to_mat_word((-0.25, 2.5, 7.625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                               0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_write_a0 <= '0';
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " fertig initialisiert");
-END init_mat_result_2x36_36x3_rbr;
-
-PROCEDURE init_mat_36x1_rbr(reg: INTEGER; opcore: INTEGER; SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC;SIGNAL s_ix_a0: OUT t_mat_ix;SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN STD_LOGIC) IS
-BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 36x1 Matrix [Zeilenweise]");
-   -- [0.25], [0.125], [0.0], [1.0], [0.125], [0.5], [1.0], [2.0], [0.0625], [0.5], [0.125], [1.0], [0.625], [0.875], [2.0], [0.5], [0.5625], [0.3125], [0.25], [0.125], [0.0], [1.0], [0.125], [0.5], [1.0], [2.0], [0.0625], [0.5], [0.125], [1.0], [0.625], [0.875], [2.0], [0.5], [0.5625], [0.3125]  
-    s_sel_a(0) <= to_mat_reg_ix(reg); 
-    s_write_a0 <= '1';
-    s_size_a0_i <= to_mat_size(36, 1);
-    s_row_by_row_a0_i <= '1';
-    
-    s_ix_a0 <= to_mat_ix(0, 0);
-    s_data_a0_i <= to_mat_word((0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(1, 0);   
-    s_data_a0_i <= to_mat_word((0.125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(2, 0);  
-    s_data_a0_i <= to_mat_word((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(3, 0);  
-    s_data_a0_i <= to_mat_word((1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(4, 0); 
-    s_data_a0_i <= to_mat_word((0.125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(5, 0);  
-    s_data_a0_i <= to_mat_word((0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(6, 0);  
-    s_data_a0_i <= to_mat_word((1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(7, 0); 
-    s_data_a0_i <= to_mat_word((2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(8, 0);   
-    s_data_a0_i <= to_mat_word((0.0625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(9, 0);   
-    s_data_a0_i <= to_mat_word((0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(10, 0);   
-    s_data_a0_i <= to_mat_word((0.125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(11, 0);   
-    s_data_a0_i <= to_mat_word((1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(12, 0);   
-    s_data_a0_i <= to_mat_word((0.625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(13, 0);   
-    s_data_a0_i <= to_mat_word((0.875, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(14, 0);   
-    s_data_a0_i <= to_mat_word((2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(15, 0);   
-    s_data_a0_i <= to_mat_word((0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(16, 0);   
-    s_data_a0_i <= to_mat_word((0.5625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(17, 0);   
-    s_data_a0_i <= to_mat_word((0.3125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(18, 0);   
-    s_data_a0_i <= to_mat_word((0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(19, 0);   
-    s_data_a0_i <= to_mat_word((0.125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(20, 0);   
-    s_data_a0_i <= to_mat_word((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(21, 0);   
-    s_data_a0_i <= to_mat_word((1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(22, 0);   
-    s_data_a0_i <= to_mat_word((0.125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(23, 0);   
-    s_data_a0_i <= to_mat_word((0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(24, 0);   
-    s_data_a0_i <= to_mat_word((1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(25, 0);   
-    s_data_a0_i <= to_mat_word((2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(26, 0);   
-    s_data_a0_i <= to_mat_word((0.0625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(27, 0);   
-    s_data_a0_i <= to_mat_word((0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(28, 0);   
-    s_data_a0_i <= to_mat_word((0.125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(29, 0);   
-    s_data_a0_i <= to_mat_word((1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(30, 0);   
-    s_data_a0_i <= to_mat_word((0.625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(31, 0);   
-    s_data_a0_i <= to_mat_word((0.875, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(32, 0);   
-    s_data_a0_i <= to_mat_word((2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(33, 0);   
-    s_data_a0_i <= to_mat_word((0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(34, 0);   
-    s_data_a0_i <= to_mat_word((0.5625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_ix_a0 <= to_mat_ix(35, 0);   
-    s_data_a0_i <= to_mat_word((0.3125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_write_a0 <= '0';
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " fertig initialisiert");
-END init_mat_36x1_rbr;
-
-PROCEDURE init_mat_1x2_cbc(reg: INTEGER; opcore: INTEGER; SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC;SIGNAL s_ix_a0: OUT t_mat_ix;SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN STD_LOGIC) IS
-BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 1x2 Matrix [Spaltenweise]");
-    -- [2, 1]
-    s_sel_a(0) <= to_mat_reg_ix(reg); 
-    s_write_a0 <= '1';
-    s_size_a0_i <= to_mat_size(1, 2);
-    s_row_by_row_a0_i <= '0';
-
-    s_ix_a0 <= to_mat_ix(0, 0);
-    s_data_a0_i <= to_mat_word((2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                               0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    
-    s_ix_a0 <= to_mat_ix(0, 1);
-    s_data_a0_i <= to_mat_word((1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                               0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_write_a0 <= '0';
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " fertig initialisiert");
-END init_mat_1x2_cbc;
-
-PROCEDURE init_mat_result_36x1_1x2_cbc(reg: INTEGER; opcore: INTEGER; SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC;SIGNAL s_ix_a0: OUT t_mat_ix;SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN STD_LOGIC) IS
-BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 36x2 (Ergebnis 36x1 * 1x2) [Spaltenweise]");
-    -- [0.5], [0.25], [0.0], [2.0], [0.25], [1.0], [2.0], [4.0], [0.125], [1.0], [0.25], [2.0], [1.25], [1.75], [4.0], [1.0], [1.125], [0.625], [0.5], [0.25], [0.0], [2.0], [0.25], [1.0], [2.0], [4.0], [0.125], [1.0], [0.25], [2.0], [1.25], [1.75], [4.0], [1.0], [1.125], [0.625]
-    -- [0.25], [0.125], [0.0], [1.0], [0.125], [0.5], [1.0], [2.0], [0.0625], [0.5], [0.125], [1.0], [0.625], [0.875], [2.0], [0.5], [0.5625], [0.3125], [0.25], [0.125], [0.0], [1.0], [0.125], [0.5], [1.0], [2.0], [0.0625], [0.5], [0.125], [1.0], [0.625], [0.875], [2.0], [0.5], [0.5625], [0.3125]
-    s_sel_a(0) <= to_mat_reg_ix(reg); 
-    s_write_a0 <= '1';
-    s_size_a0_i <= to_mat_size(36, 2);
-    s_row_by_row_a0_i <= '0';
-    
-    s_ix_a0 <= to_mat_ix(0, 0);
-    s_data_a0_i <= to_mat_word(( 0.5, 0.25, 0.0, 2.0, 0.25, 1.0, 2.0, 4.0, 0.125, 1.0, 0.25, 2.0, 1.25, 1.75, 4.0, 1.0, 
-                                1.125, 0.625, 0.5, 0.25, 0.0, 2.0, 0.25, 1.0, 2.0, 4.0, 0.125, 1.0, 0.25, 2.0, 1.25, 1.75));
-    WAIT FOR c_clk_per;
-    
-    s_ix_a0 <= to_mat_ix(32, 0);
-    s_data_a0_i <= to_mat_word((4.0, 1.0, 1.125, 0.625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                               0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    
-    s_ix_a0 <= to_mat_ix(0, 1);
-    s_data_a0_i <= to_mat_word(( 0.25, 0.125, 0.0, 1.0, 0.125, 0.5, 1.0, 2.0, 0.0625, 0.5, 0.125, 1.0, 0.625, 0.875, 2.0, 0.5, 
-                                0.5625, 0.3125, 0.25, 0.125, 0.0, 1.0, 0.125, 0.5, 1.0, 2.0, 0.0625, 0.5, 0.125, 1.0, 0.625, 0.875));
-    WAIT FOR c_clk_per;
-    
-    s_ix_a0 <= to_mat_ix(32, 1);
-    s_data_a0_i <= to_mat_word((2.0, 0.5, 0.5625, 0.3125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                               0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_write_a0 <= '0';
-    REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " fertig initialisiert");
-END init_mat_result_36x1_1x2_cbc;
-
-PROCEDURE exec_mul(wait_finish: BOOLEAN; opcore: INTEGER; reg_a: INTEGER; reg_b: INTEGER; reg_c: INTEGER; row_by_row: STD_LOGIC;SIGNAL s_sel_a: OUT t_mat_reg_ixs;SIGNAL s_sel_b: OUT t_mat_reg_ixs;SIGNAL s_sel_c: OUT t_mat_reg_ixs;SIGNAL s_opcode: OUT t_opcodes;SIGNAL s_c_row_by_row: OUT t_op_std_logics;SIGNAL s_wren: OUT STD_LOGIC;SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN STD_LOGIC) IS
-BEGIN
-    REPORT infomsg("Starte Matrix-Multiplikation: Reg" & INTEGER'IMAGE(reg_c) & " = Reg" & INTEGER'IMAGE(reg_a) & " * Reg" & INTEGER'IMAGE(reg_b));
     s_sel_a(opcore) <= to_mat_reg_ix(reg_a); 
     s_sel_b(opcore) <= to_mat_reg_ix(reg_b); 
     s_sel_c(opcore) <= to_mat_reg_ix(reg_c); 
-    s_opcode(opcore) <= MatMul;
+    s_opcode(opcore) <= op;
     s_c_row_by_row(opcore) <= row_by_row;
     
     IF wait_finish THEN
@@ -415,11 +68,23 @@ BEGIN
         WAIT FOR c_clk_per / 2;
         s_wren  <= '0';
         s_opcode(opcore) <= NoOp;
-        REPORT infomsg("Matrix-Multiplikation fertig");
+        REPORT infomsg("Operation abgeschlossen fertig");
     ELSE
         REPORT infomsg(" ----- Fuehre Operation parallel aus. Nach Abschluss OpCode auf NoOp setzen!");
     END IF;
+END exec_op;
+
+PROCEDURE exec_mul(wait_finish: BOOLEAN; opcore: INTEGER; reg_a: INTEGER; reg_b: INTEGER; reg_c: INTEGER; row_by_row: STD_LOGIC;SIGNAL s_sel_a: OUT t_mat_reg_ixs;SIGNAL s_sel_b: OUT t_mat_reg_ixs;SIGNAL s_sel_c: OUT t_mat_reg_ixs;SIGNAL s_opcode: OUT t_opcodes;SIGNAL s_c_row_by_row: OUT t_op_std_logics;SIGNAL s_wren: OUT STD_LOGIC;SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN STD_LOGIC) IS
+BEGIN
+    REPORT infomsg("Starte Matrix-Multiplikation: Reg" & INTEGER'IMAGE(reg_c) & " = Reg" & INTEGER'IMAGE(reg_a) & " * Reg" & INTEGER'IMAGE(reg_b));
+    exec_op(MatMul, wait_finish, opcore, reg_a, reg_b, reg_c, row_by_row, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
 END exec_mul;
+
+PROCEDURE exec_add(wait_finish: BOOLEAN; opcore: INTEGER; reg_a: INTEGER; reg_b: INTEGER; reg_c: INTEGER; row_by_row: STD_LOGIC;SIGNAL s_sel_a: OUT t_mat_reg_ixs;SIGNAL s_sel_b: OUT t_mat_reg_ixs;SIGNAL s_sel_c: OUT t_mat_reg_ixs;SIGNAL s_opcode: OUT t_opcodes;SIGNAL s_c_row_by_row: OUT t_op_std_logics;SIGNAL s_wren: OUT STD_LOGIC;SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN STD_LOGIC) IS
+BEGIN
+    REPORT infomsg("Starte Matrix-Addition: Reg" & INTEGER'IMAGE(reg_c) & " = Reg" & INTEGER'IMAGE(reg_a) & " + Reg" & INTEGER'IMAGE(reg_b));
+    exec_op(MatAdd, wait_finish, opcore, reg_a, reg_b, reg_c, row_by_row, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
+END exec_add;
 
 PROCEDURE test_mul(opcore: INTEGER; SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_read_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_size_a0_o: IN t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC; SIGNAL s_row_by_row_a0_o: IN STD_LOGIC; SIGNAL s_ix_a0: OUT t_mat_ix; SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_data_a0_o: IN t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_b: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_c_row_by_row: OUT t_op_std_logics; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN STD_LOGIC) IS
 BEGIN
@@ -429,7 +94,7 @@ BEGIN
     init_mat_2x3_rbr(0, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     init_mat_3x3_cbc(1, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     exec_mul(TRUE, 1, 0, 1, 2, '1', s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
-    init_mat_result_2x3_3x3_rbr(3, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    init_mat_result_2x3_mul_3x3_rbr(3, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
 --    print_mat_reg(0, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
 --    print_mat_reg(1, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
 --    print_mat_reg(2, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
@@ -440,14 +105,14 @@ BEGIN
     init_mat_2x36_rbr(0, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     init_mat_36x3_cbc(1, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     exec_mul(TRUE, 1, 0, 1, 2, '1', s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
-    init_mat_result_2x36_36x3_rbr(3, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    init_mat_result_2x36_mul_36x3_rbr(3, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     assert_mat_reg_eq(2, 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
 
     REPORT infomsg("Test 3: A(36x1) * B(1x2) (C Spaltenweise)");
     init_mat_36x1_rbr(0, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     init_mat_1x2_cbc(1, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     exec_mul(TRUE, 1, 0, 1, 2, '0', s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
-    init_mat_result_36x1_1x2_cbc(3, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    init_mat_result_36x1_mul_1x2_cbc(3, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     assert_mat_reg_eq(2, 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
 
     REPORT infomsg("Test: Matrix-Multiplikation BEENDET");
@@ -478,6 +143,27 @@ BEGIN
     
     REPORT infomsg("Test: Matrix Löschen BEENDET");
 END test_del;
+
+PROCEDURE test_add(opcore: INTEGER; SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_read_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_size_a0_o: IN t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC; SIGNAL s_row_by_row_a0_o: IN STD_LOGIC; SIGNAL s_ix_a0: OUT t_mat_ix; SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_data_a0_o: IN t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_b: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_c_row_by_row: OUT t_op_std_logics; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN STD_LOGIC) IS
+BEGIN
+    REPORT infomsg("Test: Matrix-Addition");
+    
+    REPORT infomsg("Test 1: A(64x64) + B(64x64)");
+    init_mat_64x64_rbr_01(0, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    init_mat_64x64_rbr_01(1, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    exec_add(TRUE, 1, 0, 1, 2, '1', s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
+    init_mat_result_64x64_add_64x64_rbr(3, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    assert_mat_reg_eq(2, 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    
+    REPORT infomsg("Test 2: Destruktive Addition");
+    init_mat_64x64_rbr_01(0, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    init_mat_64x64_rbr_01(1, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    exec_add(TRUE, 1, 0, 1, 0, '1', s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
+    init_mat_result_64x64_add_64x64_rbr(3, 0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    assert_mat_reg_eq(0, 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    
+    REPORT infomsg("Test: Matrix-Addition BEENDET");
+END test_add;
 
 ---------------------------------------------
 --  Signale
@@ -573,8 +259,9 @@ BEGIN
    
     REPORT infomsg("Initialisierung abgeschlossen");
 
-    test_del(1, s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
-    test_mul(1, s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
+    --test_del(1, s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
+    --test_mul(1, s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
+    test_add(0, s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
     
     REPORT infomsg("Testende");
     WAIT;

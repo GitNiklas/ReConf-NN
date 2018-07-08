@@ -1,15 +1,13 @@
-0
-    row by row richtig verkabeln XXX
 1
     - TB für CPU Mul
         X Alle Tests aus mat_mul übernehmen
-        - Einen Test ergänzen, für korrekte Spaltenweise Speicherung
-            - Bei Spaltenweiser Speicherung sollen eigentlich nur einzelne Element gesetzt werden, es wird aber immer ein gesamtes word gesetzt
-            - Evtl ix_gen anpassen, so dass die mat_c spaltenweise statt zeilenweise berechnet wird ???
+        X Einen Test ergänzen, für korrekte Spaltenweise Speicherung
+            X Bei Spaltenweiser Speicherung sollen eigentlich nur einzelne Element gesetzt werden, es wird aber immer ein gesamtes word gesetzt
+            X Evtl ix_gen anpassen, so dass die mat_c spaltenweise statt zeilenweise berechnet wird ???
 2
-    - TB für CPU Add
-        - Entsprechende Tests
-        - Desktruktive Variante (a=c)
+    X TB für CPU Add
+        X Entsprechende Tests
+        X Desktruktive Variante (a=c)
         - Spaltenweise Addition
         - Spaltenweise Speicherung
 
@@ -39,10 +37,9 @@
         - VecAdd
         - RowSum
         - ScalarSubIx
-8 [Optional] 
-    - Umwandlung 2 General Op Cores => 4 Specific Op Cores
 
-
+8
+    TBs dafür
 
 - Fragen an Timm
     - Code durchgehen, Optimierungsmöglichkeiten, ...
