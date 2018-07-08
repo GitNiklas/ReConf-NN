@@ -62,8 +62,8 @@ PORT MAP(
         
     p_size_i            => to_mat_size(64, 64),
     p_row_by_row_i      => p_mat_c_row_by_row_i,
-    p_mat_ix_t0_o       => p_mat_c_ix_o, 
-    p_mat_ix_t2_o       => OPEN,
+    p_mat_ix_t0_o       => OPEN, 
+    p_mat_ix_t2_o       => p_mat_c_ix_o,
     p_first_elem_t1_o   => OPEN
 );
 
