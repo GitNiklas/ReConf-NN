@@ -106,15 +106,14 @@ BEGIN
         s_a_size_i(opnum)           <= p_reg_mat_size_i(0);
         s_reg_row_by_row_i(opnum)   <= p_reg_row_by_row_i(0);
                                             
-        IF p_opcode_i(opnum) /= NoOp THEN
-            FOR reg IN c_num_mat_regs-1 DOWNTO 0 LOOP
-                IF p_sel_a_i(opnum) = TO_UNSIGNED( reg, 4) THEN
-                    s_a_word_i(opnum)           <= p_reg_word_i(reg); 
-                    s_a_size_i(opnum)           <= p_reg_mat_size_i(reg);
-                    s_reg_row_by_row_i(opnum)   <= p_reg_row_by_row_i(reg);
-                END IF;
-            END LOOP;
-        END IF;
+
+        FOR reg IN c_num_mat_regs-1 DOWNTO 0 LOOP
+            IF p_sel_a_i(opnum) = TO_UNSIGNED( reg, 4) THEN
+                s_a_word_i(opnum)           <= p_reg_word_i(reg); 
+                s_a_size_i(opnum)           <= p_reg_mat_size_i(reg);
+                s_reg_row_by_row_i(opnum)   <= p_reg_row_by_row_i(reg);
+            END IF;
+        END LOOP;
     END LOOP;
 END PROCESS proc_mux_a;
 
@@ -125,15 +124,13 @@ BEGIN
         p_alu_b_size_o(opnum)       <= p_reg_mat_size_i(0);
         p_alu_b_row_by_row_o(opnum) <= p_reg_row_by_row_i(0);
         
-        IF p_opcode_i(opnum) /= NoOp THEN
-            FOR reg IN c_num_mat_regs-1 DOWNTO 0 LOOP
-                IF p_sel_b_i(opnum) = TO_UNSIGNED( reg, 4) THEN
-                    p_alu_b_data_o(opnum)           <= p_reg_word_i(reg); 
-                    p_alu_b_size_o(opnum)           <= p_reg_mat_size_i(reg);
-                    p_alu_b_row_by_row_o(opnum)     <= p_reg_row_by_row_i(reg);
-                END IF;
-            END LOOP;
-        END IF;
+        FOR reg IN c_num_mat_regs-1 DOWNTO 0 LOOP
+            IF p_sel_b_i(opnum) = TO_UNSIGNED( reg, 4) THEN
+                p_alu_b_data_o(opnum)           <= p_reg_word_i(reg); 
+                p_alu_b_size_o(opnum)           <= p_reg_mat_size_i(reg);
+                p_alu_b_row_by_row_o(opnum)     <= p_reg_row_by_row_i(reg);
+            END IF;
+        END LOOP;
     END LOOP;
 END PROCESS proc_mux_b;
 
@@ -141,11 +138,11 @@ proc_mux_write : PROCESS(p_opcode_i, p_sel_c_i, p_alu_c_wren_i, p_alu_c_size_i, 
 BEGIN    
     FOR reg IN c_num_mat_regs-1 DOWNTO 0 LOOP 
         -- Standardwerte
-            s_reg_wren(reg) <= '0';
-            p_reg_mat_size_o(reg) <= p_size_a0_i;
-            p_reg_row_by_row_o(reg) <= p_row_by_row_a0_i;
-            p_reg_ix_write_o(reg) <= p_ix_a0_i;
-            p_reg_word_o(reg) <= p_data_a0_i;
+        s_reg_wren(reg) <= '0';
+        p_reg_mat_size_o(reg) <= p_size_a0_i;
+        p_reg_row_by_row_o(reg) <= p_row_by_row_a0_i;
+        p_reg_ix_write_o(reg) <= p_ix_a0_i;
+        p_reg_word_o(reg) <= p_data_a0_i;
     
         FOR opnum IN c_num_parallel_op-1 DOWNTO 0 LOOP
             IF p_opcode_i(opnum) /= NoOp THEN
