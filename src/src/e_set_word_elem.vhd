@@ -64,44 +64,15 @@ BEGIN
     END IF;
 END PROCESS proc_reg;
 
--- todo evtl mit generate
 proc_generate_s_word_o : PROCESS(s_word_ix, s_word_reg, p_elem_i)
 BEGIN
-    CASE RESIZE(s_word_ix mod 32, 5) IS
-        WHEN TO_UNSIGNED( 0, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 1) & p_elem_i);
-        WHEN TO_UNSIGNED( 1, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 2) & p_elem_i & s_word_reg(0));
-        WHEN TO_UNSIGNED( 2, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 3) & p_elem_i & s_word_reg(1 DOWNTO 0));
-        WHEN TO_UNSIGNED( 3, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 4) & p_elem_i & s_word_reg(2 DOWNTO 0));
-        WHEN TO_UNSIGNED( 4, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 5) & p_elem_i & s_word_reg(3 DOWNTO 0));
-        WHEN TO_UNSIGNED( 5, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 6) & p_elem_i & s_word_reg(4 DOWNTO 0));
-        WHEN TO_UNSIGNED( 6, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 7) & p_elem_i & s_word_reg(5 DOWNTO 0));
-        WHEN TO_UNSIGNED( 7, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 8) & p_elem_i & s_word_reg(6 DOWNTO 0));
-        WHEN TO_UNSIGNED( 8, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 9) & p_elem_i & s_word_reg(7 DOWNTO 0));
-        WHEN TO_UNSIGNED( 9, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 10) & p_elem_i & s_word_reg(8 DOWNTO 0));
-        WHEN TO_UNSIGNED(10, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 11) & p_elem_i & s_word_reg(9 DOWNTO 0));
-        WHEN TO_UNSIGNED(11, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 12) & p_elem_i & s_word_reg(10 DOWNTO 0));
-        WHEN TO_UNSIGNED(12, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 13) & p_elem_i & s_word_reg(11 DOWNTO 0));
-        WHEN TO_UNSIGNED(13, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 14) & p_elem_i & s_word_reg(12 DOWNTO 0));
-        WHEN TO_UNSIGNED(14, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 15) & p_elem_i & s_word_reg(13 DOWNTO 0));
-        WHEN TO_UNSIGNED(15, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 16) & p_elem_i & s_word_reg(14 DOWNTO 0));
-        WHEN TO_UNSIGNED(16, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 17) & p_elem_i & s_word_reg(15 DOWNTO 0));
-        WHEN TO_UNSIGNED(17, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 18) & p_elem_i & s_word_reg(16 DOWNTO 0));
-        WHEN TO_UNSIGNED(18, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 19) & p_elem_i & s_word_reg(17 DOWNTO 0));
-        WHEN TO_UNSIGNED(19, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 20) & p_elem_i & s_word_reg(18 DOWNTO 0));
-        WHEN TO_UNSIGNED(20, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 21) & p_elem_i & s_word_reg(19 DOWNTO 0));
-        WHEN TO_UNSIGNED(21, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 22) & p_elem_i & s_word_reg(20 DOWNTO 0));
-        WHEN TO_UNSIGNED(22, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 23) & p_elem_i & s_word_reg(21 DOWNTO 0));
-        WHEN TO_UNSIGNED(23, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 24) & p_elem_i & s_word_reg(22 DOWNTO 0));
-        WHEN TO_UNSIGNED(24, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 25) & p_elem_i & s_word_reg(23 DOWNTO 0));
-        WHEN TO_UNSIGNED(25, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 26) & p_elem_i & s_word_reg(24 DOWNTO 0));
-        WHEN TO_UNSIGNED(26, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 27) & p_elem_i & s_word_reg(25 DOWNTO 0));
-        WHEN TO_UNSIGNED(27, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 28) & p_elem_i & s_word_reg(26 DOWNTO 0));
-        WHEN TO_UNSIGNED(28, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 29) & p_elem_i & s_word_reg(27 DOWNTO 0));
-        WHEN TO_UNSIGNED(29, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 30) & p_elem_i & s_word_reg(28 DOWNTO 0));
-        WHEN TO_UNSIGNED(30, 5)     =>  s_word_o <= (s_word_reg(31 DOWNTO 31) & p_elem_i & s_word_reg(29 DOWNTO 0));
-        WHEN TO_UNSIGNED(31, 5)     =>  s_word_o <= (p_elem_i & s_word_reg(30 DOWNTO 0));
-        WHEN OTHERS                 =>  s_word_o <=  s_word_reg; -- noetig fuer modelsim
-    END CASE;
+    s_word_o <= (s_word_reg(31 DOWNTO 1) & p_elem_i);
+    
+    FOR i IN 31 DOWNTO 0 LOOP
+        IF RESIZE(s_word_ix mod 32, 5) = TO_UNSIGNED( i, 5) THEN
+            s_word_o <= (s_word_reg(31 DOWNTO i+1) & p_elem_i & s_word_reg(i-1 DOWNTO 0));
+        END IF;
+    END LOOP;
 END PROCESS proc_generate_s_word_o;
 
 END ARCHITECTURE a_set_word_elem;

@@ -81,7 +81,7 @@ p_alu_a_row_by_row_o <= s_reg_row_by_row_i;
 proc_mux_read_ix : PROCESS(p_opcode_i, p_read_a0_i, p_ix_a0_i, p_sel_a_i, p_sel_b_i, p_alu_a_ix_read_i, p_alu_b_ix_read_i)
 BEGIN
     FOR reg IN c_num_mat_regs-1 DOWNTO 0 LOOP
-        p_reg_ix_read_o(reg) <= p_ix_a0_i; -- Standardwert
+        p_reg_ix_read_o(reg) <= p_ix_a0_i;
         
         FOR opnum IN c_num_parallel_op-1 DOWNTO 0 LOOP
             IF p_opcode_i(opnum) /= NoOp THEN
@@ -107,39 +107,13 @@ BEGIN
         s_reg_row_by_row_i(opnum)   <= p_reg_row_by_row_i(0);
                                             
         IF p_opcode_i(opnum) /= NoOp THEN
-            CASE p_sel_a_i(opnum) IS
-                WHEN TO_UNSIGNED( 0, 4)  => s_a_word_i(opnum)           <= p_reg_word_i(0); 
-                                            s_a_size_i(opnum)           <= p_reg_mat_size_i(0);
-                                            s_reg_row_by_row_i(opnum)   <= p_reg_row_by_row_i(0);
-                WHEN TO_UNSIGNED( 1, 4)  => s_a_word_i(opnum)           <= p_reg_word_i(1); 
-                                            s_a_size_i(opnum)           <= p_reg_mat_size_i(1);
-                                            s_reg_row_by_row_i(opnum)   <= p_reg_row_by_row_i(1);
-                WHEN TO_UNSIGNED( 2, 4)  => s_a_word_i(opnum)           <= p_reg_word_i(2); 
-                                            s_a_size_i(opnum)           <= p_reg_mat_size_i(2);
-                                            s_reg_row_by_row_i(opnum)   <= p_reg_row_by_row_i(2);
-                WHEN TO_UNSIGNED( 3, 4)  => s_a_word_i(opnum)           <= p_reg_word_i(3); 
-                                            s_a_size_i(opnum)           <= p_reg_mat_size_i(3);
-                                            s_reg_row_by_row_i(opnum)   <= p_reg_row_by_row_i(3);
-                WHEN TO_UNSIGNED( 4, 4)  => s_a_word_i(opnum)           <= p_reg_word_i(4); 
-                                            s_a_size_i(opnum)           <= p_reg_mat_size_i(4);
-                                            s_reg_row_by_row_i(opnum)   <= p_reg_row_by_row_i(4);
-                WHEN TO_UNSIGNED( 5, 4)  => s_a_word_i(opnum)           <= p_reg_word_i(5); 
-                                            s_a_size_i(opnum)           <= p_reg_mat_size_i(5);
-                                            s_reg_row_by_row_i(opnum)   <= p_reg_row_by_row_i(5);
-                WHEN TO_UNSIGNED( 6, 4)  => s_a_word_i(opnum)           <= p_reg_word_i(6); 
-                                            s_a_size_i(opnum)           <= p_reg_mat_size_i(6);
-                                            s_reg_row_by_row_i(opnum)   <= p_reg_row_by_row_i(6);
-                WHEN TO_UNSIGNED( 7, 4)  => s_a_word_i(opnum)           <= p_reg_word_i(7); 
-                                            s_a_size_i(opnum)           <= p_reg_mat_size_i(7);
-                                            s_reg_row_by_row_i(opnum)   <= p_reg_row_by_row_i(7);
-                WHEN TO_UNSIGNED( 8, 4)  => s_a_word_i(opnum)           <= p_reg_word_i(8); 
-                                            s_a_size_i(opnum)           <= p_reg_mat_size_i(8);
-                                            s_reg_row_by_row_i(opnum)   <= p_reg_row_by_row_i(8);
-                WHEN TO_UNSIGNED( 9, 4)  => s_a_word_i(opnum)           <= p_reg_word_i(9); 
-                                            s_a_size_i(opnum)           <= p_reg_mat_size_i(9);
-                                            s_reg_row_by_row_i(opnum)   <= p_reg_row_by_row_i(9);
-                WHEN OTHERS              => NULL;
-            END CASE;
+            FOR reg IN c_num_mat_regs-1 DOWNTO 0 LOOP
+                IF p_sel_a_i(opnum) = TO_UNSIGNED( reg, 4) THEN
+                    s_a_word_i(opnum)           <= p_reg_word_i(reg); 
+                    s_a_size_i(opnum)           <= p_reg_mat_size_i(reg);
+                    s_reg_row_by_row_i(opnum)   <= p_reg_row_by_row_i(reg);
+                END IF;
+            END LOOP;
         END IF;
     END LOOP;
 END PROCESS proc_mux_a;
@@ -150,40 +124,15 @@ BEGIN
         p_alu_b_data_o(opnum)       <= p_reg_word_i(0); 
         p_alu_b_size_o(opnum)       <= p_reg_mat_size_i(0);
         p_alu_b_row_by_row_o(opnum) <= p_reg_row_by_row_i(0);
+        
         IF p_opcode_i(opnum) /= NoOp THEN
-            CASE p_sel_b_i(opnum) IS
-                WHEN TO_UNSIGNED( 0, 4)  => p_alu_b_data_o(opnum)       <= p_reg_word_i(0); 
-                                            p_alu_b_size_o(opnum)       <= p_reg_mat_size_i(0);
-                                            p_alu_b_row_by_row_o(opnum) <= p_reg_row_by_row_i(0);
-                WHEN TO_UNSIGNED( 1, 4)  => p_alu_b_data_o(opnum)       <= p_reg_word_i(1); 
-                                            p_alu_b_size_o(opnum)       <= p_reg_mat_size_i(1);
-                                            p_alu_b_row_by_row_o(opnum) <= p_reg_row_by_row_i(1);
-                WHEN TO_UNSIGNED( 2, 4)  => p_alu_b_data_o(opnum)       <= p_reg_word_i(2); 
-                                            p_alu_b_size_o(opnum)       <= p_reg_mat_size_i(2);
-                                            p_alu_b_row_by_row_o(opnum) <= p_reg_row_by_row_i(2);
-                WHEN TO_UNSIGNED( 3, 4)  => p_alu_b_data_o(opnum)       <= p_reg_word_i(3); 
-                                            p_alu_b_size_o(opnum)       <= p_reg_mat_size_i(3);
-                                            p_alu_b_row_by_row_o(opnum) <= p_reg_row_by_row_i(3);
-                WHEN TO_UNSIGNED( 4, 4)  => p_alu_b_data_o(opnum)       <= p_reg_word_i(4); 
-                                            p_alu_b_size_o(opnum)       <= p_reg_mat_size_i(4);
-                                            p_alu_b_row_by_row_o(opnum) <= p_reg_row_by_row_i(4);
-                WHEN TO_UNSIGNED( 5, 4)  => p_alu_b_data_o(opnum)       <= p_reg_word_i(5); 
-                                            p_alu_b_size_o(opnum)       <= p_reg_mat_size_i(5);
-                                            p_alu_b_row_by_row_o(opnum) <= p_reg_row_by_row_i(5);
-                WHEN TO_UNSIGNED( 6, 4)  => p_alu_b_data_o(opnum)       <= p_reg_word_i(6); 
-                                            p_alu_b_size_o(opnum)       <= p_reg_mat_size_i(6);
-                                            p_alu_b_row_by_row_o(opnum) <= p_reg_row_by_row_i(6);
-                WHEN TO_UNSIGNED( 7, 4)  => p_alu_b_data_o(opnum)       <= p_reg_word_i(7); 
-                                            p_alu_b_size_o(opnum)       <= p_reg_mat_size_i(7);
-                                            p_alu_b_row_by_row_o(opnum) <= p_reg_row_by_row_i(7);
-                WHEN TO_UNSIGNED( 8, 4)  => p_alu_b_data_o(opnum)       <= p_reg_word_i(8); 
-                                            p_alu_b_size_o(opnum)       <= p_reg_mat_size_i(8);
-                                            p_alu_b_row_by_row_o(opnum) <= p_reg_row_by_row_i(8);
-                WHEN TO_UNSIGNED( 9, 4)  => p_alu_b_data_o(opnum)       <= p_reg_word_i(9); 
-                                            p_alu_b_size_o(opnum)       <= p_reg_mat_size_i(9);
-                                            p_alu_b_row_by_row_o(opnum) <= p_reg_row_by_row_i(9);
-                WHEN OTHERS              => NULL;
-            END CASE;
+            FOR reg IN c_num_mat_regs-1 DOWNTO 0 LOOP
+                IF p_sel_b_i(opnum) = TO_UNSIGNED( reg, 4) THEN
+                    p_alu_b_data_o(opnum)           <= p_reg_word_i(reg); 
+                    p_alu_b_size_o(opnum)           <= p_reg_mat_size_i(reg);
+                    p_alu_b_row_by_row_o(opnum)     <= p_reg_row_by_row_i(reg);
+                END IF;
+            END LOOP;
         END IF;
     END LOOP;
 END PROCESS proc_mux_b;
