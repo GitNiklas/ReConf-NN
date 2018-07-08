@@ -120,13 +120,15 @@ BEGIN
     
     FOR i IN c_num_parallel_op-1 DOWNTO 0 LOOP
         s_opcode(i) <= NoOp;
-        s_sel_a(i) <= to_mat_reg_ix(0);
-        s_sel_b(i) <= to_mat_reg_ix(0);
-        s_sel_c(i) <= to_mat_reg_ix(0);
         s_c_row_by_row(i) <= '1';
     END LOOP;
+    s_sel_a(0) <= to_mat_reg_ix(0);
+    s_sel_b(0) <= to_mat_reg_ix(1);
+    s_sel_c(0) <= to_mat_reg_ix(2);
+    s_sel_a(1) <= to_mat_reg_ix(3);
+    s_sel_b(1) <= to_mat_reg_ix(4);
+    s_sel_c(1) <= to_mat_reg_ix(5);
     s_scalar <= to_mat_elem(0.0);
-    s_sel_c(1) <= to_mat_reg_ix(9);     -- 2. Operation soll nicht beim Schreiben stoeren
     
     s_write_a0 <= '0';
     s_read_a0 <= '0';
@@ -186,10 +188,11 @@ BEGIN
     WAIT FOR c_clk_per;
 
     REPORT infomsg("Starte Matrix-Multiplikation: Reg2 = Reg0 * Reg1");
-    s_sel_a(0) <= to_mat_reg_ix(0); 
-    s_sel_b(0) <= to_mat_reg_ix(1); 
-    s_sel_c(0) <= to_mat_reg_ix(2); 
-    s_opcode(0) <= MatMul;
+    s_sel_a(1) <= to_mat_reg_ix(0); 
+    s_sel_b(1) <= to_mat_reg_ix(1); 
+    s_sel_c(1) <= to_mat_reg_ix(2); 
+    s_opcode(1) <= MatMul;
+    s_opcode(0) <= MatAdd;
     
     s_wren  <= '1';
     s_syn_rst <= '1';
@@ -418,15 +421,15 @@ BEGIN
     s_write_a0 <= '0';  
     
     REPORT infomsg("Starte Operationen");
-    s_sel_a(0) <= to_mat_reg_ix(0); 
-    s_sel_b(0) <= to_mat_reg_ix(1); 
-    s_sel_c(0) <= to_mat_reg_ix(4); 
-    s_opcode(0) <= MatMul;
+    s_sel_a(1) <= to_mat_reg_ix(0); 
+    s_sel_b(1) <= to_mat_reg_ix(1); 
+    s_sel_c(1) <= to_mat_reg_ix(4); 
+    s_opcode(1) <= MatMul;
     
-    s_sel_a(1) <= to_mat_reg_ix(2); 
-    s_sel_b(1) <= to_mat_reg_ix(3); 
-    s_sel_c(1) <= to_mat_reg_ix(5); 
-    s_opcode(1) <= MatAdd;
+    s_sel_a(0) <= to_mat_reg_ix(2); 
+    s_sel_b(0) <= to_mat_reg_ix(3); 
+    s_sel_c(0) <= to_mat_reg_ix(5); 
+    s_opcode(0) <= MatAdd;
     
     s_wren  <= '1';
     s_syn_rst <= '1';

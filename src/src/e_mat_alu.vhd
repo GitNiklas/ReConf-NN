@@ -502,7 +502,7 @@ BEGIN
                                 p_mat_c_data_o(i)   <= s_scalar_max_c_data;
                                 p_mat_c_size_o(i)   <= s_scalar_max_c_size;
                                 
-            WHEN NoOp     =>    s_finished_t1(i)    <= '1';
+            WHEN OTHERS     =>    s_finished_t1(i)    <= '1';
                                 p_mat_a_ix_o(i)     <= s_add_a_ix;
                                 p_mat_b_ix_o(i)     <= s_add_b_ix;
                                 p_mat_c_ix_o(i)     <= s_add_c_ix;

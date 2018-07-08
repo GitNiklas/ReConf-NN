@@ -107,7 +107,7 @@ BEGIN
 END PROCESS proc_clk_gen;
 
 proc_test : PROCESS
-
+VARIABLE opcore : INTEGER := 1;
 BEGIN
     REPORT infomsg("Test Start");
 ----------------------------------------------------------------------------------------------------
@@ -126,7 +126,6 @@ BEGIN
         s_c_row_by_row(i) <= '1';
     END LOOP;
     s_scalar <= to_mat_elem(0.0);
-    s_sel_c(1) <= to_mat_reg_ix(9);     -- 2. Operation soll nicht beim Schreiben stoeren
     
     s_write_a0 <= '0';
     s_read_a0 <= '0';
@@ -193,13 +192,13 @@ BEGIN
     s_write_a0 <= '0';
     REPORT infomsg("Fertig");
     WAIT FOR c_clk_per;
-
+    
     REPORT infomsg("Starte Matrix-Multiplikation: Reg2 = Reg0 * Reg1");
-    s_sel_a(0) <= to_mat_reg_ix(0); 
-    s_sel_b(0) <= to_mat_reg_ix(1); 
-    s_sel_c(0) <= to_mat_reg_ix(2); 
-    s_opcode(0) <= MatMul;
-    s_c_row_by_row(0) <= '1';
+    s_sel_a(opcore) <= to_mat_reg_ix(0); 
+    s_sel_b(opcore) <= to_mat_reg_ix(1); 
+    s_sel_c(opcore) <= to_mat_reg_ix(2); 
+    s_opcode(opcore) <= MatMul;
+    s_c_row_by_row(opcore) <= '1';
     
     s_wren  <= '1';
     s_syn_rst <= '1';
@@ -231,7 +230,7 @@ BEGIN
     s_write_a0 <= '0';
      
     assert_mat_reg_eq(2, 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-    
+
     ----------------------------------------------------------------------------------------------------
 --  Test 2
 ----------------------------------------------------------------------------------------------------
@@ -312,11 +311,11 @@ BEGIN
     s_sel_a(0) <= to_mat_reg_ix(2); 
     delete_mat(s_write_a0, s_data_a0_i, s_ix_a0);
     REPORT infomsg("Starte Matrix-Multiplikation: Reg2 = Reg0 * Reg1");  
-    s_sel_a(0) <= to_mat_reg_ix(0); 
-    s_sel_b(0) <= to_mat_reg_ix(1); 
-    s_sel_c(0) <= to_mat_reg_ix(2); 
-    s_opcode(0) <= MatMul;
-    s_c_row_by_row(0) <= '1';
+    s_sel_a(opcore) <= to_mat_reg_ix(0); 
+    s_sel_b(opcore) <= to_mat_reg_ix(1); 
+    s_sel_c(opcore) <= to_mat_reg_ix(2); 
+    s_opcode(opcore) <= MatMul;
+    s_c_row_by_row(opcore) <= '1';
     
     s_wren  <= '1';
     s_syn_rst <= '1';
@@ -503,11 +502,11 @@ BEGIN
     s_sel_a(0) <= to_mat_reg_ix(2); 
     delete_mat(s_write_a0, s_data_a0_i, s_ix_a0);
     REPORT infomsg("Starte Matrix-Multiplikation: Reg2 = Reg0 * Reg1");  
-    s_sel_a(0) <= to_mat_reg_ix(0); 
-    s_sel_b(0) <= to_mat_reg_ix(1); 
-    s_sel_c(0) <= to_mat_reg_ix(2); 
-    s_opcode(0) <= MatMul;
-    s_c_row_by_row(0) <= '0';
+    s_sel_a(opcore) <= to_mat_reg_ix(0); 
+    s_sel_b(opcore) <= to_mat_reg_ix(1); 
+    s_sel_c(opcore) <= to_mat_reg_ix(2); 
+    s_opcode(opcore) <= MatMul;
+    s_c_row_by_row(opcore) <= '0';
     
     s_wren  <= '1';
     s_syn_rst <= '1';
@@ -551,8 +550,8 @@ BEGIN
     WAIT FOR c_clk_per;
     s_write_a0 <= '0';
     
-    print_mat_reg(2, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-    print_mat_reg(3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    --print_mat_reg(2, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    --print_mat_reg(3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
     assert_mat_reg_eq(2, 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
     
     REPORT infomsg("Testende");
