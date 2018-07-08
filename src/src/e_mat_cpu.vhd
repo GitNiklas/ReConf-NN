@@ -98,6 +98,7 @@ COMPONENT e_mega_mux
         p_sel_a_i               : IN t_mat_reg_ixs;
         p_sel_b_i               : IN t_mat_reg_ixs;
         p_sel_c_i               : IN t_mat_reg_ixs;
+        p_opcode_i              : IN t_opcodes;
         
         p_reg_mat_size_o        : OUT t_mat_size_arr; 
         p_reg_mat_size_i        : IN t_mat_size_arr;        
@@ -213,6 +214,7 @@ PORT MAP(
     p_sel_a_i               => p_sel_a_i,
     p_sel_b_i               => p_sel_b_i,
     p_sel_c_i               => p_sel_c_i,
+    p_opcode_i              => p_opcode_i,
     
     p_reg_mat_size_o        => s_reg_size_i,
     p_reg_mat_size_i        => s_reg_size_o,       
