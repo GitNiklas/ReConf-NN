@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------------------------------------
---  Testbench fuer e_mat_cpu - Multiplikation
+--  Testbench fuer e_mat_cpu
 --  Simulationszeit: ??
 --
 --  Autor: Niklas Kuehl
