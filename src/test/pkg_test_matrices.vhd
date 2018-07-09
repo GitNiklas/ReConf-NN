@@ -70,14 +70,14 @@ PROCEDURE init_mat_result_36x1_mul_1x2_cbc(
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
 
-PROCEDURE init_mat_64x64_rbr_01(
+PROCEDURE init_mat_a0_64x64_rbr(
     reg : INTEGER; 
     opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
 
-PROCEDURE init_mat_result_64x64_add_64x64_rbr(
+PROCEDURE init_mat_result_a0_add_a0(
     reg : INTEGER; 
     opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
@@ -471,7 +471,7 @@ BEGIN
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " fertig initialisiert");
 END init_mat_result_36x1_mul_1x2_cbc;
 
-PROCEDURE init_mat_64x64_rbr_01(
+PROCEDURE init_mat_a0_64x64_rbr(
     reg : INTEGER; 
     opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
@@ -533,9 +533,9 @@ BEGIN
     WAIT FOR c_clk_per;
     s_write_a0 <= '0';
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " fertig initialisiert");
-END init_mat_64x64_rbr_01;
+END init_mat_a0_64x64_rbr;
 
-PROCEDURE init_mat_result_64x64_add_64x64_rbr(
+PROCEDURE init_mat_result_a0_add_a0(
     reg : INTEGER; 
     opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
@@ -597,6 +597,6 @@ BEGIN
     WAIT FOR c_clk_per;
     s_write_a0 <= '0';
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " fertig initialisiert");
-END init_mat_result_64x64_add_64x64_rbr;
+END init_mat_result_a0_add_a0;
 
 END PACKAGE BODY;

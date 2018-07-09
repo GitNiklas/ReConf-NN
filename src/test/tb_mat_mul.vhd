@@ -340,7 +340,7 @@ BEGIN
     REPORT infomsg("Matrix-Multiplikation fertig");
    
     REPORT infomsg("Loesche Matrix A");
-    delete_mat(s_a_wren, s_a_data_i, s_a_ix_w);
+    set_mat(to_mat_elem(0.0), s_a_wren, s_a_data_i, s_a_ix_w);
     REPORT infomsg("Initialisiere Matrix A mit Vergleichswerten");
     -- 1.25     -0.375      -2.5625 | 0001.0100     1111.1010    1101.0111
     -- -1.75    0.5625      3.25    | 1110.0100     0000.1001    0011.0100
@@ -367,7 +367,7 @@ BEGIN
     REPORT infomsg(" ----- Test 2: A(2x36) * B(36x3)");
     
     REPORT infomsg("Loesche Matrix A");
-    delete_mat(s_a_wren, s_a_data_i, s_a_ix_w);
+    set_mat(to_mat_elem(0.0), s_a_wren, s_a_data_i, s_a_ix_w);
     REPORT infomsg("Initialisiere Matrix A");
     -- [0.25, 0.25, 1.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 0.5, 2.0]
     -- [-0.25, -0.35, -0.875, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.5, 0.5, 0.25]
@@ -397,7 +397,7 @@ BEGIN
     s_a_wren <= '0';
     
     REPORT infomsg("Loesche Matrix B");
-    delete_mat(s_b_wren, s_b_data_i, s_b_ix_w);
+    set_mat(to_mat_elem(0.0), s_b_wren, s_b_data_i, s_b_ix_w);
     REPORT infomsg("Initialisiere Matrix B (Spaltenweise)");
     -- [1, 1, 2.0],[2, 3, -4],[1, -2, -3],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.5, 0.5, 0.5],[0.5, 0.5, 2.0],[0.5, 1.0, 0.5],[0.5, 1.5, 1.0]
     s_b_wren <= '1';
@@ -435,7 +435,7 @@ BEGIN
     WAIT FOR c_clk_per; 
     
     REPORT infomsg("Loesche Matrix C");
-    delete_mat(s_nomul_c_wren, s_nomul_c_data_i, s_nomul_c_ix_w);
+    set_mat(to_mat_elem(0.0), s_nomul_c_wren, s_nomul_c_data_i, s_nomul_c_ix_w);
     REPORT infomsg("Starte Matrix-Multiplikation");  
         
     s_rst_mul <= '0';
@@ -450,7 +450,7 @@ BEGIN
     REPORT infomsg("Matrix-Multiplikation fertig");
         
     REPORT infomsg("Loesche Matrix A");
-    delete_mat(s_a_wren, s_a_data_i, s_a_ix_w);
+    set_mat(to_mat_elem(0.0), s_a_wren, s_a_data_i, s_a_ix_w);
     REPORT infomsg("Initialisiere Matrix A mit Vergleichswerten");
     -- 5.0      3.0     1.75
     -- -0.2     2.575   7.525 -- erzeugt rundungsfehler!
@@ -476,7 +476,7 @@ BEGIN
     REPORT infomsg(" ----- Test 3: A(36x1) * B(1x1) (C Spaltenweise)");
 
     REPORT infomsg("Loesche Matrix A");
-    delete_mat(s_a_wren, s_a_data_i, s_a_ix_w); 
+    set_mat(to_mat_elem(0.0), s_a_wren, s_a_data_i, s_a_ix_w); 
     REPORT infomsg("Initialisiere Matrix A");
     -- [0.25], [0.125], [0.0], [1.0], [0.125], [0.5], [1.0], [2.0], [0.0625], [0.5], [0.125], [1.0], [0.625], [0.875], [2.0], [0.5], [0.5625], [0.3125], [0.25], [0.125], [0.0], [1.0], [0.125], [0.5], [1.0], [2.0], [0.0625], [0.5], [0.125], [1.0], [0.625], [0.875], [2.0], [0.5], [0.5625], [0.3125]
     s_a_wren <= '1';
@@ -595,7 +595,7 @@ BEGIN
     s_a_wren <= '0';
     
     REPORT infomsg("Loesche Matrix B");
-    delete_mat(s_b_wren, s_b_data_i, s_b_ix_w);
+    set_mat(to_mat_elem(0.0), s_b_wren, s_b_data_i, s_b_ix_w);
     REPORT infomsg("Initialisiere Matrix B (Spaltenweise)");
     -- [2]
     
@@ -612,7 +612,7 @@ BEGIN
     WAIT FOR c_clk_per; 
       
     REPORT infomsg("Loesche Matrix C");
-    delete_mat(s_nomul_c_wren, s_nomul_c_data_i, s_nomul_c_ix_w);
+    set_mat(to_mat_elem(0.0), s_nomul_c_wren, s_nomul_c_data_i, s_nomul_c_ix_w);
     REPORT infomsg("Starte Matrix-Multiplikation");  
     s_rst_mul <= '0';
     s_enable_mul <= '1';
@@ -627,7 +627,7 @@ BEGIN
     REPORT infomsg("Matrix-Multiplikation fertig");
     
     REPORT infomsg("Loesche Matrix A");
-    delete_mat(s_a_wren, s_a_data_i, s_a_ix_w);    
+    set_mat(to_mat_elem(0.0), s_a_wren, s_a_data_i, s_a_ix_w);    
     REPORT infomsg("Initialisiere Matrix A mit Vergleichswerten");
     -- [0.5], [0.25], [0.0], [2.0], [0.25], [1.0], [2.0], [4.0], [0.125], [1.0], [0.25], [2.0], [1.25], [1.75], [4.0], [1.0], [1.125], [0.625], [0.5], [0.25], [0.0], [2.0], [0.25], [1.0], [2.0], [4.0], [0.125], [1.0], [0.25], [2.0], [1.25], [1.75], [4.0], [1.0], [1.125], [0.625]
     s_a_wren <= '1';

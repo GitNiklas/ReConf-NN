@@ -36,7 +36,7 @@ USE work.pkg_tools.ALL;
 ENTITY e_serial IS
     GENERIC(
         g_clk_periode       : TIME      := 20 ns;
-        g_baudrate          : POSITIVE  := 115200 
+        g_baudrate          : POSITIVE  := 9600 
     );
     PORT(
         p_rst_i             : IN STD_LOGIC;

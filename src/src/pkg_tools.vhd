@@ -91,7 +91,7 @@ PACKAGE pkg_tools IS
 --  Serial
 ----------------------------------------------------------------------------------------------------
     SUBTYPE t_byte IS STD_LOGIC_VECTOR(7 DOWNTO 0);
-    CONSTANT c_baudrate : POSITIVE  := 115200;
+    CONSTANT c_baudrate : POSITIVE  :=  9600;
     
     ----------------------------------------------------------------------------------------------------
     -- Function f_calc_serial_wait
