@@ -1,45 +1,120 @@
-1
-    - TB für CPU Mul
-        X Alle Tests aus mat_mul übernehmen
-        X Einen Test ergänzen, für korrekte Spaltenweise Speicherung
-            X Bei Spaltenweiser Speicherung sollen eigentlich nur einzelne Element gesetzt werden, es wird aber immer ein gesamtes word gesetzt
-            X Evtl ix_gen anpassen, so dass die mat_c spaltenweise statt zeilenweise berechnet wird ???
-2
-    X TB für CPU Add
-        X Entsprechende Tests
-        X Desktruktive Variante (a=c)
-        - Spaltenweise Addition
-        - Spaltenweise Speicherung
+1 Mat CPU - 31h
+    1.1
+        - TB für CPU Mul
+            X Alle Tests aus mat_mul übernehmen
+            X Einen Test ergänzen, für korrekte Spaltenweise Speicherung
+                X Bei Spaltenweiser Speicherung sollen eigentlich nur einzelne Element gesetzt werden, es wird aber immer ein gesamtes word gesetzt
+                X Evtl ix_gen anpassen, so dass die mat_c spaltenweise statt zeilenweise berechnet wird
+    1.2 - 4h
+        X TB für CPU Add
+            X Entsprechende Tests
+            X Desktruktive Variante (a=c)
+            - Spaltenweise Addition
+            - Spaltenweise Speicherung
 
-2.1
-    - Eventuelle Fehler korrigieren
-        - ix gen anpassen für spaltenweise speicherung
-        - set word elem anpassen
-3
-    - TB für Trans
-        - Entsprechende Tests
-        - Spalten/Zeilenweise Eingabe
-        - Spalten/Zeilenweise Speicherung
-4
-    - Restliche TBs
-        - MatDel, ScalarMul, ScalarDiv, ScalarMax
-        - Desktruktive Variante (a=c)
-        - Spalten/Zeilenweise Eingabe
-        - Spalten/Zeilenweise Speicherung
-5
-    - Parallel TB
-        - Parallele Verarbeitung von 2 Kommandos
-6
-    - Master TB
-        - Alle einzel-TBs zusammen kopiert
-7
-    - Restliche Operationen
-        - VecAdd
-        - RowSum
-        - ScalarSubIx
+        1.2.1
+            - Eventuelle Fehler korrigieren
+                - ix gen anpassen für spaltenweise speicherung
+                - set word elem anpassen
+    1.3 - 4h
+        - TB für Trans
+            - Entsprechende Tests
+            - Spalten/Zeilenweise Eingabe
+            - Spalten/Zeilenweise Speicherung
+    1.4 - 2h
+        - Restliche TBs
+            X MatDel 
+            - ScalarMul, ScalarDiv, ScalarMax
+            - Desktruktive Variante (a=c)
+            - Spalten/Zeilenweise Eingabe
+            - Spalten/Zeilenweise Speicherung
+    1.5 - 2h
+        - Parallel TB
+            - Parallele Verarbeitung von 2 Kommandos
+    1.6 - 1h
+        - Master TB
+            - Alle einzel-TBs zusammen kopiert
+    1.7 - 10h
+        - Restliche Operationen
+            - VecAdd - 2h
+            - RowSum - 4h
+            - ScalarSubIx - 4h
+    1.8 8h
+        TBs dafür 
 
-8
-    TBs dafür
+
+2 Reconf Algo - 30h
+    2.1 -1h
+        - Algorithmus zur Parallelen Verarbeitung anpassen
+
+    2.1 2h
+        - Entity entwerfen 
+        - Kommandos: Start_Algo, Load_image, ...
+
+    2.2 3h
+        Zustandsautomat entwerfen
+
+    2.3 8h
+        ALle Schritte des Algo implementieren
+
+    2.4 16h
+        Testbench für einen einzelnen Batch
+
+3 TLE 36h
+    3.1 
+        X Serielle Kommunikation
+    3.2 16h
+        Zustandsautomat für Seriellen Protokoll
+            - Init
+            - 64 mal
+                - Bild empfangen und mit Algo speichern
+                - Klasse empfangen, in Algo speichern
+            - Algorithmus starten
+            - Byte senden um nächsten Batch zu starten
+    3.3 4h
+        - Kommando hinzufügen, um Algorithmus Training zu beenden
+        - Und Ausgabe der Fehlerraten
+
+    3.4 16h
+        Testbench: Bilder von HDD laden, Algo ausführen
+
+4 Testen 16h
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Insgesamt benötigt: 113h
+
+Verfügbar:
+    - KW28: 20h
+    - KW31: 8
+    - KW32: 20
+    - KW33: 20
+    - KW34: 40
+=> 108h Also ende August lauffähig
+
+Ende KW28:
+    - Alle TBs für bereits implementierte OP
+    - Alle weiteren OP implementiert
+
+Ende KW31:
+    - TBs für ALLE operatoren
+    - Mat CPU Master TB
+    - Struktur des Reconf Algo
+
+Ende KW31:
+    - Testbench Reconf algo
+
+Ende KW31:
+    - Design TLE
+    - Protokoll
+
+Ende KW31:
+    - Testbench für TLE
+    - HW GEsamt Test
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
 
 - Fragen an Timm
     - Code durchgehen, Optimierungsmöglichkeiten, ...
@@ -47,3 +122,5 @@
         => Was kann meine Implementierung leisten wenn auf einem besseren/schnelleren FPGA ausgeführt
         - Maximale Taktrate
         - ...
+    - Serial Port in VHDl - STolperfalen o.ä.
+    - Dateien (Bilder) in Modelsim laden und über Serial Port meines Designs schicken
