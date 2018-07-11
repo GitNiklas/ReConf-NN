@@ -10,7 +10,6 @@ PACKAGE pkg_test IS
     
     PROCEDURE delete_reg(
         CONSTANT reg: INTEGER;
-        CONSTANT opcore: INTEGER; 
         
         SIGNAL s_sel_c: OUT t_mat_reg_ixs;
         SIGNAL s_opcode: OUT t_opcodes;
@@ -79,8 +78,7 @@ PACKAGE BODY pkg_test IS
     END;
     
     PROCEDURE delete_reg(
-        CONSTANT reg: INTEGER;
-        CONSTANT opcore: INTEGER; 
+        CONSTANT reg: INTEGER; 
         
         SIGNAL s_sel_c: OUT t_mat_reg_ixs;
         SIGNAL s_opcode: OUT t_opcodes;
@@ -90,8 +88,8 @@ PACKAGE BODY pkg_test IS
     ) IS
     BEGIN
         REPORT infomsg("Loesche Register " & INTEGER'IMAGE(reg));
-        s_sel_c(opcore) <= to_mat_reg_ix(reg); 
-        s_opcode(opcore) <= MatDel;
+        s_sel_c(2) <= to_mat_reg_ix(reg); 
+        s_opcode(2) <= MatDel;
     
         s_wren  <= '1';
         s_syn_rst <= '1';
@@ -101,7 +99,7 @@ PACKAGE BODY pkg_test IS
         WAIT UNTIL s_finished = '1';
         WAIT FOR c_clk_per / 2;
         s_wren  <= '0';
-        s_opcode(opcore) <= NoOp;
+        s_opcode(2) <= NoOp;
     END delete_reg;
     
     PROCEDURE print_mat_reg(
@@ -146,7 +144,6 @@ PACKAGE BODY pkg_test IS
         END LOOP; 
         read_a <= '0';  
     END print_mat_reg;
-    
     
     PROCEDURE assert_mat_reg_eq(
         CONSTANT reg_x          : IN INTEGER;

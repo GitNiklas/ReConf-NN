@@ -20,7 +20,6 @@
         - TB für Trans
             X Zeilenweise
             X Spaltenweise
-            -
     1.4 - 2h
         - Restliche TBs
             X MatDel 
@@ -32,7 +31,7 @@
             X Spaltenweise
     1.5 - 2h
         - Parallel TB
-            X Parallele Verarbeitung von 2 Kommandos
+            X Parallele Verarbeitung von 3 Kommandos
             - Weitere Tests
     1.6 - 1h
         - Master TB
@@ -44,9 +43,16 @@
             - RowSum - 4h
             - ScalarSubIx - 4h
     1.8 8h
-        TBs dafür 
+        - TBs dafür 
+    
+    1.9 3 OpCores
+        X 0: MatMul, MatAdd, VecAdd, RowSum, NoOp
+        X 1: ScalarMul, ScalarDiv, ScalarMax, ScalarSubIx, NoOp 
+        X 2: MatTrans, MatFlip, MatDel, NoOp
 
-
+    1.10 
+        X Matrizenvergleich beschleunigen
+     
 2 Reconf Algo - 30h
     2.1 -1h
         - Algorithmus zur Parallelen Verarbeitung anpassen

@@ -83,6 +83,8 @@ BEGIN
     FOR reg IN c_num_mat_regs-1 DOWNTO 0 LOOP
         p_reg_ix_read_o(reg) <= p_ix_a0_i;
         
+        -- Da Schleife downto, sind die Operanden von OpCore0 am hoechsten priorisiert
+        --  => p_sel_b_i von OpCore 1 & 2 wird nicht beachtet
         FOR opnum IN c_num_parallel_op-1 DOWNTO 0 LOOP
             IF p_opcode_i(opnum) /= NoOp THEN
                 IF p_sel_a_i(opnum) = TO_UNSIGNED(reg, p_sel_a_i(opnum)'LENGTH) THEN

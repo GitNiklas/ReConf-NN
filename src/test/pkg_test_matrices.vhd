@@ -9,112 +9,96 @@ PACKAGE pkg_test_matrices IS
 
 PROCEDURE init_mat_2x3_rbr(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
 
 PROCEDURE init_mat_3x3_cbc(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
 
 PROCEDURE init_mat_result_2x3_mul_3x3_rbr(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
 
 PROCEDURE init_mat_2x36_rbr(
-    reg : INTEGER; 
-    opcore : INTEGER; 
+    reg : INTEGER;
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
 
 PROCEDURE init_mat_36x3_cbc(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
 
 PROCEDURE init_mat_result_2x36_mul_36x3_rbr(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
 
 PROCEDURE init_mat_36x1_rbr(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
 
 PROCEDURE init_mat_1x2_cbc(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
 
 PROCEDURE init_mat_result_36x1_mul_1x2_cbc(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
 
 PROCEDURE init_mat_a0_64x64_rbr(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
 
 PROCEDURE init_mat_a1_64x64_cbc(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
 
 PROCEDURE init_mat_result_a0_add_a0(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
 
 PROCEDURE init_mat_result_a1_add_a1(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
 
 PROCEDURE init_mat_result_a0_trans(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
 
 PROCEDURE init_mat_result_a1_trans(
-    reg : INTEGER; 
-    opcore : INTEGER; 
+    reg : INTEGER;  
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
 
 PROCEDURE init_mat_result_a0_scalar_max(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 );
@@ -125,12 +109,11 @@ PACKAGE BODY pkg_test_matrices IS
 
 PROCEDURE init_mat_2x3_rbr(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 ) IS
 BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    delete_reg(reg, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 2x3 Matrix [Zeilenweise]");
     -- {{0.125, 0.25, 0.625}, {-0.25, -0.3125, -0.875}}
     --
@@ -155,12 +138,11 @@ END init_mat_2x3_rbr;
 
 PROCEDURE init_mat_3x3_cbc(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 ) IS
 BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    delete_reg(reg, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 3x3 Matrix [Spaltenweise]");
     -- {{1, 1, 2.5}, {2, 3, -4}, {1, -2, -3}}
     --
@@ -189,12 +171,11 @@ END init_mat_3x3_cbc;
 
 PROCEDURE init_mat_result_2x3_mul_3x3_rbr(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 ) IS
 BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    delete_reg(reg, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 2x3 (Ergebnis 2x3 * 3x3) [Zeilenweise]");
     s_sel_a(0) <= to_mat_reg_ix(reg); 
     s_write_a0 <= '1';
@@ -214,12 +195,11 @@ END init_mat_result_2x3_mul_3x3_rbr;
 
 PROCEDURE init_mat_2x36_rbr(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 ) IS
 BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    delete_reg(reg, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 2x36 Matrix [Zeilenweise]");
     -- [0.25, 0.25, 1.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 0.5, 2.0]
     -- [-0.25, -0.35, -0.875, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.5, 0.5, 0.25]    
@@ -249,12 +229,11 @@ END init_mat_2x36_rbr;
 
 PROCEDURE init_mat_36x3_cbc(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 ) IS
 BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    delete_reg(reg, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 36x3 Matrix [Spaltenweise]");
     -- [1, 1, 2.0],[2, 3, -4],[1, -2, -3],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.5, 0.5, 0.5],[0.5, 0.5, 2.0],[0.5, 1.0, 0.5],[0.5, 1.5, 1.0]
     s_sel_a(0) <= to_mat_reg_ix(reg); 
@@ -291,12 +270,11 @@ END init_mat_36x3_cbc;
 
 PROCEDURE init_mat_result_2x36_mul_36x3_rbr(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 ) IS
 BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    delete_reg(reg, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 2x3 (Ergebnis 2x36 * 36x3) [Zeilenweise]");
     -- 5.0      3.0     1.75
     -- -0.2     2.575   7.525 -- erzeugt rundungsfehler!
@@ -320,12 +298,11 @@ END init_mat_result_2x36_mul_36x3_rbr;
 
 PROCEDURE init_mat_36x1_rbr(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 ) IS
 BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    delete_reg(reg, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 36x1 Matrix [Zeilenweise]");
    -- [0.25], [0.125], [0.0], [1.0], [0.125], [0.5], [1.0], [2.0], [0.0625], [0.5], [0.125], [1.0], [0.625], [0.875], [2.0], [0.5], [0.5625], [0.3125], [0.25], [0.125], [0.0], [1.0], [0.125], [0.5], [1.0], [2.0], [0.0625], [0.5], [0.125], [1.0], [0.625], [0.875], [2.0], [0.5], [0.5625], [0.3125]  
     s_sel_a(0) <= to_mat_reg_ix(reg); 
@@ -447,12 +424,11 @@ END init_mat_36x1_rbr;
 
 PROCEDURE init_mat_1x2_cbc(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 ) IS
 BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    delete_reg(reg, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 1x2 Matrix [Spaltenweise]");
     -- [2, 1]
     s_sel_a(0) <= to_mat_reg_ix(reg); 
@@ -473,12 +449,11 @@ END init_mat_1x2_cbc;
 
 PROCEDURE init_mat_result_36x1_mul_1x2_cbc(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 ) IS
 BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    delete_reg(reg, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 36x2 (Ergebnis 36x1 * 1x2) [Spaltenweise]");
     -- [0.5], [0.25], [0.0], [2.0], [0.25], [1.0], [2.0], [4.0], [0.125], [1.0], [0.25], [2.0], [1.25], [1.75], [4.0], [1.0], [1.125], [0.625], [0.5], [0.25], [0.0], [2.0], [0.25], [1.0], [2.0], [4.0], [0.125], [1.0], [0.25], [2.0], [1.25], [1.75], [4.0], [1.0], [1.125], [0.625]
     -- [0.25], [0.125], [0.0], [1.0], [0.125], [0.5], [1.0], [2.0], [0.0625], [0.5], [0.125], [1.0], [0.625], [0.875], [2.0], [0.5], [0.5625], [0.3125], [0.25], [0.125], [0.0], [1.0], [0.125], [0.5], [1.0], [2.0], [0.0625], [0.5], [0.125], [1.0], [0.625], [0.875], [2.0], [0.5], [0.5625], [0.3125]
@@ -508,12 +483,11 @@ END init_mat_result_36x1_mul_1x2_cbc;
 
 PROCEDURE init_mat_a0_64x64_rbr(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 ) IS
 BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    delete_reg(reg, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 64x64 Matrix [Zeilenweise]");
     -- [1.0, -0.25, ..., 2.25, -0.75]
     -- [0.25, -0.5, ..., 1.5, -0.125]
@@ -572,12 +546,11 @@ END init_mat_a0_64x64_rbr;
 
 PROCEDURE init_mat_a1_64x64_cbc(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 ) IS
 BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    delete_reg(reg, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 64x64 Matrix [Spaltenweise]");
     -- [1.0, 0.25, ..., 1.125, 2.0]
     -- [-0.25, -0.5, ..., 0.625, 1.0]
@@ -636,12 +609,11 @@ END init_mat_a1_64x64_cbc;
 
 PROCEDURE init_mat_result_a0_add_a0(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 ) IS
 BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    delete_reg(reg, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 64x64 (Ergebnis a0 + a0) [Zeilenweise]");
     s_sel_a(0) <= to_mat_reg_ix(reg); 
     s_write_a0 <= '1';
@@ -695,12 +667,11 @@ END init_mat_result_a0_add_a0;
 
 PROCEDURE init_mat_result_a1_add_a1(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 ) IS
 BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    delete_reg(reg, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 64x64 (Ergebnis a1 + a1) [Spaltenweise]");
     s_sel_a(0) <= to_mat_reg_ix(reg); 
     s_write_a0 <= '1';
@@ -754,12 +725,11 @@ END init_mat_result_a1_add_a1;
 
 PROCEDURE init_mat_result_a0_trans(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 ) IS
 BEGIN   
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    delete_reg(reg, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 64x64 (Ergebnis trans(a0)) [Zeilenweise]");
     -- [1.0, 0.25, ..., 1.125, 2.0]
     -- [-0.25, -0.5, ..., 0.625, 1.0]
@@ -818,12 +788,11 @@ END init_mat_result_a0_trans;
 
 PROCEDURE init_mat_result_a1_trans(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 ) IS
 BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    delete_reg(reg, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 64x64 (Ergebnis trans(a1)) [Spaltenweise]");
     -- [1.0, -0.25, ..., 2.25, -0.75]
     -- [0.25, -0.5, ..., 1.5, -0.125]
@@ -883,12 +852,11 @@ END init_mat_result_a1_trans;
 
 PROCEDURE init_mat_result_a0_scalar_max(
     reg : INTEGER; 
-    opcore : INTEGER; 
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN STD_LOGIC
 ) IS
 BEGIN
-    delete_reg(reg, opcore, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    delete_reg(reg, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     REPORT infomsg("Register " & INTEGER'IMAGE(reg) & " = 64x64 (Ergebnis scalar_max(a0)) [Zeilenweise]");
     s_sel_a(0) <= to_mat_reg_ix(reg); 
     s_write_a0 <= '1';
