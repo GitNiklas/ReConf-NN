@@ -161,8 +161,9 @@ PACKAGE BODY pkg_test IS
     ) IS
         VARIABLE row_by_row_x, row_by_row_y : STD_LOGIC;
         VARIABLE size_x, size_y : t_mat_size;
+        VARIABLE word_x, word_y : t_mat_word;
         VARIABLE data_x, data_y : t_mat_elem;
-        VARIABLE index_word : INTEGER;
+        VARIABLE col, row : INTEGER;
     BEGIN
         REPORT infomsg("Vergleiche Matrix-Register " & INTEGER'IMAGE(reg_x) & " (x) und " & INTEGER'IMAGE(reg_y) & " (y)");
         read_a <= '1';  
@@ -180,28 +181,38 @@ PACKAGE BODY pkg_test IS
         assert row_by_row_x = row_by_row_y REPORT err("Matrix_Orientierung (Spalten/Zeilenweise) unterschiedlich: row_by_row_x = " & STD_LOGIC'IMAGE(row_by_row_x) & ", row_by_row_y = " & STD_LOGIC'IMAGE(row_by_row_y));
         assert size_x = size_y REPORT err("Matrixdimensionen unterschiedlich: size_x = " & mat_size_to_str(size_x) & "; size_y = " & mat_size_to_str(size_y));
         
-        FOR y IN 0 TO c_max_mat_dim - 1 LOOP
-            FOR x IN 0 TO c_max_mat_dim - 1 LOOP
-                ix_a <= to_mat_ix(y, x);
+        FOR lines_ix IN 0 TO c_max_mat_dim - 1 LOOP
+            FOR word IN 0 TO c_max_mat_dim/t_mat_word'LENGTH - 1 LOOP -- Schleife ueber Woerter
                 IF row_by_row_x = '1' THEN
-                    index_word := x mod 32;
+                    ix_a <= to_mat_ix(lines_ix, word * 32);
                 ELSE
-                   index_word := y mod 32;
-                END IF; 
+                    ix_a <= to_mat_ix(word * 32, lines_ix);
+                END IF;
                 
                 sel_a <= to_mat_reg_ix(reg_x);
                 WAIT FOR 2*c_clk_per;
-                data_x := data_a(index_word);
+                word_x := data_a;
                 
                 sel_a <= to_mat_reg_ix(reg_y);
                 WAIT FOR 2*c_clk_per;
-                data_y := data_a(index_word);
+                word_y := data_a;
                 
-                ASSERT data_x = data_y
-                    REPORT err("Die Matrizen unterscheiden sich an Position y= ") & INTEGER'IMAGE(y) & ", x=" & INTEGER'IMAGE(x) 
-                    & ": data_x = " & REAL'IMAGE(to_real(data_x)) & " (" & mat_elem_to_str(data_x) & ")" & "; data_y = " & REAL'IMAGE(to_real(data_y)) & " (" & mat_elem_to_str(data_y) & ")";
+                FOR word_index IN 0 TO t_mat_word'LENGTH-1 LOOP
+                    IF row_by_row_x = '1' THEN
+                        row := lines_ix;
+                        col := word * 32 + word_index;
+                    ELSE
+                        row := word * 32 + word_index;
+                        col := lines_ix;
+                    END IF;
+                    data_x := word_x(word_index);
+                    data_y := word_y(word_index);
+                    ASSERT data_x = data_y
+                        REPORT err("Die Matrizen unterscheiden sich an Position row=") & INTEGER'IMAGE(row) & ", col=" & INTEGER'IMAGE(col) 
+                        & ": data_x = " & REAL'IMAGE(to_real(data_x)) & " (" & mat_elem_to_str(data_x) & ")" & "; data_y = " & REAL'IMAGE(to_real(data_y)) & " (" & mat_elem_to_str(data_y) & ")";
+                END LOOP;
             END LOOP;
-        END LOOP; 
+        END LOOP;
        read_a <= '0';   
     END assert_mat_reg_eq;
     
