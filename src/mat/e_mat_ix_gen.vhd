@@ -42,10 +42,6 @@ BEGIN
 p_mat_ix_t0_o       <= s_ix_t0;
 p_mat_ix_t2_o       <= s_ix_t2;
 
-s_last_col_t1       <=  to_sl((p_size_i.max_col < t_mat_word'LENGTH) OR (s_ix_t1.col = t_mat_word'LENGTH)) WHEN inc_by_wordlen ELSE
-                        to_sl(s_ix_t1.col = p_size_i.max_col);
-                        
-s_last_row_t1       <= to_sl(s_ix_t1.row = p_size_i.max_row);
 p_finished_o        <= s_last_col_t1 AND s_last_row_t1 AND p_word_done_i;
 p_first_elem_t1_o   <= s_first_elem;
 
@@ -55,6 +51,24 @@ c_inc_ix <= t_mat_word'LENGTH WHEN inc_by_wordlen ELSE 1;
 --  Prozesse
 ----------------------------------------------------------------------------------------------------
 
+proc_last_rowcol : PROCESS(p_row_by_row_i, p_size_i, s_ix_t1)
+BEGIN
+    IF p_row_by_row_i = '1' THEN
+        IF inc_by_wordlen THEN    
+            s_last_col_t1 <= to_sl((p_size_i.max_col < t_mat_word'LENGTH) OR (s_ix_t1.col = t_mat_word'LENGTH));
+        ELSE
+            s_last_col_t1 <= to_sl(s_ix_t1.col = p_size_i.max_col);
+        END IF;          
+        s_last_row_t1 <= to_sl(s_ix_t1.row = p_size_i.max_row);
+    ELSE
+        s_last_col_t1 <= to_sl(s_ix_t1.col = p_size_i.max_col);
+        IF inc_by_wordlen THEN    
+            s_last_row_t1 <= to_sl((p_size_i.max_row < t_mat_word'LENGTH) OR (s_ix_t1.row = t_mat_word'LENGTH));
+        ELSE
+            s_last_row_t1 <= to_sl(s_ix_t1.row = p_size_i.max_row);
+        END IF;          
+    END IF;
+END PROCESS proc_last_rowcol;
 
 proc_registers : PROCESS(p_rst_i, p_clk_i, p_syn_rst_i, s_ix_t0, s_ix_t1)
 BEGIN
