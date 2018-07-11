@@ -9,33 +9,37 @@
         X TB für CPU Add
             X Entsprechende Tests
             X Desktruktive Variante (a=c)
-            - Spaltenweise Addition
-            - Spaltenweise Speicherung
+            X Spaltenweise Addition
+            X Spaltenweise Speicherung
 
         1.2.1
-            - Eventuelle Fehler korrigieren
-                - ix gen anpassen für spaltenweise speicherung
-                - set word elem anpassen
+            X Eventuelle Fehler korrigieren
+                X ix gen anpassen für spaltenweise speicherung
+                X set word elem anpassen
     1.3 - 4h
         - TB für Trans
-            - Entsprechende Tests
-            - Spalten/Zeilenweise Eingabe
-            - Spalten/Zeilenweise Speicherung
+            X Zeilenweise
+            X Spaltenweise
+            -
     1.4 - 2h
         - Restliche TBs
             X MatDel 
-            - ScalarMul, ScalarDiv, ScalarMax
-            - Desktruktive Variante (a=c)
-            - Spalten/Zeilenweise Eingabe
-            - Spalten/Zeilenweise Speicherung
+            X ScalarMul
+            - ScalarDiv
+            X ScalarMax
+            X Desktruktive Variante (a=c)
+            X Zeilenweise
+            X Spaltenweise
     1.5 - 2h
         - Parallel TB
-            - Parallele Verarbeitung von 2 Kommandos
+            X Parallele Verarbeitung von 2 Kommandos
+            - Weitere Tests
     1.6 - 1h
         - Master TB
-            - Alle einzel-TBs zusammen kopiert
+            X Alle einzel-TBs zusammen kopiert
     1.7 - 10h
         - Restliche Operationen
+            - FlipTrans
             - VecAdd - 2h
             - RowSum - 4h
             - ScalarSubIx - 4h

@@ -60,6 +60,7 @@ PACKAGE pkg_tools IS
     TYPE t_mat_reg_ixs IS ARRAY(c_num_parallel_op-1 DOWNTO 0) OF t_mat_reg_ix;
     
     FUNCTION to_sl(x: BOOLEAN) RETURN STD_LOGIC;
+    FUNCTION to_bool(x: STD_LOGIC) RETURN BOOLEAN;
     FUNCTION to_mat_word(x: t_mat_word_const) RETURN t_mat_word; 
     FUNCTION to_mat_elem(x: REAL) RETURN t_mat_elem;
     FUNCTION to_mat_elem(x: UNRESOLVED_sfixed) RETURN t_mat_elem;
@@ -113,6 +114,15 @@ PACKAGE BODY pkg_tools IS
             RETURN '0';
         END IF;
     END to_sl;
+    
+    FUNCTION to_bool(x: STD_LOGIC) RETURN BOOLEAN IS
+    BEGIN
+        IF x = '1' THEN 
+            RETURN TRUE;
+        ELSE
+            RETURN FALSE;
+        END IF;
+    END to_bool;
     
     FUNCTION to_mat_word(x: t_mat_word_const) RETURN t_mat_word IS
         VARIABLE v_res : t_mat_word;

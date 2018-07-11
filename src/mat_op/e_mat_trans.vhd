@@ -72,7 +72,7 @@ END COMPONENT;
 ----------------------------------------------------------------------------------------------------
 --  Signale
 ----------------------------------------------------------------------------------------------------
-SIGNAL s_mat_a_ix_t0, s_mat_a_ix_t2, s_mat_c_ix_t2 : t_mat_ix;
+SIGNAL s_mat_c_ix_t0, s_mat_c_ix_t2, s_mat_a_ix_t0, s_mat_a_ix_t2 : t_mat_ix;
 SIGNAL s_c_size : t_mat_size;
 SIGNAL s_c_elem : t_mat_elem;
 SIGNAL s_word_ix : t_mat_ix_elem;
@@ -109,10 +109,10 @@ PORT MAP(
     p_finished_o        => p_finished_o,
     p_word_done_i       => '1',
         
-    p_size_i            => p_mat_a_size_i,
+    p_size_i            => s_c_size,
     p_row_by_row_i      => p_mat_c_row_by_row_i,
-    p_mat_ix_t0_o       => s_mat_a_ix_t0,
-    p_mat_ix_t2_o       => s_mat_a_ix_t2,
+    p_mat_ix_t0_o       => s_mat_c_ix_t0,
+    p_mat_ix_t2_o       => s_mat_c_ix_t2,
     p_first_elem_t1_o   => OPEN
 );
 
@@ -122,10 +122,12 @@ PORT MAP(
 
 s_c_size        <= (p_mat_a_size_i.max_col, p_mat_a_size_i.max_row);
 p_mat_c_size_o  <= s_c_size;
-s_mat_c_ix_t2   <= (s_mat_a_ix_t2.col, s_mat_a_ix_t2.row);
+s_mat_a_ix_t0   <= (s_mat_c_ix_t0.col, s_mat_c_ix_t0.row);
+s_mat_a_ix_t2   <= (s_mat_c_ix_t2.col, s_mat_c_ix_t2.row);
+p_mat_c_ix_o    <= s_mat_c_ix_t2;
 p_mat_a_ix_o    <= s_mat_a_ix_t0;
 
-s_word_ix       <= s_mat_a_ix_t0.col WHEN p_mat_a_row_by_row_i = '1' ELSE s_mat_a_ix_t0.row;
+s_word_ix       <= s_mat_a_ix_t2.col WHEN p_mat_a_row_by_row_i = '1' ELSE s_mat_a_ix_t2.row;
 s_c_elem        <= p_mat_a_data_i(to_integer(s_word_ix mod 32));
 
 END ARCHITECTURE a_mat_trans;
