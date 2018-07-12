@@ -124,7 +124,7 @@ PACKAGE BODY pkg_test IS
         row_by_row := row_by_row_a;
         size := size_a;
         
-        REPORT infomsg("Matrix Register " & INTEGER'IMAGE(reg) & " : size = " &  mat_size_to_str(size) & "; row_by_row = " & STD_LOGIC'IMAGE(row_by_row));
+        REPORT infomsg("Matrix Register " & INTEGER'IMAGE(reg) & " : size = " &  mat_size_to_str(size) & "; row_by_row = " & STD_LOGIC'IMAGE(row_by_row) & "(Ausgelassene Werte sind 0.0)");
         
         FOR y IN 0 TO to_integer(size.max_row) LOOP
             FOR x IN 0 TO to_integer(size.max_col) LOOP
@@ -138,8 +138,9 @@ PACKAGE BODY pkg_test IS
                 WAIT FOR 2*c_clk_per;
                 data := data_a(index_word);
                 
-                --REPORT c_info_prefix & " " & REAL'IMAGE(to_real(data_a(0))) & ", " & REAL'IMAGE(to_real(data_a(1))) & ", " & REAL'IMAGE(to_real(data_a(2))) & ", " & REAL'IMAGE(to_real(data_a(3)));
-                REPORT infomsg("Reg" & INTEGER'IMAGE(reg) & "(" & INTEGER'IMAGE(y) & "," & INTEGER'IMAGE(x) & ") = " & REAL'IMAGE(to_real(data)) & " (" & mat_elem_to_str(data) & ")");
+                IF data /= to_mat_elem(0.0) THEN
+                    REPORT infomsg("Reg" & INTEGER'IMAGE(reg) & "(" & INTEGER'IMAGE(y) & "," & INTEGER'IMAGE(x) & ") = " & REAL'IMAGE(to_real(data)) & " (" & mat_elem_to_str(data) & ")");
+                END IF;
             END LOOP;
         END LOOP; 
         read_a <= '0';  
@@ -175,8 +176,8 @@ PACKAGE BODY pkg_test IS
         row_by_row_y := row_by_row_a;
         size_y := size_a; 
         
-        assert row_by_row_x = row_by_row_y REPORT err("Matrix_Orientierung (Spalten/Zeilenweise) unterschiedlich: row_by_row_x = " & STD_LOGIC'IMAGE(row_by_row_x) & ", row_by_row_y = " & STD_LOGIC'IMAGE(row_by_row_y));
-        assert size_x = size_y REPORT err("Matrixdimensionen unterschiedlich: size_x = " & mat_size_to_str(size_x) & "; size_y = " & mat_size_to_str(size_y));
+        ASSERT row_by_row_x = row_by_row_y REPORT err("Matrix_Orientierung (Spalten/Zeilenweise) unterschiedlich: row_by_row_x = " & STD_LOGIC'IMAGE(row_by_row_x) & ", row_by_row_y = " & STD_LOGIC'IMAGE(row_by_row_y));
+        ASSERT size_x = size_y REPORT err("Matrixdimensionen unterschiedlich: size_x = " & mat_size_to_str(size_x) & "; size_y = " & mat_size_to_str(size_y));
         
         FOR lines_ix IN 0 TO c_max_mat_dim - 1 LOOP
             FOR word IN 0 TO c_max_mat_dim/t_mat_word'LENGTH - 1 LOOP -- Schleife ueber Woerter
