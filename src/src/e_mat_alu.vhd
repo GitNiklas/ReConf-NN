@@ -18,7 +18,7 @@ ENTITY e_mat_alu IS
         
         p_syn_rst_i             : IN STD_LOGIC;
         p_wren_i                : IN STD_LOGIC;
-        p_finished_o            : OUT STD_LOGIC;
+        p_finished_o            : OUT t_op_std_logics;
         
         p_opcode_i              : IN t_opcodes;
         p_scalar_i              : IN t_mat_elem;
@@ -358,6 +358,7 @@ FOR i IN c_num_parallel_op-1 DOWNTO 0 GENERATE
     f_reg(p_rst_i, p_clk_i, p_syn_rst_i, s_finished_t1(i), s_finished_t2(i));
     f_reg(p_rst_i, p_clk_i, p_syn_rst_i, s_finished_t2(i), s_finished_t3(i));
     p_mat_c_wren_o(i) <= p_wren_i AND NOT p_syn_rst_i AND NOT s_finished_t3(i);
+    p_finished_o(i) <= s_finished_t3(i);
 END GENERATE generate_regs;
 
 p_mat_c_row_by_row_o    <= p_mat_c_row_by_row_i;
@@ -365,17 +366,6 @@ p_mat_c_row_by_row_o    <= p_mat_c_row_by_row_i;
 ----------------------------------------------------------------------------------------------------
 --  Prozesse
 ----------------------------------------------------------------------------------------------------
-
-proc_finished : PROCESS(s_finished_t3)
-VARIABLE s_finished_tmp : STD_LOGIC;
-BEGIN
-    s_finished_tmp := '1';
-    FOR i IN c_num_parallel_op-1 DOWNTO 0 LOOP
-        s_finished_tmp := s_finished_tmp AND s_finished_t3(i);
-    END LOOP;
-    p_finished_o <= s_finished_tmp;
-END PROCESS proc_finished;
-
 
 proc_opcore0 : PROCESS(p_opcode_i,
     s_mul_finished, s_mul_a_ix, s_mul_b_ix, s_mul_c_ix, s_mul_c_data, s_mul_c_size,

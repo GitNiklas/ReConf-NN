@@ -15,7 +15,7 @@ PACKAGE pkg_test IS
         SIGNAL s_opcode: OUT t_opcodes;
         SIGNAL s_wren: OUT STD_LOGIC;
         SIGNAL s_syn_rst: OUT STD_LOGIC; 
-        SIGNAL s_finished: IN STD_LOGIC
+        SIGNAL s_finished: IN t_op_std_logics
     );
     
     PROCEDURE print_mat_reg(
@@ -84,10 +84,10 @@ PACKAGE BODY pkg_test IS
         SIGNAL s_opcode: OUT t_opcodes;
         SIGNAL s_wren: OUT STD_LOGIC;
         SIGNAL s_syn_rst: OUT STD_LOGIC; 
-        SIGNAL s_finished: IN STD_LOGIC
+        SIGNAL s_finished: IN t_op_std_logics
     ) IS
     BEGIN
-        REPORT infomsg("Loesche Register " & INTEGER'IMAGE(reg));
+        --REPORT infomsg("Loesche Register " & INTEGER'IMAGE(reg));
         s_sel_c(2) <= to_mat_reg_ix(reg); 
         s_opcode(2) <= MatDel;
     
@@ -96,7 +96,7 @@ PACKAGE BODY pkg_test IS
         WAIT FOR c_clk_per;
         s_syn_rst <= '0';
         
-        WAIT UNTIL s_finished = '1';
+        WAIT UNTIL s_finished(2) = '1';
         WAIT FOR c_clk_per / 2;
         s_wren  <= '0';
         s_opcode(2) <= NoOp;

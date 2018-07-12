@@ -29,7 +29,7 @@
         - Restliche TBs
             X MatDel 
             X ScalarMul
-            - ScalarDiv
+            X ScalarDiv
             X ScalarMax
             X Desktruktive Variante (a=c)
             X Zeilenweise
@@ -131,10 +131,10 @@ Ende KW31:
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------
 Ergebnisse Gespräch Timm
-    - ALU
-        - Statt 1 Finished Flag alle 3 Rausgeben
-    - MEGAMUX
-        - statt den Standardwerten am Anfang der Prozesse Dont Cares verwenden
+    X ALU
+        X Statt 1 Finished Flag alle 3 Rausgeben
+    X MEGAMUX
+        X statt den Standardwerten am Anfang der Prozesse Dont Cares verwenden
     - Reconf-Algo
         - Kein Zustandsautomat
         - Stattdessen opcodes, reg_ixs, usw in Array Speichern
@@ -154,8 +154,8 @@ Ergebnisse Gespräch Timm
             - Es muss garantiert sein dass der Algo rechtzeitg fertig wird
         - Kritisch: Uart wird 97% der Rechenzeit belegen, dann werden sich unsere Programme kaum unterscheiden
 
-    - Test-Matrizen
-        - Daten in Array Speichern und durchiterieren
+    X Test-Matrizen
+        X Daten in Array Speichern und durchiterieren
 
     - Taktanalyse
         - *.sdc Datei Erstellen => Grobe Abschätzung durch Compiler
