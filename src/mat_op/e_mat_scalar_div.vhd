@@ -5,7 +5,7 @@ USE work.fixed_pkg.ALL;
 USE work.pkg_tools.ALL;
 
 ENTITY e_mat_scalar_div IS
-    GENERIC(scalar : UNSIGNED(7 DOWNTO 0) := TO_UNSIGNED(c_batch_size, 8)); -- division by next lower power of 2
+    GENERIC(scalar : UNSIGNED := TO_UNSIGNED(c_batch_size, 8)); -- division by next lower power of 2
     PORT (    
         p_rst_i                 : IN STD_LOGIC;
         p_clk_i                 : IN STD_LOGIC;
@@ -87,17 +87,21 @@ p_mat_c_size_o <= p_mat_a_size_i;
 --  Prozesse
 ----------------------------------------------------------------------------------------------------
 
+-- 6 magic no
 proc_calc : PROCESS(p_mat_a_data_i)
+    VARIABLE tmp : t_mat_elem_slv;
     VARIABLE shift_val : INTEGER;
-BEGIN  
+BEGIN
+    -- determine highest bit set
     FOR i IN scalar'LOW TO scalar'HIGH LOOP
         IF scalar(i) = '1' THEN 
             shift_val := i;
         END IF;
     END LOOP;
-   
+  
     FOR i IN p_mat_a_data_i'RANGE LOOP
-        p_mat_c_data_o(i) <= to_mat_elem(p_mat_a_data_i(i) SRA (shift_val - 1));
+        tmp := (OTHERS => p_mat_a_data_i(i)(t_mat_elem'HIGH)); -- fill tmp with SIGN Bits
+        p_mat_c_data_o(i) <= to_mat_elem(tmp(tmp'HIGH DOWNTO tmp'LENGTH - shift_val) & to_slv(p_mat_a_data_i(i))(t_mat_elem_slv'HIGH DOWNTO shift_val));
     END LOOP;
 END PROCESS proc_calc;
 

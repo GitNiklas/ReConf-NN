@@ -48,12 +48,12 @@ PACKAGE pkg_tools IS
     TYPE t_mat_word_arr IS ARRAY(c_num_mat_regs-1 DOWNTO 0) OF t_mat_word; -- Typ fuer die Datenleitungen aller register
     TYPE t_mat_logic_arr IS ARRAY(c_num_mat_regs-1 DOWNTO 0) OF STD_LOGIC;
 
-    TYPE t_opcode IS (MatDel, MatMul, MatAdd, VecAdd, MatTrans, MatFlip, RowSum, ScalarMul, ScalarDiv, ScalarMax, ScalarSubIx, NoOp);
+    TYPE t_opcode IS (MatDel, MatMul, MatAdd, VecAdd, MatTrans, MatFlip, ColSum, ScalarMul, ScalarDiv, ScalarMax, ScalarSubIx, NoOp);
     
     -- Typen fuer alle Parallel ausgefuehrten Operationen
     TYPE t_opcodes IS ARRAY(c_num_parallel_op-1 DOWNTO 0) OF t_opcode;
     TYPE t_mat_elems IS ARRAY(c_num_parallel_op-1 DOWNTO 0) OF t_mat_elem;
-    TYPE t_mat_sizes IS ARRAY(c_num_parallel_op-1 DOWNTO 0) OF t_mat_size;
+    TYPE t_mat_sizes IS ARRAY(c_num_parallel_op-1 DOWNTO 0) OF  t_mat_size;
     TYPE t_mat_words IS ARRAY(c_num_parallel_op-1 DOWNTO 0) OF t_mat_word;
     TYPE t_op_std_logics IS ARRAY(c_num_parallel_op-1 DOWNTO 0) OF STD_LOGIC;
     TYPE t_mat_ixs IS ARRAY(c_num_parallel_op-1 DOWNTO 0) OF t_mat_ix;
@@ -64,6 +64,7 @@ PACKAGE pkg_tools IS
     FUNCTION to_mat_word(x: t_mat_word_const) RETURN t_mat_word; 
     FUNCTION to_mat_elem(x: REAL) RETURN t_mat_elem;
     FUNCTION to_mat_elem(x: UNRESOLVED_sfixed) RETURN t_mat_elem;
+    FUNCTION to_mat_elem(x: STD_LOGIC_VECTOR) RETURN t_mat_elem;
     FUNCTION to_mat_ix_el(x: INTEGER) RETURN t_mat_ix_elem;
     FUNCTION to_mat_ix(row: INTEGER; col: INTEGER) RETURN t_mat_ix;
     FUNCTION to_mat_size_el(x: INTEGER) RETURN t_mat_ix_elem;
@@ -71,6 +72,8 @@ PACKAGE pkg_tools IS
     FUNCTION to_mat_reg_ix(x: INTEGER) RETURN t_mat_reg_ix;
     FUNCTION mat_elem_to_str(x: t_mat_elem) RETURN STRING;
     FUNCTION mat_size_to_str(x: t_mat_size) RETURN STRING;
+    
+    FUNCTION set_mat_word(x: STD_LOGIC) RETURN t_mat_word;
     
     PROCEDURE f_reg(
         SIGNAL s_rst_i      : IN STD_LOGIC;
@@ -143,6 +146,11 @@ PACKAGE BODY pkg_tools IS
         RETURN RESIZE(x, t_mat_elem'HIGH, t_mat_elem'LOW);
     END to_mat_elem;
     
+    FUNCTION to_mat_elem(x: STD_LOGIC_VECTOR) RETURN t_mat_elem IS
+    BEGIN
+        RETURN to_sfixed(x, t_mat_elem'HIGH, t_mat_elem'LOW);
+    END to_mat_elem;
+    
     FUNCTION to_mat_ix_el(x: INTEGER) RETURN t_mat_ix_elem IS
     BEGIN
         RETURN TO_UNSIGNED(x, t_mat_ix_elem'LENGTH); 
@@ -189,6 +197,17 @@ PACKAGE BODY pkg_tools IS
     FUNCTION mat_size_to_str(x: t_mat_size) RETURN STRING IS
     BEGIN
         RETURN INTEGER'IMAGE(to_integer(to_ufixed(x.max_row, x.max_row'LENGTH)) + 1) & "x" & INTEGER'IMAGE(to_integer(to_ufixed(x.max_col, x.max_col'LENGTH)) + 1);
+    END;
+    
+    FUNCTION set_mat_word(x: STD_LOGIC) RETURN t_mat_word IS
+    VARIABLE data : t_mat_elem_slv;
+    VARIABLE res : t_mat_word;
+    BEGIN
+        data := (OTHERS => x);
+        FOR i IN t_mat_word'RANGE LOOP
+            res(i) := t_mat_elem(data);
+        END LOOP;
+        RETURN res;
     END;
     
     PROCEDURE f_reg(
