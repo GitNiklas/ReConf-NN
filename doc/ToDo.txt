@@ -1,3 +1,8 @@
+0 Doku
+    X Doku anpassen: ColSum
+        X PDF korrigieren
+        X Flowgraph anpassen
+            X FLipTrans muss an anderen Stellen gemacht werden
 1 Mat CPU - 31h
     1.1
         - TB für CPU Mul
@@ -127,10 +132,97 @@ Ende KW31:
 ----------------------------------------------------------------------------------------------------------------------------------------------------
 
 - Fragen an Timm
+    - Git
     - Code durchgehen, Optimierungsmöglichkeiten, ...
+    - Warnungen in Quartus & Modelsim
     - Spezifika meines Designs
         => Was kann meine Implementierung leisten wenn auf einem besseren/schnelleren FPGA ausgeführt
         - Maximale Taktrate
+        - Andere Kenngrößen die man in der Doku erwähnen sollte
         - ...
     - Serial Port in VHDl - STolperfalen o.ä.
     - Dateien (Bilder) in Modelsim laden und über Serial Port meines Designs schicken
+        -> Komplette Simulation des Programmablaufs
+
+
+
+Ergebnisse Gespräch Timm
+    - ALU
+        - Statt 1 Finished Flag alle 3 Rausgeben
+    - MEGAMUX
+        - statt den Standardwerten am Anfang der Prozesse Dont Cares verwenden
+    - Reconf-Algo
+        - Kein Zustandsautomat
+        - Stattdessen opcodes, reg_ixs, usw in Array Speichern
+        - Program Counter um Array zu indizieren
+    - Serial Port
+        - Senden
+            - Schieberegister mit Daten, Start und Stoppbit
+            - rausschieben mit bestimmter Geschwindigkeit
+        - Empfangen
+            - auf fallende Flanke warten
+            - dann 1/2 bit warten, so dass in der mitte abgetastet wird
+            - dann bit abtasten, also 1x schieberegister schieben
+            - dann 1 bit warten
+            - nächstes bit abtatsten...
+        - Zum Puffern der Daten: Megawizard FiFo Block verwenden
+        - Alternativ: 2 Mat Register in die abwechselnd rein geschrieben wird
+            - Es muss garantiert sein dass der Algo rechtzeitg fertig wird
+        - Kritisch: Uart wird 97% der Rechenzeit belegen, dann werden sich unsere Programme kaum unterscheiden
+
+    - Test-Matrizen
+        - Daten in Array Speichern und durchiterieren
+
+    - Taktanalyse
+        - *.sdc Datei Erstellen => Grobe Abschätzung durch Compiler
+        - Genauer Analyse: TimeQuest Timing Analyzer Wizard
+            - Im 1. Tab
+                - Taktrate einstellen: 50MHz
+                - Dann sagt er ob er es mit 50Mhz schafft
+                    - Wenn nicht muss ich Registerstufen einführen
+                - Er sagt auch ob er es schneller schafft. Das ist aber nicht unbedingt die Maximale Taktrate
+            - Der gibt auch Reports raus, aus denen kann man sich dann die eigentliche max. Taktrate berechnen
+        - Anderes Device einstellen
+            - Und nochmal den TimeQuest Timing Analyzer Wizard durchlaufen lassen, ob es z.b. mit 300 MHz klappt
+
+    - Kenngrößen fpr Doku:
+        - Max Taktrate 
+            - Taktrate die der Algo benötigt, bis er fertig ist
+        - Platzbedarf des Designs
+        - Benötigte RAM-Blöcke
+        - Verwendete Multiplizierer
+        - Besserer FPGA
+            - Schnellere Taktrate
+            - Mehr Parallelität möglich
+
+    - alle 3 finished flags rausgeben
+    - statt standardwerte dont care verwenden
+    - kein zustandsautomat für algo sondern zähler und damit ein array indizieren
+         quasi ein pc
+-serial
+    empfangen
+        - auf fallende flanke lauschen
+        - 1/2 bit warten
+        - dann abtastetn (1x schieben)
+        dann 1 bit waretn
+        - nächstes bit
+
+- megawizard fifo block zum puffern der uart daten
+
+- uart belegt 95% der benchmarking zeit
+
+- test-matrizen: in array speichern und dann durch iterieren
+
+*.sdc File Generieren zur Timing Analyse um Taktrate rauszukriegen
+=> TimeQust Analyzer Wizard 1.Tab
+    => Takt 50Mhz
+    => Läuft das mit 50Mhz??
+    => Reports durchschauen
+
+
+Doku
+    -Platzbedarf
+    - RAM blöcke
+    - Mehr Parallelität
+    - ANderes Device einstellen und schauen wie die max Taktrate da ist
+    - Takte die es braucht bis es fertig ist
