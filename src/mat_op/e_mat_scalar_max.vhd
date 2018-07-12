@@ -89,6 +89,7 @@ p_mat_c_size_o <= p_mat_a_size_i;
 
 proc_calc : PROCESS(p_mat_a_data_i)
 BEGIN
+-- Produces: Warning (10325): VHDL Choice warning at std_1164.vhd(1092): ignored choice containing meta-value "'X'" 
     FOR i IN p_mat_a_data_i'RANGE LOOP
         IF p_mat_a_data_i(i) > scalar THEN
             p_mat_c_data_o(i) <= p_mat_a_data_i(i);

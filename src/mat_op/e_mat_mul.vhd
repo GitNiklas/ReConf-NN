@@ -108,7 +108,7 @@ END COMPONENT;
 SIGNAL s_result_t2, s_last_result_t2, s_last_result_t3: t_mat_elem;
 SIGNAL s_ix_c_t0, s_ix_c_t2 : t_mat_ix;
 SIGNAL s_col_a_row_b_t0, s_col_a_row_b_t1: t_mat_ix_elem;
-SIGNAL s_first_elem_t1, s_finished : STD_LOGIC;
+SIGNAL s_first_elem_t1, s_finished_t1, s_finished_t2 : STD_LOGIC;
 SIGNAL s_last_col_a_row_b_t1, s_last_col_a_row_b_t2 : STD_LOGIC;
 SIGNAL s_c_size : t_mat_size;
 
@@ -141,7 +141,7 @@ PORT MAP(
     p_clk_i             => p_clk_i,
     
     p_syn_rst_i         => p_syn_rst_i,
-    p_finished_o        => s_finished,
+    p_finished_o        => s_finished_t1,
     p_word_done_i       => s_last_col_a_row_b_t1,
 
     p_size_i            => s_c_size,
@@ -181,17 +181,19 @@ PORT MAP(
 ----------------------------------------------------------------------------------------------------
 p_mat_a_ix_o            <= (s_ix_c_t0.row, s_col_a_row_b_t0);
 p_mat_b_ix_o            <= (s_col_a_row_b_t0, s_ix_c_t0.col);
-s_last_col_a_row_b_t1   <= to_sl((p_mat_a_size_i.max_col < t_mat_word'LENGTH) OR (s_col_a_row_b_t1 = t_mat_word'LENGTH)) OR s_finished;
+s_last_col_a_row_b_t1   <= to_sl((p_mat_a_size_i.max_col < t_mat_word'LENGTH) OR (s_col_a_row_b_t1 = t_mat_word'LENGTH)) OR s_finished_t2;
 s_last_result_t2        <= s_result_t2 WHEN s_last_col_a_row_b_t2 = '0' ELSE to_mat_elem(0.0);
 
 s_c_size                <= (p_mat_a_size_i.max_row, p_mat_b_size_i.max_col);
 p_mat_c_size_o          <= s_c_size;
-p_finished_o            <= s_finished;
+p_finished_o            <= s_finished_t1;
 
 s_col_a_row_b_t0        <=  to_mat_ix_el(0) WHEN to_bool(s_first_elem_t1 OR s_last_col_a_row_b_t1) ELSE
                             s_col_a_row_b_t1 + t_mat_word'LENGTH;
                             
 
+f_reg(p_rst_i, p_clk_i, p_syn_rst_i, s_finished_t1, s_finished_t2);
+                            
 END ARCHITECTURE a_mat_mul;
 
 ----------------------------------------------------------------------------------------------------
