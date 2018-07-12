@@ -8,9 +8,9 @@ USE work.pkg_tools.ALL;
 -- MatAdd: A and B must have the same orientation
 -- Other OPs: Egal
 -- OpCores:
---   OpCore0: MatMul, MatAdd, VecAdd, RowSum, NoOp
+--   OpCore0: MatMul, MatAdd, VecAdd, NoOp
 --   OpCore1: ScalarMul, ScalarDiv, ScalarMax, ScalarSubIx, NoOp
---   OpCore2: MatTrans, MatFlip, MatDel, NoOp
+--   OpCore2: MatTrans, MatFlip, MatDel, ColSum, NoOp -- evtl ein 2. MatAdd
 ENTITY e_mat_alu IS       
     PORT (    
         p_rst_i                 : IN STD_LOGIC;
@@ -397,11 +397,11 @@ BEGIN
                             p_mat_c_size_o(0)   <= s_add_c_size;
                             
         WHEN OTHERS     =>  s_finished_t1(0)    <= '1';
-                            p_mat_a_ix_o(0)     <= s_mul_a_ix;
-                            p_mat_b_ix_o(0)     <= s_mul_b_ix;
-                            p_mat_c_ix_o(0)     <= s_mul_c_ix;
-                            p_mat_c_data_o(0)   <= s_mul_c_data;
-                            p_mat_c_size_o(0)   <= s_mul_c_size;
+                            p_mat_a_ix_o(0)     <= ((OTHERS => '-'), (OTHERS => '-'));
+                            p_mat_b_ix_o(0)     <= ((OTHERS => '-'), (OTHERS => '-'));
+                            p_mat_c_ix_o(0)     <= ((OTHERS => '-'), (OTHERS => '-'));
+                            p_mat_c_data_o(0)   <= set_mat_word('-');
+                            p_mat_c_size_o(0)   <= ((OTHERS => '-'), (OTHERS => '-'));
     END CASE;
 END PROCESS proc_opcore0;
 
@@ -431,10 +431,10 @@ BEGIN
                             p_mat_c_size_o(1)   <= s_scalar_max_c_size;
                             
         WHEN OTHERS     =>  s_finished_t1(1)    <= '1';
-                            p_mat_a_ix_o(1)     <= s_scalar_mul_a_ix;
-                            p_mat_c_ix_o(1)     <= s_scalar_mul_c_ix;
-                            p_mat_c_data_o(1)   <= s_scalar_mul_c_data;
-                            p_mat_c_size_o(1)   <= s_scalar_mul_c_size;
+                            p_mat_a_ix_o(1)     <= ((OTHERS => '-'), (OTHERS => '-'));
+                            p_mat_c_ix_o(1)     <= ((OTHERS => '-'), (OTHERS => '-'));
+                            p_mat_c_data_o(1)   <= set_mat_word('-');
+                            p_mat_c_size_o(1)   <= ((OTHERS => '-'), (OTHERS => '-'));
     END CASE;
 END PROCESS proc_opcore1;
 
@@ -455,9 +455,9 @@ BEGIN
                             p_mat_c_size_o(2)   <= s_del_c_size;
                             
         WHEN OTHERS     =>  s_finished_t1(2)    <= '1';
-                            p_mat_c_ix_o(2)     <= s_del_c_ix;
-                            p_mat_c_data_o(2)   <= s_del_c_data;
-                            p_mat_c_size_o(2)   <= s_del_c_size;
+                            p_mat_c_ix_o(2)     <= ((OTHERS => '-'), (OTHERS => '-'));
+                            p_mat_c_data_o(2)   <= set_mat_word('-');
+                            p_mat_c_size_o(2)   <= ((OTHERS => '-'), (OTHERS => '-'));
     END CASE;
 END PROCESS proc_opcore2;
 
