@@ -45,12 +45,13 @@
         - Restliche Operationen
             - FlipTrans 2h
             X VecAdd - 2h
-            - RowSum - 4h
+            X ColSum - 4h
             - ScalarSubIx - 4h
-    1.8 8h
+    1.8 8h 
+        - TB
             - FlipTrans 2h
             X VecAdd - 2h
-            - RowSum - 3h
+            X ColSum - 3h
             - ScalarSubIx - 3h
     
     1.9 3 OpCores
@@ -62,7 +63,11 @@
         X Matrizenvergleich beschleunigen
     1.11 
         - Matrix Löschen beschleunigen
-        - 2. Kern der Addition kann
+        - 2. AMtAdd hinzüfügen (zu OpCore 2) => 2 Parallele Additionen
+        - Warnungen/ Fehlermeldungen bei falschen row_by_row
+            - matmul
+            - mattrans (muss bei beiden gleich sein)
+            - ...
      
 2 Reconf Algo - 30h
     2.1 -1h

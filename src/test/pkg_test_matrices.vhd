@@ -21,12 +21,13 @@ PROCEDURE init_mat_a1_64x64_cbc(                reg : INTEGER; SIGNAL s_write_a0
 PROCEDURE init_mat_result_a0_add_a0(            reg : INTEGER; SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word; SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN t_op_std_logics);
 PROCEDURE init_mat_result_a1_add_a1(            reg : INTEGER; SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word; SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN t_op_std_logics);
 PROCEDURE init_mat_result_a0_trans(             reg : INTEGER; SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word; SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN t_op_std_logics);
-PROCEDURE init_mat_result_a1_trans(             reg : INTEGER;  SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word; SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN t_op_std_logics);
+PROCEDURE init_mat_result_a1_trans(             reg : INTEGER; SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word; SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN t_op_std_logics);
 PROCEDURE init_mat_result_a0_scalar_max(        reg : INTEGER; SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word; SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN t_op_std_logics);
 PROCEDURE init_mat_a2_64x64_rbr(                reg : INTEGER; SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word; SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN t_op_std_logics);
 PROCEDURE init_mat_result_a2_scalar_div(        reg : INTEGER; SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word; SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN t_op_std_logics);
 PROCEDURE init_mat_a3_1x64_rbr(                 reg : INTEGER; SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word; SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN t_op_std_logics);
 PROCEDURE init_mat_result_a0_vec_add_a3(        reg : INTEGER; SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word; SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN t_op_std_logics);
+PROCEDURE init_mat_result_a0_col_sum(           reg : INTEGER; SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word; SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN t_op_std_logics);
 
 END;
 
@@ -477,7 +478,7 @@ PROCEDURE init_mat_result_a0_vec_add_a3(
     SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
     SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN t_op_std_logics
 ) IS
-VARIABLE data : t_mat_word_const_arr(0 To 127);
+VARIABLE data : t_mat_word_const_arr(0 TO 127);
 BEGIN
     FOR i IN data'RANGE LOOP
         IF i mod 2 = 0 THEN
@@ -497,5 +498,19 @@ BEGIN
     data(127) :=                    (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,          2.3125, -2.0);
     init_reg(data, '1', to_mat_size(64, 64), reg, "VecAdd(a0, a2)", s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
 END init_mat_result_a0_vec_add_a3;
+
+PROCEDURE init_mat_result_a0_col_sum(
+    reg : INTEGER; 
+    SIGNAL s_write_a0 : OUT STD_LOGIC; SIGNAL s_size_a0_i : OUT t_mat_size; SIGNAL s_row_by_row_a0_i : OUT STD_LOGIC; SIGNAL s_ix_a0 : OUT t_mat_ix; SIGNAL s_data_a0_i : OUT t_mat_word;
+    SIGNAL s_sel_a : OUT t_mat_reg_ixs; SIGNAL s_sel_c : OUT t_mat_reg_ixs; SIGNAL s_opcode : OUT t_opcodes; SIGNAL s_wren : OUT STD_LOGIC; SIGNAL s_syn_rst : OUT STD_LOGIC; SIGNAL s_finished : IN t_op_std_logics
+) IS
+VARIABLE data : t_mat_word_const_arr(0 TO 1);
+BEGIN
+data := (
+        (2.25, 1.125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+                    (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.0, 4.5)
+    );
+    init_reg(data, '1', to_mat_size(1, 64), reg, "ColSum(a1)", s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+END init_mat_result_a0_col_sum;
 
 END PACKAGE BODY;
