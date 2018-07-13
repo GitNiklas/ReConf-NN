@@ -75,14 +75,6 @@ PACKAGE pkg_tools IS
     
     FUNCTION set_mat_word(x: STD_LOGIC) RETURN t_mat_word;
     
-    PROCEDURE f_reg(
-        SIGNAL s_rst_i      : IN STD_LOGIC;
-        SIGNAL s_clk_i      : IN STD_LOGIC;
-        SIGNAL s_syn_rst_i  : IN STD_LOGIC;
-        SIGNAL s_dat_i      : IN STD_LOGIC;
-        SIGNAL s_dat_o      : OUT STD_LOGIC
-    );
-    
 ----------------------------------------------------------------------------------------------------
 --  Matrix Konstanten
 ----------------------------------------------------------------------------------------------------    
@@ -91,6 +83,13 @@ PACKAGE pkg_tools IS
     CONSTANT c_mat_elem_zero : t_mat_elem;
     CONSTANT c_mat_word_zero : t_mat_word;
     
+    PROCEDURE f_reg(
+        SIGNAL s_rst_i      : IN STD_LOGIC;
+        SIGNAL s_clk_i      : IN STD_LOGIC;
+        SIGNAL s_syn_rst_i  : IN STD_LOGIC;
+        SIGNAL s_dat_i      : IN STD_LOGIC;
+        SIGNAL s_dat_o      : OUT STD_LOGIC
+    );
 ----------------------------------------------------------------------------------------------------
 --  Serial
 ----------------------------------------------------------------------------------------------------
@@ -105,10 +104,14 @@ PACKAGE pkg_tools IS
     ----------------------------------------------------------------------------------------------------
     FUNCTION f_calc_serial_wait_time(baudrate: POSITIVE) RETURN TIME;
 
+----------------------------------------------------------------------------------------------------
+--  Reporting
+----------------------------------------------------------------------------------------------------
+    FUNCTION infomsg(x: STRING) RETURN STRING;
+    FUNCTION err(x: STRING) RETURN STRING;
 END;
 
-PACKAGE BODY pkg_tools IS
-
+PACKAGE BODY pkg_tools IS    
     FUNCTION to_sl(x: BOOLEAN) RETURN STD_LOGIC IS
     BEGIN
         IF x THEN 
@@ -179,11 +182,6 @@ PACKAGE BODY pkg_tools IS
             RETURN TO_UNSIGNED(0, t_mat_reg_ix'LENGTH);
         END IF;
     END to_mat_reg_ix;
-   
-    FUNCTION f_calc_serial_wait_time(baudrate: POSITIVE) RETURN TIME IS
-    BEGIN
-        RETURN 1 sec / baudrate; 
-    END f_calc_serial_wait_time;
     
     FUNCTION mat_elem_to_str(x: t_mat_elem) RETURN STRING IS
     VARIABLE str_bits : STRING(1 TO 9) := "????.????";
@@ -210,6 +208,11 @@ PACKAGE BODY pkg_tools IS
         RETURN res;
     END;
     
+    CONSTANT c_mat_ix_zero : t_mat_ix := to_mat_ix(0, 0);
+    CONSTANT c_mat_size_zero : t_mat_size := to_mat_size(1, 1);
+    CONSTANT c_mat_elem_zero : t_mat_elem := to_mat_elem(0.0);
+    CONSTANT c_mat_word_zero : t_mat_word := (OTHERS => c_mat_elem_zero);
+    
     PROCEDURE f_reg(
         SIGNAL s_rst_i      : IN STD_LOGIC;
         SIGNAL s_clk_i      : IN STD_LOGIC;
@@ -229,9 +232,22 @@ PACKAGE BODY pkg_tools IS
         END IF;
     END f_reg;
     
+    FUNCTION f_calc_serial_wait_time(baudrate: POSITIVE) RETURN TIME IS
+    BEGIN
+        RETURN 1 sec / baudrate; 
+    END f_calc_serial_wait_time;
     
-    CONSTANT c_mat_ix_zero : t_mat_ix := to_mat_ix(0, 0);
-    CONSTANT c_mat_size_zero : t_mat_size := to_mat_size(1, 1);
-    CONSTANT c_mat_elem_zero : t_mat_elem := to_mat_elem(0.0);
-    CONSTANT c_mat_word_zero : t_mat_word := (OTHERS => c_mat_elem_zero);
+    
+    CONSTANT c_err_prefix : STRING :=   "-------------------- ERROR -------------------- ";
+    CONSTANT c_info_prefix : STRING :=  "                                                ";
+    
+    FUNCTION infomsg(x: STRING) RETURN STRING IS
+    BEGIN
+        RETURN c_info_prefix & x;
+    END;
+    
+    FUNCTION err(x: STRING) RETURN STRING IS
+    BEGIN
+        RETURN c_err_prefix & x;
+    END;
 END PACKAGE BODY;

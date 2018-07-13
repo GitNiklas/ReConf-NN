@@ -5,9 +5,6 @@ USE work.pkg_tools.ALL;
 USE work.fixed_pkg.ALL;
     
 PACKAGE pkg_test IS  
-    FUNCTION infomsg(x: STRING) RETURN STRING;
-    FUNCTION err(x: STRING) RETURN STRING;
-    
     PROCEDURE delete_reg(
         CONSTANT reg: INTEGER;
         
@@ -63,19 +60,17 @@ PACKAGE pkg_test IS
 END;
 
 PACKAGE BODY pkg_test IS
-
-    CONSTANT c_err_prefix : STRING :=   "-------------------- ERROR -------------------- ";
-    CONSTANT c_info_prefix : STRING :=  "                                                ";
     
-    FUNCTION infomsg(x: STRING) RETURN STRING IS
+    PROCEDURE ensure(
+        x: BOOLEAN;
+        msg: STRING
+    ) IS
     BEGIN
-        RETURN c_info_prefix & x;
-    END;
-    
-    FUNCTION err(x: STRING) RETURN STRING IS
-    BEGIN
-        RETURN c_err_prefix & x;
-    END;
+        IF NOT x THEN
+            ASSERT FALSE REPORT err(msg);
+            WAIT;
+        END IF;
+    END ensure;
     
     PROCEDURE delete_reg(
         CONSTANT reg: INTEGER; 
@@ -162,8 +157,10 @@ PACKAGE BODY pkg_test IS
         VARIABLE word_x, word_y : t_mat_word;
         VARIABLE data_x, data_y : t_mat_elem;
         VARIABLE col, row : INTEGER;
+        VARIABLE err_cnt : INTEGER;
     BEGIN
         REPORT infomsg("Vergleiche Matrix-Register " & INTEGER'IMAGE(reg_x) & " (x) und " & INTEGER'IMAGE(reg_y) & " (y)");
+        err_cnt := 0;
         read_a <= '1';  
         
         sel_a <= to_mat_reg_ix(reg_x);
@@ -176,8 +173,8 @@ PACKAGE BODY pkg_test IS
         row_by_row_y := row_by_row_a;
         size_y := size_a; 
         
-        ASSERT row_by_row_x = row_by_row_y REPORT err("Matrix_Orientierung (Spalten/Zeilenweise) unterschiedlich: row_by_row_x = " & STD_LOGIC'IMAGE(row_by_row_x) & ", row_by_row_y = " & STD_LOGIC'IMAGE(row_by_row_y));
-        ASSERT size_x = size_y REPORT err("Matrixdimensionen unterschiedlich: size_x = " & mat_size_to_str(size_x) & "; size_y = " & mat_size_to_str(size_y));
+        ensure(row_by_row_x = row_by_row_y, "Matrix_Orientierung (Spalten/Zeilenweise) unterschiedlich: row_by_row_x = " & STD_LOGIC'IMAGE(row_by_row_x) & ", row_by_row_y = " & STD_LOGIC'IMAGE(row_by_row_y));
+        ensure(size_x = size_y, "Matrixdimensionen unterschiedlich: size_x = " & mat_size_to_str(size_x) & "; size_y = " & mat_size_to_str(size_y));
         
         FOR lines_ix IN 0 TO c_max_mat_dim - 1 LOOP
             FOR word IN 0 TO c_max_mat_dim/t_mat_word'LENGTH - 1 LOOP -- Schleife ueber Woerter
@@ -205,9 +202,8 @@ PACKAGE BODY pkg_test IS
                     END IF;
                     data_x := word_x(word_index);
                     data_y := word_y(word_index);
-                    ASSERT data_x = data_y
-                        REPORT err("Die Matrizen unterscheiden sich an Position row=") & INTEGER'IMAGE(row) & ", col=" & INTEGER'IMAGE(col) 
-                        & ": data_x = " & REAL'IMAGE(to_real(data_x)) & " (" & mat_elem_to_str(data_x) & ")" & "; data_y = " & REAL'IMAGE(to_real(data_y)) & " (" & mat_elem_to_str(data_y) & ")";
+                    ensure(data_x = data_y, "Die Matrizen unterscheiden sich an Position row=" & INTEGER'IMAGE(row) & ", col=" & INTEGER'IMAGE(col) & ": data_x = " & REAL'IMAGE(to_real(data_x)) 
+                                            & " (" & mat_elem_to_str(data_x) & ")" & "; data_y = " & REAL'IMAGE(to_real(data_y)) & " (" & mat_elem_to_str(data_y) & ")" );
                 END LOOP;
             END LOOP;
         END LOOP;

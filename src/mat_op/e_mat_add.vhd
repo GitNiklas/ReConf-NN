@@ -4,6 +4,8 @@ use IEEE.NUMERIC_STD.all;
 USE work.fixed_pkg.ALL;
 USE work.pkg_tools.ALL;
 
+-- VecAdd mode: Add Vector in Line 0 of Mat_b to all lines of mat a
+-- only works when row_by_row = '1'
 ENTITY e_mat_add IS       
     PORT (    
         p_rst_i                 : IN STD_LOGIC;
@@ -11,6 +13,7 @@ ENTITY e_mat_add IS
         
         p_syn_rst_i             : IN STD_LOGIC;
         p_finished_o            : OUT STD_LOGIC;
+        p_vec_add_i             : IN STD_LOGIC;
         
         p_mat_a_size_i          : IN t_mat_size;
         p_mat_a_ix_o            : OUT t_mat_ix;
@@ -83,7 +86,8 @@ PORT MAP(
 --  Zuweisungen
 ----------------------------------------------------------------------------------------------------
 p_mat_a_ix_o <= s_mat_ab_ix;
-p_mat_b_ix_o <= s_mat_ab_ix;
+p_mat_b_ix_o <= s_mat_ab_ix WHEN p_vec_add_i = '0' 
+                ELSE (to_mat_ix_el(0), s_mat_ab_ix.col);
 p_mat_c_size_o <= p_mat_a_size_i;
 
 ----------------------------------------------------------------------------------------------------

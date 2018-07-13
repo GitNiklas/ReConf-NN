@@ -81,6 +81,7 @@ COMPONENT e_mat_add
         
         p_syn_rst_i             : IN STD_LOGIC;
         p_finished_o            : OUT STD_LOGIC;
+        p_vec_add_i             : IN STD_LOGIC;
         
         p_mat_a_size_i          : IN t_mat_size;
         p_mat_a_ix_o            : OUT t_mat_ix;
@@ -212,6 +213,8 @@ SIGNAL s_mul_c_data, s_add_c_data, s_del_c_data, s_trans_c_data, s_scalar_mul_c_
 SIGNAL s_mul_finished, s_add_finished, s_del_finished, s_trans_finished, s_scalar_mul_finished, s_scalar_div_finished, s_scalar_max_finished : STD_LOGIC;
 SIGNAL s_mul_c_size, s_add_c_size, s_del_c_size, s_trans_c_size, s_scalar_mul_c_size, s_scalar_div_c_size, s_scalar_max_c_size : t_mat_size;
 
+SIGNAL s_vec_add : STD_LOGIC;
+
 ----------------------------------------------------------------------------------------------------
 --  Port Maps
 ----------------------------------------------------------------------------------------------------
@@ -246,13 +249,14 @@ PORT MAP(
         
     p_syn_rst_i             => p_syn_rst_i,
     p_finished_o            => s_add_finished,
+    p_vec_add_i             => s_vec_add,
 
     p_mat_a_size_i          => p_mat_a_size_i(opcore_add),
     p_mat_a_ix_o            => s_add_a_ix,
     p_mat_a_data_i          => p_mat_a_data_i(opcore_add),
     
     p_mat_b_ix_o            => s_add_b_ix,
-    p_mat_b_data_i          => p_mat_a_data_i(opcore_add),
+    p_mat_b_data_i          => p_mat_b_data_i(opcore_add),
 
     p_mat_c_ix_o            => s_add_c_ix,
     p_mat_c_data_o          => s_add_c_data,
@@ -378,6 +382,7 @@ BEGIN
                             p_mat_c_ix_o(0)     <= s_mul_c_ix;
                             p_mat_c_data_o(0)   <= s_mul_c_data;
                             p_mat_c_size_o(0)   <= s_mul_c_size;
+                            s_vec_add           <= '-';
                             
         WHEN MatAdd     =>  s_finished_t1(0)    <= s_add_finished;
                             p_mat_a_ix_o(0)     <= s_add_a_ix;
@@ -385,6 +390,15 @@ BEGIN
                             p_mat_c_ix_o(0)     <= s_add_c_ix;
                             p_mat_c_data_o(0)   <= s_add_c_data;
                             p_mat_c_size_o(0)   <= s_add_c_size;
+                            s_vec_add           <= '0';
+                            
+        WHEN VecAdd     =>  s_finished_t1(0)    <= s_add_finished;
+                            p_mat_a_ix_o(0)     <= s_add_a_ix;
+                            p_mat_b_ix_o(0)     <= s_add_b_ix;
+                            p_mat_c_ix_o(0)     <= s_add_c_ix;
+                            p_mat_c_data_o(0)   <= s_add_c_data;
+                            p_mat_c_size_o(0)   <= s_add_c_size;
+                            s_vec_add           <= '1';
                             
         WHEN OTHERS     =>  s_finished_t1(0)    <= '1';
                             p_mat_a_ix_o(0)     <= ((OTHERS => '-'), (OTHERS => '-'));
@@ -392,6 +406,8 @@ BEGIN
                             p_mat_c_ix_o(0)     <= ((OTHERS => '-'), (OTHERS => '-'));
                             p_mat_c_data_o(0)   <= set_mat_word('-');
                             p_mat_c_size_o(0)   <= ((OTHERS => '-'), (OTHERS => '-'));
+                            s_vec_add           <= '-';
+                            IF p_opcode_i(0) /= NoOp THEN REPORT err("Nicht unterstuetze Operation auf Opcore 0"); END IF;
     END CASE;
 END PROCESS proc_opcore0;
 
@@ -425,6 +441,7 @@ BEGIN
                             p_mat_c_ix_o(1)     <= ((OTHERS => '-'), (OTHERS => '-'));
                             p_mat_c_data_o(1)   <= set_mat_word('-');
                             p_mat_c_size_o(1)   <= ((OTHERS => '-'), (OTHERS => '-'));
+                            IF p_opcode_i(1) /= NoOp THEN REPORT err("Nicht unterstuetze Operation auf Opcore 1"); END IF;
     END CASE;
 END PROCESS proc_opcore1;
 
@@ -448,6 +465,7 @@ BEGIN
                             p_mat_c_ix_o(2)     <= ((OTHERS => '-'), (OTHERS => '-'));
                             p_mat_c_data_o(2)   <= set_mat_word('-');
                             p_mat_c_size_o(2)   <= ((OTHERS => '-'), (OTHERS => '-'));
+                            IF p_opcode_i(2) /= NoOp THEN REPORT err("Nicht unterstuetze Operation auf Opcore 2"); END IF;
     END CASE;
 END PROCESS proc_opcore2;
 
