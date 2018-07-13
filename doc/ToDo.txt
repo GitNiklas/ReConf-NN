@@ -43,12 +43,15 @@
             X Alle einzel-TBs zusammen kopiert
     1.7 - 10h
         - Restliche Operationen
-            - FlipTrans
-            - VecAdd - 2h
+            - FlipTrans 2h
+            X VecAdd - 2h
             - RowSum - 4h
             - ScalarSubIx - 4h
     1.8 8h
-        - TBs dafür 
+            - FlipTrans 2h
+            X VecAdd - 2h
+            - RowSum - 3h
+            - ScalarSubIx - 3h
     
     1.9 3 OpCores
         X 0: MatMul, MatAdd, VecAdd, RowSum, NoOp
@@ -57,6 +60,9 @@
 
     1.10 
         X Matrizenvergleich beschleunigen
+    1.11 
+        - Matrix Löschen beschleunigen
+        - 2. Kern der Addition kann
      
 2 Reconf Algo - 30h
     2.1 -1h
@@ -178,3 +184,8 @@ Ergebnisse Gespräch Timm
         - Besserer FPGA
             - Schnellere Taktrate
             - Mehr Parallelität möglich
+
+
+
+- Modified Delete: Delete only used words in matrix
+- Add 2nd Adder to OpCore 2
