@@ -69,6 +69,7 @@ set_global_assignment -name VHDL_FILE mat_op/e_mat_col_sum.vhd
 set_global_assignment -name VHDL_FILE mat_op/e_mat_scalar_mul.vhd
 set_global_assignment -name VHDL_FILE mat_op/e_mat_scalar_div.vhd
 set_global_assignment -name VHDL_FILE mat_op/e_mat_scalar_max.vhd
+set_global_assignment -name VHDL_FILE mat_op/e_mat_scalar_sub_ix.vhd
 set_global_assignment -name VHDL_FILE mat/e_mat_ix_gen.vhd
 set_global_assignment -name VHDL_FILE mat/e_set_word_elem.vhd
 set_global_assignment -name VHDL_FILE mat/e_mat_reg.vhd
