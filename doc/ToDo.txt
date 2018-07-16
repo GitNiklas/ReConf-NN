@@ -3,6 +3,15 @@
         X PDF korrigieren
         X Flowgraph anpassen
             X FLipTrans muss an anderen Stellen gemacht werden
+    - Doku anpassen:
+        - Änderungen
+            - b2 ist jetzt cbc
+            - score ist initial cbc
+            - so kann die operation scalarsubix schnell ausgeführt werden
+            - dann wird flip ausgeführt
+        - Algo anpassen
+        - Flowchart anpassen
+        - Test für ColSum Spaltenweise speicherung
 1 Mat CPU - 31h
     1.1
         - TB für CPU Mul
@@ -43,10 +52,10 @@
             X Alle einzel-TBs zusammen kopiert
     1.7 - 10h
         - Restliche Operationen
-            - FlipTrans 2h
+            X FlipTrans 2h
             X VecAdd - 2h
             X ColSum - 4h
-            - ScalarSubIx - 4h
+            X ScalarSubIx - 4h
     1.8 8h 
         - TB
             - FlipTrans 2h

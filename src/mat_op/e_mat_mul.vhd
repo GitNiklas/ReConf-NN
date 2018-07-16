@@ -14,11 +14,11 @@ ENTITY e_mat_mul IS
         
         p_mat_a_size_i          : IN t_mat_size;
         p_mat_a_ix_o            : OUT t_mat_ix;
-        p_mat_a_data_i          : IN t_mat_word; -- a has to be line_by_line
+        p_mat_a_data_i          : IN t_mat_word; -- a has to be row_by_row = 1
         
         p_mat_b_size_i          : IN t_mat_size;
         p_mat_b_ix_o            : OUT t_mat_ix;
-        p_mat_b_data_i          : IN t_mat_word; -- b has to be row_by_row
+        p_mat_b_data_i          : IN t_mat_word; -- b has to be row_by_row = 0
 
         p_mat_c_ix_o            : OUT t_mat_ix; 
         p_mat_c_data_o          : OUT t_mat_word;
