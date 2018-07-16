@@ -21,7 +21,7 @@ ENTITY e_mat_alu IS
         p_finished_o            : OUT t_op_std_logics;
         
         p_opcode_i              : IN t_opcodes;
-        p_scalar_i              : IN t_mat_elem;
+        p_data_i                : IN STD_LOGIC_VECTOR(7 DOWNTO 0); -- scalar fuer scalarmul, ix fuer scalarsubix
         
         p_mat_a_size_i          : IN t_mat_sizes;
         p_mat_a_ix_o            : OUT t_mat_ixs;
@@ -345,7 +345,7 @@ PORT MAP(
     p_syn_rst_i             => p_syn_rst_i,
     p_finished_o            => s_scalar_mul_finished,
     
-    p_scalar_i              => p_scalar_i,
+    p_scalar_i              => to_mat_elem(p_data_i),
     
     p_mat_a_size_i          => p_mat_a_size_i(opcore_scalar_mul),
     p_mat_a_ix_o            => s_scalar_mul_a_ix,

@@ -12,7 +12,7 @@ ENTITY e_mat_scalar_mul IS
         p_syn_rst_i             : IN STD_LOGIC;
         p_finished_o            : OUT STD_LOGIC;
         
-        p_scalar_i              : IN t_mat_elem;
+        p_scalar_i              : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
         
         p_mat_a_size_i          : IN t_mat_size;
         p_mat_a_ix_o            : OUT t_mat_ix;
@@ -56,6 +56,7 @@ END COMPONENT;
 --  Signale
 ----------------------------------------------------------------------------------------------------
 SIGNAL s_mat_ab_ix : t_mat_ix;
+SIGNAL s_scalar : t_mat_elem;
 
 ----------------------------------------------------------------------------------------------------
 --  Port Maps
@@ -83,6 +84,7 @@ PORT MAP(
 ----------------------------------------------------------------------------------------------------
 p_mat_a_ix_o <= s_mat_ab_ix;
 p_mat_c_size_o <= p_mat_a_size_i;
+s_scalar <= to_mat_elem(p_scalar_i);
 
 ----------------------------------------------------------------------------------------------------
 --  Prozesse
@@ -91,7 +93,7 @@ p_mat_c_size_o <= p_mat_a_size_i;
 proc_calc : PROCESS(p_mat_a_data_i, p_scalar_i)
 BEGIN
     FOR i IN p_mat_a_data_i'RANGE LOOP
-        p_mat_c_data_o(i) <= to_mat_elem(p_mat_a_data_i(i) * p_scalar_i);
+        p_mat_c_data_o(i) <= to_mat_elem(p_mat_a_data_i(i) * s_scalar);
     END LOOP;
 END PROCESS proc_calc;
 
