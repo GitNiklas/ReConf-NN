@@ -3,15 +3,14 @@
         X PDF korrigieren
         X Flowgraph anpassen
             X FLipTrans muss an anderen Stellen gemacht werden
-    - Doku anpassen:
-        - Änderungen
-            - b2 ist jetzt cbc
-            - score ist initial cbc
-            - so kann die operation scalarsubix schnell ausgeführt werden
-            - dann wird flip ausgeführt
-        - Algo anpassen
-        - Flowchart anpassen
-        - Test für ColSum Spaltenweise speicherung
+    X Doku anpassen:
+        X Änderungen
+            X b2 ist jetzt cbc
+            X score ist initial cbc
+            X so kann die operation scalarsubix schnell ausgeführt werden
+            X dann wird flip ausgeführt
+        X Algo anpassen
+        X Flowchart anpassen
 1 Mat CPU - 31h
     1.1
         - TB für CPU Mul
@@ -59,6 +58,7 @@
     1.8 8h 
         - TB
             - FlipTrans 2h
+            - Test für ColSum Spaltenweise speicherung
             X VecAdd - 2h
             X ColSum - 3h
             - ScalarSubIx - 3h
@@ -73,10 +73,6 @@
     1.11 
         - Matrix Löschen beschleunigen
         - 2. AMtAdd hinzüfügen (zu OpCore 2) => 2 Parallele Additionen
-        - Warnungen/ Fehlermeldungen bei falschen row_by_row
-            - matmul
-            - mattrans (muss bei beiden gleich sein)
-            - ...
      
 2 Reconf Algo - 30h
     2.1 -1h
