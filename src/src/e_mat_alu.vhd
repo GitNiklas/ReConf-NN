@@ -160,7 +160,7 @@ COMPONENT e_mat_scalar_mul
         p_syn_rst_i             : IN STD_LOGIC;
         p_finished_o            : OUT STD_LOGIC;
         
-        p_scalar_i              : IN t_mat_elem;
+        p_scalar_i              : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
         
         p_mat_a_size_i          : IN t_mat_size;
         p_mat_a_ix_o            : OUT t_mat_ix;
@@ -213,6 +213,27 @@ COMPONENT e_mat_scalar_max
     );
 END COMPONENT;
 
+COMPONENT e_mat_scalar_sub_ix
+    GENERIC(scalar : t_mat_elem := to_mat_elem(1.0));
+    PORT (    
+        p_rst_i                 : IN STD_LOGIC;
+        p_clk_i                 : IN STD_LOGIC;
+        
+        p_syn_rst_i             : IN STD_LOGIC;
+        p_finished_o            : OUT STD_LOGIC;
+        
+        p_ix_i                  : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+        
+        p_mat_c_size_i          : IN t_mat_size;
+        p_mat_c_r_ix_o          : OUT t_mat_ix;
+        p_mat_c_data_i          : IN t_mat_word;
+        
+        p_mat_c_w_ix_o          : OUT t_mat_ix; 
+        p_mat_c_data_o          : OUT t_mat_word;
+        p_mat_c_size_o          : OUT t_mat_size
+    );
+END COMPONENT;
+
 ----------------------------------------------------------------------------------------------------
 --  Signale
 ----------------------------------------------------------------------------------------------------
@@ -224,15 +245,16 @@ CONSTANT opcore_col_sum : INTEGER := 2;
 CONSTANT opcore_scalar_mul : INTEGER := 1;
 CONSTANT opcore_scalar_div : INTEGER := 1;
 CONSTANT opcore_scalar_max : INTEGER := 1;
+CONSTANT opcore_scalar_sub_ix : INTEGER := 1;
 
 SIGNAL s_finished_t1, s_finished_t2, s_finished_t3 : t_op_std_logics;
 
-SIGNAL s_mul_a_ix, s_add_a_ix, s_trans_a_ix, s_col_sum_a_ix, s_scalar_mul_a_ix, s_scalar_div_a_ix, s_scalar_max_a_ix : t_mat_ix; 
+SIGNAL s_mul_a_ix, s_add_a_ix, s_trans_a_ix, s_col_sum_a_ix, s_scalar_mul_a_ix, s_scalar_div_a_ix, s_scalar_max_a_ix, s_scalar_sub_ix_a_ix : t_mat_ix; 
 SIGNAL s_mul_b_ix, s_add_b_ix : t_mat_ix;  
-SIGNAL s_mul_c_ix, s_add_c_ix, s_del_c_ix, s_trans_c_ix, s_col_sum_c_ix, s_scalar_mul_c_ix, s_scalar_div_c_ix, s_scalar_max_c_ix : t_mat_ix;
-SIGNAL s_mul_c_data, s_add_c_data, s_del_c_data, s_trans_c_data, s_col_sum_c_data, s_scalar_mul_c_data, s_scalar_div_c_data, s_scalar_max_c_data : t_mat_word;
-SIGNAL s_mul_finished, s_add_finished, s_del_finished, s_trans_finished, s_col_sum_finished, s_scalar_mul_finished, s_scalar_div_finished, s_scalar_max_finished : STD_LOGIC;
-SIGNAL s_mul_c_size, s_add_c_size, s_del_c_size, s_trans_c_size, s_col_sum_c_size, s_scalar_mul_c_size, s_scalar_div_c_size, s_scalar_max_c_size : t_mat_size;
+SIGNAL s_mul_c_ix, s_add_c_ix, s_del_c_ix, s_trans_c_ix, s_col_sum_c_ix, s_scalar_mul_c_ix, s_scalar_div_c_ix, s_scalar_max_c_ix, s_scalar_sub_ix_c_ix : t_mat_ix;
+SIGNAL s_mul_c_data, s_add_c_data, s_del_c_data, s_trans_c_data, s_col_sum_c_data, s_scalar_mul_c_data, s_scalar_div_c_data, s_scalar_max_c_data, s_scalar_sub_ix_c_data : t_mat_word;
+SIGNAL s_mul_finished, s_add_finished, s_del_finished, s_trans_finished, s_col_sum_finished, s_scalar_mul_finished, s_scalar_div_finished, s_scalar_max_finished, s_scalar_sub_ix_finished : STD_LOGIC;
+SIGNAL s_mul_c_size, s_add_c_size, s_del_c_size, s_trans_c_size, s_col_sum_c_size, s_scalar_mul_c_size, s_scalar_div_c_size, s_scalar_max_c_size, s_scalar_sub_ix_c_size : t_mat_size;
 
 SIGNAL s_vec_add : STD_LOGIC;
 
@@ -345,7 +367,7 @@ PORT MAP(
     p_syn_rst_i             => p_syn_rst_i,
     p_finished_o            => s_scalar_mul_finished,
     
-    p_scalar_i              => to_mat_elem(p_data_i),
+    p_scalar_i              => p_data_i,
     
     p_mat_a_size_i          => p_mat_a_size_i(opcore_scalar_mul),
     p_mat_a_ix_o            => s_scalar_mul_a_ix,
@@ -390,6 +412,25 @@ PORT MAP(
     p_mat_c_ix_o            => s_scalar_max_c_ix,
     p_mat_c_data_o          => s_scalar_max_c_data,
     p_mat_c_row_by_row_i    => p_mat_c_row_by_row_i(opcore_scalar_max),
+    p_mat_c_size_o          => s_scalar_max_c_size
+);
+
+mat_scalar_sub_ix : e_mat_scalar_sub_ix
+PORT MAP(
+    p_rst_i                 => p_rst_i,
+    p_clk_i                 => p_clk_i,
+        
+    p_syn_rst_i             => p_syn_rst_i,
+    p_finished_o            => s_scalar_sub_ix_finished,
+    
+    p_ix_i                  => p_data_i,
+        
+    p_mat_c_size_i          => p_mat_a_size_i(opcore_scalar_sub_ix),
+    p_mat_c_r_ix_o          => s_scalar_sub_ix_a_ix,
+    p_mat_c_data_i          => p_mat_a_data_i(opcore_scalar_sub_ix),
+        
+    p_mat_c_w_ix_o          => s_scalar_sub_ix_c_ix,
+    p_mat_c_data_o          => s_scalar_sub_ix_c_data,
     p_mat_c_size_o          => s_scalar_max_c_size
 );
 
@@ -475,6 +516,12 @@ BEGIN
                             p_mat_c_ix_o(1)     <= s_scalar_max_c_ix;
                             p_mat_c_data_o(1)   <= s_scalar_max_c_data;
                             p_mat_c_size_o(1)   <= s_scalar_max_c_size;
+                            
+        WHEN ScalarSubIx => s_finished_t1(1)    <= s_scalar_sub_ix_finished;
+                            p_mat_a_ix_o(1)     <= s_scalar_sub_ix_a_ix;   
+                            p_mat_c_ix_o(1)     <= s_scalar_sub_ix_c_ix;
+                            p_mat_c_data_o(1)   <= s_scalar_sub_ix_c_data;
+                            p_mat_c_size_o(1)   <= s_scalar_sub_ix_c_size;
                             
         WHEN OTHERS     =>  s_finished_t1(1)    <= '1';
                             p_mat_a_ix_o(1)     <= ((OTHERS => '-'), (OTHERS => '-'));

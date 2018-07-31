@@ -5,7 +5,7 @@ USE work.fixed_pkg.ALL;
 USE work.pkg_tools.ALL;
 
 ENTITY e_mat_scalar_sub_ix IS
-    GENERIC(scalar : t_mat_elem := to_mat_elem(1.0));         
+    GENERIC(scalar : t_mat_elem := to_mat_elem(1.0));
     PORT (    
         p_rst_i                 : IN STD_LOGIC;
         p_clk_i                 : IN STD_LOGIC;
@@ -97,20 +97,20 @@ BEGIN
                                 END IF;
 
                                 p_finished_o     <= '0';
-                                p_mat_c_r_ix_o   <= ((OTHERS => '-'), (OTHERS => '-'));     -- todo: geht das so????
+                                p_mat_c_r_ix_o   <= (to_mat_ix_el(0), to_mat_ix_el(0)); --((OTHERS => '-'), (OTHERS => '-'));     -- todo: geht das so????
                                 p_mat_c_w_ix_o   <= (to_mat_ix_el(0), s_ix);
 
         WHEN st_write_1 =>      s_next_state <= st_finished;
 
                                 p_finished_o     <= '0';
-                                p_mat_c_r_ix_o   <= ((OTHERS => '-'), (OTHERS => '-'));     -- todo: geht das so????
+                                p_mat_c_r_ix_o   <= (to_mat_ix_el(0), to_mat_ix_el(0)); --((OTHERS => '-'), (OTHERS => '-'));     -- todo: geht das so????
                                 p_mat_c_w_ix_o   <= (to_mat_ix_el(32), s_ix);
 
         WHEN st_finished =>     s_next_state <= s_cur_state;
 
                                 p_finished_o     <= '1';
-                                p_mat_c_r_ix_o   <= ((OTHERS => '-'), (OTHERS => '-'));     -- todo: geht das so????
-                                p_mat_c_w_ix_o   <= ((OTHERS => '-'), (OTHERS => '-'));     -- todo: geht das so????
+                                p_mat_c_r_ix_o   <= (to_mat_ix_el(0), to_mat_ix_el(0)); --((OTHERS => '-'), (OTHERS => '-'));     -- todo: geht das so????
+                                p_mat_c_w_ix_o   <= (to_mat_ix_el(0), to_mat_ix_el(0)); --((OTHERS => '-'), (OTHERS => '-'));     -- todo: geht das so????
         
     END CASE;
 END PROCESS proc_calc_state;

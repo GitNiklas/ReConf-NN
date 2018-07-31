@@ -120,14 +120,26 @@ PORT MAP(
 --  Zuweisungen
 ----------------------------------------------------------------------------------------------------
 
-s_c_size        <= (p_mat_a_size_i.max_col, p_mat_a_size_i.max_row);
 p_mat_c_size_o  <= s_c_size;
-s_mat_a_ix_t0   <= (s_mat_c_ix_t0.col, s_mat_c_ix_t0.row);
-s_mat_a_ix_t2   <= (s_mat_c_ix_t2.col, s_mat_c_ix_t2.row);
 p_mat_c_ix_o    <= s_mat_c_ix_t2;
 p_mat_a_ix_o    <= s_mat_a_ix_t0;
 
 s_word_ix       <= s_mat_a_ix_t2.col WHEN p_mat_a_row_by_row_i = '1' ELSE s_mat_a_ix_t2.row;
 s_c_elem        <= p_mat_a_data_i(to_integer(s_word_ix mod 32));
+
+
+proc_trans_mode : PROCESS(p_mat_a_row_by_row_i, p_mat_c_row_by_row_i, p_mat_a_size_i, s_mat_c_ix_t0, s_mat_c_ix_t2)
+BEGIN
+    IF p_mat_a_row_by_row_i /= p_mat_c_row_by_row_i THEN -- Change Matrix Orientation
+        s_c_size <= p_mat_a_size_i;
+        s_mat_a_ix_t0 <= s_mat_c_ix_t0;
+        s_mat_a_ix_t2 <= s_mat_c_ix_t2;
+    ELSE -- Normal Transpose
+        s_c_size <= (p_mat_a_size_i.max_col, p_mat_a_size_i.max_row);
+        s_mat_a_ix_t0 <= (s_mat_c_ix_t0.col, s_mat_c_ix_t0.row);
+        s_mat_a_ix_t2 <= (s_mat_c_ix_t2.col, s_mat_c_ix_t2.row);
+    END IF;
+END PROCESS proc_trans_mode;
+
 
 END ARCHITECTURE a_mat_trans;

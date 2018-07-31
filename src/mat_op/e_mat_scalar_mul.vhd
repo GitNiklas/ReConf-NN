@@ -90,7 +90,7 @@ s_scalar <= to_mat_elem(p_scalar_i);
 --  Prozesse
 ----------------------------------------------------------------------------------------------------
 
-proc_calc : PROCESS(p_mat_a_data_i, p_scalar_i)
+proc_calc : PROCESS(p_mat_a_data_i, s_scalar)
 BEGIN
     FOR i IN p_mat_a_data_i'RANGE LOOP
         p_mat_c_data_o(i) <= to_mat_elem(p_mat_a_data_i(i) * s_scalar);

@@ -38,7 +38,7 @@
 
 set_global_assignment -name FAMILY "Cyclone II"
 set_global_assignment -name DEVICE EP2C35F672C6
-set_global_assignment -name TOP_LEVEL_ENTITY e_mat_cpu
+set_global_assignment -name TOP_LEVEL_ENTITY e_mat_scalar_sub_ix
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 11.1
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "15:06:23  MAY 16, 2018"
 set_global_assignment -name LAST_QUARTUS_VERSION 11.0

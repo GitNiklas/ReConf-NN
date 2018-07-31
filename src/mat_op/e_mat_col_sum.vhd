@@ -19,7 +19,7 @@ ENTITY e_mat_col_sum IS
         
         p_mat_c_ix_o            : OUT t_mat_ix; 
         p_mat_c_data_o          : OUT t_mat_word;
-        p_mat_c_row_by_row_i    : IN STD_LOGIC; -- has to be row_by_row = 1
+        p_mat_c_row_by_row_i    : IN STD_LOGIC;
         p_mat_c_size_o          : OUT t_mat_size
     );
 END ENTITY e_mat_col_sum;
@@ -73,9 +73,10 @@ END COMPONENT;
 --  Signale
 ----------------------------------------------------------------------------------------------------
 SIGNAL s_c_size : t_mat_size;
-SIGNAL s_a_ix_t2, s_c_ix_t2 : t_mat_ix; 
+SIGNAL s_a_ix_t2, s_c_ix_t2, s_swe_ix : t_mat_ix; 
 SIGNAL s_result_t2, s_last_result_t2, s_last_result_t3 : t_mat_elem;
 SIGNAL s_first_elem_t1, s_first_elem_t2, s_word_done : STD_LOGIC;
+SIGNAL s_swe_word : t_mat_word;
 
 ----------------------------------------------------------------------------------------------------
 --  Port Maps
@@ -95,8 +96,8 @@ PORT MAP(
     p_row_by_row_i      => p_mat_c_row_by_row_i,
     p_size_i            => s_c_size,
     
-    p_word_o            => p_mat_c_data_o,
-    p_ix_write_o        => p_mat_c_ix_o
+    p_word_o            => s_swe_word,
+    p_ix_write_o        => s_swe_ix
 );
  
 ix_c_gen : e_mat_ix_gen
@@ -113,7 +114,7 @@ PORT MAP(
     p_row_by_row_i      => p_mat_a_row_by_row_i,
     p_mat_ix_t0_o       => p_mat_a_ix_o,
     p_mat_ix_t2_o       => s_a_ix_t2,
-    p_first_elem_t1_o   =>s_first_elem_t1
+    p_first_elem_t1_o   => s_first_elem_t1
 );
 
 ----------------------------------------------------------------------------------------------------
@@ -155,5 +156,17 @@ BEGIN
         END IF;
     END IF;
 END PROCESS proc_registers;
+
+proc_handle_orientation : PROCESS(p_mat_c_row_by_row_i, s_swe_word, s_swe_ix, s_result_t2, s_c_ix_t2)
+BEGIN
+    IF p_mat_c_row_by_row_i = '1' THEN
+        p_mat_c_data_o <= s_swe_word;
+        p_mat_c_ix_o <= s_swe_ix;
+    ELSE 
+        p_mat_c_data_o <= c_mat_word_zero;
+        p_mat_c_data_o(0) <= s_result_t2;
+        p_mat_c_ix_o <= s_c_ix_t2;
+    END IF;
+END PROCESS proc_handle_orientation;
 
 END ARCHITECTURE a_mat_col_sum;
