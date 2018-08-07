@@ -431,7 +431,7 @@ PORT MAP(
         
     p_mat_c_w_ix_o          => s_scalar_sub_ix_c_ix,
     p_mat_c_data_o          => s_scalar_sub_ix_c_data,
-    p_mat_c_size_o          => s_scalar_max_c_size
+    p_mat_c_size_o          => s_scalar_sub_ix_c_size
 );
 
 ----------------------------------------------------------------------------------------------------
@@ -495,7 +495,8 @@ END PROCESS proc_opcore0;
 proc_opcore1 : PROCESS(p_opcode_i,
     s_scalar_mul_finished, s_scalar_mul_a_ix, s_scalar_mul_c_ix, s_scalar_mul_c_data, s_scalar_mul_c_size,
     s_scalar_div_finished, s_scalar_div_a_ix, s_scalar_div_c_ix, s_scalar_div_c_data, s_scalar_div_c_size,
-    s_scalar_max_finished, s_scalar_max_a_ix, s_scalar_max_c_ix, s_scalar_max_c_data, s_scalar_max_c_size)
+    s_scalar_max_finished, s_scalar_max_a_ix, s_scalar_max_c_ix, s_scalar_max_c_data, s_scalar_max_c_size,
+    s_scalar_sub_ix_finished, s_scalar_sub_ix_a_ix, s_scalar_sub_ix_c_ix, s_scalar_sub_ix_c_data, s_scalar_sub_ix_c_size)
 BEGIN
     p_mat_b_ix_o(1)     <= c_mat_ix_zero;
     CASE p_opcode_i(1) IS

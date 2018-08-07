@@ -57,11 +57,11 @@
             X ScalarSubIx - 4h
     1.8 8h 
         - TB
-            - FlipTrans 2h
-            - Test für ColSum Spaltenweise speicherung
+            X FlipTrans 2h
+            x Test für ColSum Spaltenweise speicherung
             X VecAdd - 2h
             X ColSum - 3h
-            - ScalarSubIx - 3h
+            X ScalarSubIx - 3h
     
     1.9 3 OpCores
         X 0: MatMul, MatAdd, VecAdd, RowSum, NoOp
@@ -71,12 +71,14 @@
     1.10 
         X Matrizenvergleich beschleunigen
     1.11 
+        . ScalarSubIx korrigieren: Nur Ein bestimmtes Element verringern
+            ( Es muss in jeder Zeile ein anderes Element verringert weerden)
         - Matrix Löschen beschleunigen
         - 2. AMtAdd hinzüfügen (zu OpCore 2) => 2 Parallele Additionen
      
 2 Reconf Algo - 30h
     2.1 -1h
-        - Algorithmus zur Parallelen Verarbeitung anpassen
+        X Algorithmus zur Parallelen Verarbeitung anpassen
 
     2.1 2h
         - Entity entwerfen 

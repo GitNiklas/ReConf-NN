@@ -22,7 +22,7 @@ PACKAGE pkg_tools IS
 ----------------------------------------------------------------------------------------------------
     CONSTANT c_max_mat_dim : INTEGER := 64; 
     CONSTANT c_batch_size : INTEGER := c_max_mat_dim;
-    CONSTANT c_num_mat_regs : INTEGER := 10; 
+    CONSTANT c_num_mat_regs : INTEGER := 12; 
     CONSTANT c_num_parallel_op : INTEGER := 3; -- Anzahl parallel ausfuehrbarer Matrix-Operationen
     
     SUBTYPE t_mat_reg_ix IS UNSIGNED(3 DOWNTO 0); -- Range 0 to 11 used
@@ -50,6 +50,17 @@ PACKAGE pkg_tools IS
 
     TYPE t_opcode IS (MatDel, MatMul, MatAdd, VecAdd, MatTrans, ColSum, ScalarMul, ScalarDiv, ScalarMax, ScalarSubIx, NoOp);
     
+    TYPE t_cpu_base_instr IS RECORD
+        opcode : t_opcode;
+        sel_a : t_mat_reg_ix;
+        sel_b : t_mat_reg_ix;
+        sel_c : t_mat_reg_ix;
+        row_by_row : STD_LOGIC;
+    END RECORD t_cpu_base_instr;
+    
+    TYPE t_cpu_instr IS ARRAY(c_num_parallel_op-1 DOWNTO 0) OF t_cpu_base_instr; -- Typ parallele Ausfuerhrung von Instruktionen
+    TYPE t_program IS ARRAY (INTEGER RANGE <>) OF t_cpu_instr;
+    
     -- Typen fuer alle Parallel ausgefuehrten Operationen
     TYPE t_opcodes IS ARRAY(c_num_parallel_op-1 DOWNTO 0) OF t_opcode;
     TYPE t_mat_elems IS ARRAY(c_num_parallel_op-1 DOWNTO 0) OF t_mat_elem;
@@ -70,6 +81,7 @@ PACKAGE pkg_tools IS
     FUNCTION to_mat_size_el(x: INTEGER) RETURN t_mat_ix_elem;
     FUNCTION to_mat_size(max_row: INTEGER; max_col: INTEGER) RETURN t_mat_size;
     FUNCTION to_mat_reg_ix(x: INTEGER) RETURN t_mat_reg_ix;
+    FUNCTION reg(x: INTEGER) RETURN t_mat_reg_ix;
     FUNCTION mat_elem_to_str(x: t_mat_elem) RETURN STRING;
     FUNCTION mat_size_to_str(x: t_mat_size) RETURN STRING;
     
@@ -82,6 +94,7 @@ PACKAGE pkg_tools IS
     CONSTANT c_mat_size_zero : t_mat_size;
     CONSTANT c_mat_elem_zero : t_mat_elem;
     CONSTANT c_mat_word_zero : t_mat_word;
+    CONSTANT c_noop_instr : t_cpu_base_instr;
     
     PROCEDURE f_reg(
         SIGNAL s_rst_i      : IN STD_LOGIC;
@@ -183,6 +196,11 @@ PACKAGE BODY pkg_tools IS
         END IF;
     END to_mat_reg_ix;
     
+    FUNCTION reg(x: INTEGER) RETURN t_mat_reg_ix IS
+    BEGIN
+        RETURN to_mat_reg_ix(x);
+    END reg;
+    
     FUNCTION mat_elem_to_str(x: t_mat_elem) RETURN STRING IS
     VARIABLE str_bits : STRING(1 TO 9) := "????.????";
     BEGIN
@@ -212,6 +230,7 @@ PACKAGE BODY pkg_tools IS
     CONSTANT c_mat_size_zero : t_mat_size := to_mat_size(1, 1);
     CONSTANT c_mat_elem_zero : t_mat_elem := to_mat_elem(0.0);
     CONSTANT c_mat_word_zero : t_mat_word := (OTHERS => c_mat_elem_zero);
+    CONSTANT c_noop_instr : t_cpu_base_instr := (NoOp, reg(0), reg(0), reg(0), '1');
     
     PROCEDURE f_reg(
         SIGNAL s_rst_i      : IN STD_LOGIC;
