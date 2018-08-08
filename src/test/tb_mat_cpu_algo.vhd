@@ -65,9 +65,34 @@ SIGNAL s_ix_a0 : t_mat_ix;
 SIGNAL s_size_a0_i, s_size_a0_o : t_mat_size;
 SIGNAL s_row_by_row_a0_i, s_row_by_row_a0_o : STD_LOGIC;
 
-SIGNAL s_program : t_program(0 TO 1) := (
-    ((MatMul, reg(4), reg(0), reg(6), '1'), c_noop_instr, c_noop_instr ), 
-    ((MatAdd, reg(1), reg(6), reg(7), '1'), c_noop_instr, c_noop_instr )
+CONSTANT w1 : t_mat_reg_ix := to_mat_reg_ix(0);
+CONSTANT b1 : t_mat_reg_ix := to_mat_reg_ix(1);
+CONSTANT w2 : t_mat_reg_ix := to_mat_reg_ix(2);
+CONSTANT b2 : t_mat_reg_ix := to_mat_reg_ix(3);
+
+CONSTANT dw1 : t_mat_reg_ix := to_mat_reg_ix(4);
+CONSTANT db1 : t_mat_reg_ix := to_mat_reg_ix(5);
+CONSTANT dw2 : t_mat_reg_ix := to_mat_reg_ix(6);
+CONSTANT db2 : t_mat_reg_ix := to_mat_reg_ix(7);
+
+CONSTANT d2 : t_mat_reg_ix := to_mat_reg_ix(7);
+CONSTANT scores : t_mat_reg_ix := to_mat_reg_ix(7);
+CONSTANT d : t_mat_reg_ix := to_mat_reg_ix(9);
+CONSTANT hl : t_mat_reg_ix := to_mat_reg_ix(9);
+CONSTANT hl_ReLu : t_mat_reg_ix := to_mat_reg_ix(9);
+CONSTANT x_train : t_mat_reg_ix := to_mat_reg_ix(5);
+CONSTANT x_train_t : t_mat_reg_ix := to_mat_reg_ix(6);
+CONSTANT w2_t : t_mat_reg_ix := to_mat_reg_ix(8);
+
+CONSTANT dummy : t_mat_reg_ix := to_mat_reg_ix(0);
+
+SIGNAL s_program : t_program(0 TO 5) := (
+    ((MatMul, x_train, w1, d, '1'), c_noop_instr, c_noop_instr),
+    ((MatAdd, b1, d, hl, '1'), c_noop_instr, (MatTrans, x_train, dummy, x_train_t, '1')),
+    (c_noop_instr, (ScalarMax, hl, dummy, hl_ReLu, '1'), c_noop_instr),
+    ((MatMul, hl_ReLu, w2, d2, '0'), c_noop_instr, c_noop_instr),
+    ((MatAdd, b2, d2, scores, '1'), c_noop_instr, (MatTrans, w2, dummy, w2_t, '1')), 
+    (c_noop_instr, (ScalarMax, scores, dummy, scores, '1'), c_noop_instr)
 );
 
 ---------------------------------------------

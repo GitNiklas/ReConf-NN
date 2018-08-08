@@ -22,7 +22,7 @@ PACKAGE pkg_tools IS
 ----------------------------------------------------------------------------------------------------
     CONSTANT c_max_mat_dim : INTEGER := 64; 
     CONSTANT c_batch_size : INTEGER := c_max_mat_dim;
-    CONSTANT c_num_mat_regs : INTEGER := 12; 
+    CONSTANT c_num_mat_regs : INTEGER := 11; 
     CONSTANT c_num_parallel_op : INTEGER := 3; -- Anzahl parallel ausfuehrbarer Matrix-Operationen
     
     SUBTYPE t_mat_reg_ix IS UNSIGNED(3 DOWNTO 0); -- Range 0 to 11 used

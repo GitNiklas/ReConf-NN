@@ -39,3 +39,4 @@ src/ReConf-NN.map.rpt
 src/ReConf-NN.flow.rpt
 *.summary
 *.rpt
+src_py/
