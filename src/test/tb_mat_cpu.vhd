@@ -28,6 +28,7 @@ COMPONENT e_mat_cpu
         p_finished_o            : OUT t_op_std_logics;
         p_opcode_i              : IN t_opcodes;
         p_data_i                : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+        p_data_o                : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 
         p_sel_a_i               : IN t_mat_reg_ixs;
         p_sel_b_i               : IN t_mat_reg_ixs;
@@ -46,7 +47,24 @@ COMPONENT e_mat_cpu
     );
 END COMPONENT;
 
+COMPONENT e_ram_64_8
+	PORT (
+		clock : IN STD_LOGIC  := '1';
+		data : IN STD_LOGIC_VECTOR (7 DOWNTO 0);
+		rdaddress : IN STD_LOGIC_VECTOR (5 DOWNTO 0);
+		wraddress : IN STD_LOGIC_VECTOR (5 DOWNTO 0);
+		wren : IN STD_LOGIC  := '0';
+		q : OUT STD_LOGIC_VECTOR (7 DOWNTO 0)
+	);
+END COMPONENT;
+
+---------------------------------------------
+--  Typen, Konstanten
+---------------------------------------------
+
 CONSTANT test_prefix : STRING := " ---------- ";
+
+TYPE t_data_port_mode IS (DPMScalarSubIx, DPMScalarMul);
 
 ---------------------------------------------
 --  Prozeduren
@@ -144,10 +162,9 @@ BEGIN
     exec_op(ColSum, wait_finish, 2, reg_a, reg_b, reg_c, row_by_row, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
 END exec_col_sum;
 
-PROCEDURE exec_scalar_sub_ix(ix: INTEGER; wait_finish: BOOLEAN; reg_a: INTEGER; reg_b: INTEGER; reg_c: INTEGER; row_by_row: STD_LOGIC; SIGNAL s_scalar: OUT t_mat_elem_slv; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_b: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_c_row_by_row: OUT t_op_std_logics; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN t_op_std_logics) IS
+PROCEDURE exec_scalar_sub_ix(wait_finish: BOOLEAN; reg_a: INTEGER; reg_b: INTEGER; reg_c: INTEGER; row_by_row: STD_LOGIC; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_b: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_c_row_by_row: OUT t_op_std_logics; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN t_op_std_logics) IS
 BEGIN
-    REPORT infomsg("Starte Skalare Subtraktion in Spalte " & INTEGER'IMAGE(ix) & ": ScalarSubIx(Reg" & INTEGER'IMAGE(reg_c) & ")");
-    s_scalar <= "00" & STD_LOGIC_VECTOR(to_mat_ix_el(ix));
+    REPORT infomsg("Starte Skalare Subtraktion");
     exec_op(ScalarSubIx, wait_finish, 1, reg_a, reg_b, reg_c, row_by_row, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
 END exec_scalar_sub_ix;
 
@@ -277,9 +294,10 @@ BEGIN
     REPORT infomsg("Test: Matrix-Orientierung aendern BEENDET");
 END test_flip;
     
-PROCEDURE test_scalar_mul(SIGNAL s_scalar : OUT t_mat_elem_slv; SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_read_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_size_a0_o: IN t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC; SIGNAL s_row_by_row_a0_o: IN STD_LOGIC; SIGNAL s_ix_a0: OUT t_mat_ix; SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_data_a0_o: IN t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_b: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_c_row_by_row: OUT t_op_std_logics; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN t_op_std_logics) IS
+PROCEDURE test_scalar_mul(SIGNAL s_data_port_mode : OUT t_data_port_mode; SIGNAL s_scalar : OUT t_mat_elem_slv; SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_read_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_size_a0_o: IN t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC; SIGNAL s_row_by_row_a0_o: IN STD_LOGIC; SIGNAL s_ix_a0: OUT t_mat_ix; SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_data_a0_o: IN t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_b: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_c_row_by_row: OUT t_op_std_logics; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN t_op_std_logics) IS
 BEGIN
     REPORT infomsg("Test: Skalare Multiplikation");
+    s_data_port_mode <= DPMScalarMul;
     
     REPORT infomsg(test_prefix & "Test 1: a0 * 2");
     init_mat_a0_64x64_rbr(0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
@@ -365,22 +383,26 @@ BEGIN
     REPORT infomsg("Test: ColSum BEENDET");
 END test_col_sum;
 
-PROCEDURE test_scalar_sub_ix(SIGNAL s_ix : OUT STD_LOGIC_VECTOR(7 DOWNTO 0); SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_read_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_size_a0_o: IN t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC; SIGNAL s_row_by_row_a0_o: IN STD_LOGIC; SIGNAL s_ix_a0: OUT t_mat_ix; SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_data_a0_o: IN t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_b: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_c_row_by_row: OUT t_op_std_logics; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN t_op_std_logics) IS
+PROCEDURE test_scalar_sub_ix(SIGNAL s_data_port_mode : OUT t_data_port_mode; SIGNAL s_ix_arr_data_i : OUT STD_LOGIC_VECTOR (7 DOWNTO 0); SIGNAL s_ix_addr_write : OUT STD_LOGIC_VECTOR (5 DOWNTO 0); SIGNAL s_ix_arr_wren : OUT STD_LOGIC; SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_read_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_size_a0_o: IN t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC; SIGNAL s_row_by_row_a0_o: IN STD_LOGIC; SIGNAL s_ix_a0: OUT t_mat_ix; SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_data_a0_o: IN t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_b: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_c_row_by_row: OUT t_op_std_logics; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN t_op_std_logics) IS
 BEGIN
     REPORT infomsg("Test: ScalarSubIx");
     
-    REPORT infomsg(test_prefix & "Test 1: ScalarSubIx(a1, 1)");
-    init_mat_a1_64x64_cbc(0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    exec_scalar_sub_ix(1, TRUE, 0, 1, 0, '0', s_ix, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
-    --init_mat_result_a1_scalar_sub_ix_1(3, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    --assert_mat_reg_eq(0, 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    REPORT infomsg(test_prefix & "Test 1: ScalarSubIx(a1)");  
+    s_data_port_mode <= DPMScalarSubIx;
+    init_ix_array_scalar_sub_ix(s_ix_arr_data_i, s_ix_addr_write, s_ix_arr_wren);
+    
+    init_mat_a0_64x64_rbr(0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    exec_scalar_sub_ix(TRUE, 0, 1, 0, '1', s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
+    init_mat_result_a0_scalar_sub_ix(3, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    assert_mat_reg_eq(0, 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
     
     REPORT infomsg("Test: ScalarSubIx BEENDET");
 END test_scalar_sub_ix;
 
-PROCEDURE test_parallel(SIGNAL s_scalar : OUT t_mat_elem_slv; SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_read_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_size_a0_o: IN t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC; SIGNAL s_row_by_row_a0_o: IN STD_LOGIC; SIGNAL s_ix_a0: OUT t_mat_ix; SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_data_a0_o: IN t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_b: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_c_row_by_row: OUT t_op_std_logics; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN t_op_std_logics) IS
+PROCEDURE test_parallel(SIGNAL s_data_port_mode : OUT t_data_port_mode; SIGNAL s_scalar : OUT t_mat_elem_slv; SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_read_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_size_a0_o: IN t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC; SIGNAL s_row_by_row_a0_o: IN STD_LOGIC; SIGNAL s_ix_a0: OUT t_mat_ix; SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_data_a0_o: IN t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_b: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_c_row_by_row: OUT t_op_std_logics; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN t_op_std_logics) IS
 BEGIN
     REPORT infomsg("Test: Parallele Operations-Ausfuerhrung");
+    s_data_port_mode <= DPMScalarMul;
     
     REPORT infomsg(test_prefix & "Test 1: Mul/ScalarMul/Trans");
     
@@ -416,11 +438,13 @@ END test_parallel;
 ---------------------------------------------
 --  Signale
 ---------------------------------------------
+SIGNAL s_data_port_mode : t_data_port_mode;
+
 SIGNAL s_clk, s_rst, s_syn_rst, s_wren : STD_LOGIC;
 SIGNAL s_finished : t_op_std_logics;
 SIGNAL s_c_row_by_row : t_op_std_logics;
 SIGNAL s_opcode : t_opcodes;
-SIGNAL s_data : STD_LOGIC_VECTOR(7 DOWNTO 0);
+SIGNAL s_data_i, s_data_o : STD_LOGIC_VECTOR(7 DOWNTO 0);
 
 SIGNAL s_sel_a, s_sel_b, s_sel_c : t_mat_reg_ixs;
 
@@ -429,6 +453,12 @@ SIGNAL s_data_a0_i, s_data_a0_o : t_mat_word;
 SIGNAL s_ix_a0 : t_mat_ix;
 SIGNAL s_size_a0_i, s_size_a0_o : t_mat_size;
 SIGNAL s_row_by_row_a0_i, s_row_by_row_a0_o : STD_LOGIC;
+
+SIGNAL s_mul_scalar : t_mat_elem_slv;
+SIGNAL s_ix_arr_data_i, s_ix_arr_data_o : STD_LOGIC_VECTOR (7 DOWNTO 0);
+SIGNAL s_ix_addr_read, s_ix_addr_write : STD_LOGIC_VECTOR (5 DOWNTO 0);
+SIGNAL s_ix_arr_wren : STD_LOGIC;
+
 
 ---------------------------------------------
 --  Port Maps
@@ -444,7 +474,8 @@ PORT MAP(
     
     p_finished_o            => s_finished, 
     p_opcode_i              => s_opcode,
-    p_data_i                => s_data,
+    p_data_i                => s_data_i,
+    p_data_o                => s_data_o,
 
     p_sel_a_i               => s_sel_a,
     p_sel_b_i               => s_sel_b,
@@ -462,10 +493,36 @@ PORT MAP(
     p_row_by_row_a0_o       => s_row_by_row_a0_o
 );
 
+ix_array : e_ram_64_8
+PORT MAP(
+    clock => s_clk,
+    data => s_ix_arr_data_i,
+    rdaddress => s_ix_addr_read,
+    wraddress => s_ix_addr_write,
+    wren => s_ix_arr_wren,
+    q => s_ix_arr_data_o
+);
+
+---------------------------------------------
+--  Zuweisungen
+---------------------------------------------
+
 ---------------------------------------------
 --  Prozesse
 ---------------------------------------------
 
+-- Steuert die Generellen data ports der mat cpu
+proc_cpu_data : PROCESS(s_ix_arr_data_o, s_data_o, s_mul_scalar)
+BEGIN
+    IF s_data_port_mode = DPMScalarSubIx THEN
+        s_data_i <= s_ix_arr_data_o; -- Matrix Address to decrement
+        s_ix_addr_read <= s_data_o(5 DOWNTO 0); -- Read Adress for Ix Array
+    ELSE
+        s_data_i <= s_mul_scalar; -- Scalare Multiplication
+        s_ix_addr_read <= s_data_o(5 DOWNTO 0);  -- Ein beliebiger Wert (Don't care erzeugt Fehler in Modelsim)
+    END IF;
+END PROCESS proc_cpu_data;
+    
 proc_clk_gen : PROCESS
 BEGIN
     s_clk <= '0';
@@ -493,7 +550,6 @@ BEGIN
         s_sel_c(i) <= to_mat_reg_ix(0);
         s_c_row_by_row(i) <= '1';
     END LOOP;
-    s_data <= (OTHERS => '0');
     
     s_write_a0 <= '0';
     s_read_a0 <= '0';
@@ -501,6 +557,13 @@ BEGIN
     s_ix_a0 <= to_mat_ix(0, 0);
     s_size_a0_i <= to_mat_size(7, 7);
     s_row_by_row_a0_i <= '1';
+    s_data_port_mode <= DPMScalarMul;
+    s_mul_scalar <= (OTHERS => '0');
+    
+    -- Ix Array
+    s_ix_arr_data_i <= (OTHERS => '0');
+    s_ix_addr_write <= (OTHERS => '0');
+    s_ix_arr_wren <= '0';
    
     WAIT FOR c_clk_per;
     s_rst <= '0';
@@ -512,14 +575,15 @@ BEGIN
     test_add(s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
     test_trans(s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished); 
     test_flip(s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished); 
-    test_scalar_mul(s_data, s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
+    test_scalar_mul(s_data_port_mode, s_mul_scalar, s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
     test_scalar_div(s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
     test_scalar_max(s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
     test_vec_add(s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
     test_col_sum(s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
-    test_scalar_sub_ix(s_data, s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
+ 
+    test_scalar_sub_ix(s_data_port_mode, s_ix_arr_data_i, s_ix_addr_write, s_ix_arr_wren, s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
     
-    test_parallel(s_data, s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
+    test_parallel(s_data_port_mode, s_mul_scalar, s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
     
     REPORT infomsg("Testende");
     WAIT;

@@ -29,6 +29,7 @@ COMPONENT e_mat_cpu
         p_finished_o            : OUT t_op_std_logics;
         p_opcode_i              : IN t_opcodes;
         p_data_i                : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+        p_data_o                : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 
         p_sel_a_i               : IN t_mat_reg_ixs;
         p_sel_b_i               : IN t_mat_reg_ixs;
@@ -55,7 +56,7 @@ SIGNAL s_clk, s_rst, s_syn_rst, s_wren : STD_LOGIC;
 SIGNAL s_finished : t_op_std_logics;
 SIGNAL s_c_row_by_row : t_op_std_logics;
 SIGNAL s_opcode : t_opcodes;
-SIGNAL s_data : STD_LOGIC_VECTOR(7 DOWNTO 0);
+SIGNAL s_data_i, s_data_o : STD_LOGIC_VECTOR(7 DOWNTO 0);
 
 SIGNAL s_sel_a, s_sel_b, s_sel_c : t_mat_reg_ixs;
 
@@ -86,13 +87,14 @@ CONSTANT w2_t : t_mat_reg_ix := to_mat_reg_ix(8);
 
 CONSTANT dummy : t_mat_reg_ix := to_mat_reg_ix(0);
 
-SIGNAL s_program : t_program(0 TO 5) := (
+SIGNAL s_program : t_program(0 TO 1) := (
     ((MatMul, x_train, w1, d, '1'), c_noop_instr, c_noop_instr),
-    ((MatAdd, b1, d, hl, '1'), c_noop_instr, (MatTrans, x_train, dummy, x_train_t, '1')),
-    (c_noop_instr, (ScalarMax, hl, dummy, hl_ReLu, '1'), c_noop_instr),
-    ((MatMul, hl_ReLu, w2, d2, '0'), c_noop_instr, c_noop_instr),
-    ((MatAdd, b2, d2, scores, '1'), c_noop_instr, (MatTrans, w2, dummy, w2_t, '1')), 
-    (c_noop_instr, (ScalarMax, scores, dummy, scores, '1'), c_noop_instr)
+    (c_noop_instr, c_noop_instr, c_noop_instr)
+--    ((MatAdd, b1, d, hl, '1'), c_noop_instr, (MatTrans, x_train, dummy, x_train_t, '1'))
+--    (c_noop_instr, (ScalarMax, hl, dummy, hl_ReLu, '1'), c_noop_instr),
+--    ((MatMul, hl_ReLu, w2, d2, '0'), c_noop_instr, c_noop_instr),
+--    ((MatAdd, b2, d2, scores, '1'), c_noop_instr, (MatTrans, w2, dummy, w2_t, '1')), 
+--    (c_noop_instr, (ScalarMax, scores, dummy, scores, '1'), c_noop_instr)
 );
 
 ---------------------------------------------
@@ -109,7 +111,8 @@ PORT MAP(
     
     p_finished_o            => s_finished, 
     p_opcode_i              => s_opcode,
-    p_data_i                => s_data,
+    p_data_i                => s_data_i,
+    p_data_o                => s_data_o,
 
     p_sel_a_i               => s_sel_a,
     p_sel_b_i               => s_sel_b,
@@ -158,7 +161,7 @@ BEGIN
         s_sel_c(i) <= to_mat_reg_ix(0);
         s_c_row_by_row(i) <= '1';
     END LOOP;
-    s_data <= (OTHERS => '0');
+    s_data_i <= (OTHERS => '0');
     
     s_write_a0 <= '0';
     s_read_a0 <= '0';
@@ -171,12 +174,13 @@ BEGIN
     s_rst <= '0';
    
     REPORT infomsg("Initialisierung abgeschlossen");
-    init_mat_a0_64x64_rbr(0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    init_mat_a0_64x64_rbr(1, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    init_mat_a0_64x64_rbr(2, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    init_mat_a0_64x64_rbr(3, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    init_mat_a0_64x64_rbr(4, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    init_mat_x_train_rbr(5, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
     
+    init_mat_b1_rbr(1, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    init_mat_b2_rbr(3, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    init_mat_w1_cbc(0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    init_mat_w2_cbc(2, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+
     FOR pc IN s_program'RANGE LOOP
         FOR core IN s_program(pc)'RANGE LOOP
             s_opcode(core) <= s_program(pc)(core).opcode;
@@ -198,6 +202,7 @@ BEGIN
         REPORT infomsg("Operation abgeschlossen");
     END LOOP;
 
+    print_mat_reg(9, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
       
     REPORT infomsg("Testende");
     WAIT;

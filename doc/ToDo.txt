@@ -74,14 +74,14 @@
         - Matrix Löschen beschleunigen
         - 2. AMtAdd hinzüfügen (zu OpCore 2) => 2 Parallele Additionen
     1.12 
-        - ScalarSubIx korrigieren
-            - es gibt  Ram Block für y Train (64 x 8 Bit) => Geben die Klassen der Bilder an
-            - ScalarSubIx und auch Mat_cpu bekommen einen neuen Ausgang: p_data_o
+        X ScalarSubIx korrigieren
+            X es gibt  Ram Block für y Train (64 x 8 Bit) => Geben die Klassen der Bilder an
+            X ScalarSubIx und auch Mat_cpu bekommen einen neuen Ausgang: p_data_o
                 - Dieser Entspricht dem Index für y_train
-            - scalarsubix arbeitete nur auf Row_by_row matrizen, diese sind 64x10 groß
-            - der neue ausgnag entspricht p_mat_c_r_ix_o.row 
-        - Test für ScalarSubIx 
-            - In Testfunktion Array hinzufügen (0,2,1,1,1 ....., 7, 0) => y_train
+            X scalarsubix arbeitete nur auf Row_by_row matrizen, diese sind 64x10 groß
+           X der neue ausgnag entspricht p_mat_c_r_ix_o.row 
+        X Test für ScalarSubIx 
+            X In Testfunktion Array hinzufügen (0,2,1,1,1 ....., 7, 0) => y_train
         - RNG bauen
             - soll Zahlen im Bereich 0.01 und 0 liefern
             - bei mir reicht ein 2 Bit Zähler: Berecih 0.0 bis 0.1875
@@ -144,14 +144,14 @@ Ende KW31:
     - Mat CPU Master TB
     - Struktur des Reconf Algo
 
-Ende KW31:
+Ende KW32:
     - Testbench Reconf algo
 
-Ende KW31:
+Ende KW33:
     - Design TLE
     - Protokoll
 
-Ende KW31:
+Ende KW34:
     - Testbench für TLE
     - HW GEsamt Test
 

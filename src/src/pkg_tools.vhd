@@ -58,7 +58,7 @@ PACKAGE pkg_tools IS
         row_by_row : STD_LOGIC;
     END RECORD t_cpu_base_instr;
     
-    TYPE t_cpu_instr IS ARRAY(c_num_parallel_op-1 DOWNTO 0) OF t_cpu_base_instr; -- Typ parallele Ausfuerhrung von Instruktionen
+    TYPE t_cpu_instr IS ARRAY(0 TO c_num_parallel_op-1) OF t_cpu_base_instr; -- Typ parallele Ausfuerhrung von Instruktionen
     TYPE t_program IS ARRAY (INTEGER RANGE <>) OF t_cpu_instr;
     
     -- Typen fuer alle Parallel ausgefuehrten Operationen

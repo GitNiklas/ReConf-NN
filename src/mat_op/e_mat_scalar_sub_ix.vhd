@@ -57,6 +57,7 @@ END COMPONENT;
 --  Signale
 ----------------------------------------------------------------------------------------------------
 SIGNAL s_mat_c_r_ix : t_mat_ix;
+SIGNAL s_ix_gen_size : t_mat_size;
 
 ----------------------------------------------------------------------------------------------------
 --  Port Maps
@@ -72,7 +73,7 @@ PORT MAP(
     p_finished_o        => p_finished_o,
     p_word_done_i       => '1',
 
-    p_size_i            => p_mat_c_size_i,
+    p_size_i            => s_ix_gen_size,
     p_row_by_row_i      => '1',
     p_mat_ix_t0_o       => s_mat_c_r_ix,
     p_mat_ix_t2_o       => p_mat_c_w_ix_o,
@@ -85,15 +86,20 @@ PORT MAP(
 p_mat_c_size_o <= p_mat_c_size_i;
 p_mat_c_r_ix_o <= s_mat_c_r_ix;
 p_ix_o <= "00" & STD_LOGIC_VECTOR(s_mat_c_r_ix.row);
+s_ix_gen_size <= (p_mat_c_size_i.max_row, to_mat_size_el(32));
 
 ----------------------------------------------------------------------------------------------------
 --  Prozesse
 ----------------------------------------------------------------------------------------------------
 
-proc_calc : PROCESS(p_mat_c_data_i)
+proc_calc : PROCESS(p_mat_c_data_i, p_ix_i)
 BEGIN
     FOR i IN p_mat_c_data_i'RANGE LOOP
-        p_mat_c_data_o(i) <= to_mat_elem(p_mat_c_data_i(i) - scalar);
+        IF to_mat_ix_el(i) = UNSIGNED(p_ix_i(5 DOWNTO 0)) THEN
+            p_mat_c_data_o(i) <= to_mat_elem(p_mat_c_data_i(i) - scalar);
+        ELSE
+            p_mat_c_data_o(i) <= p_mat_c_data_i(i);
+        END IF;
     END LOOP;
 END PROCESS proc_calc;
 
