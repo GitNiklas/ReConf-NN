@@ -86,6 +86,15 @@
             - soll Zahlen im Bereich 0.01 und 0 liefern
             - bei mir reicht ein 2 Bit Zähler: Berecih 0.0 bis 0.1875
             - jeden takt weiterschalten
+    1.13
+        Division
+            - Akuelle Implementierung - Division durch 64
+                - Alle Werte 4 <= x < 8 werden abgebildet auf 0.0625
+                - Alle Werte 0 <= x < 4 werden abgebildet auf 0.0
+                - Alle Werte -4 <= x < 0 werden abgebildet auf -0.0625
+                - Alle Werte -8 <= x < -4 werden abgebildet auf -0.125
+            - Es bleiben sehr viele Nullen in der scores Matrix übrig => schlecht
+            - Außerdem gibt es eine Asymmetrie zwischen + und  - => evtl auch nicht gut
 2 Reconf Algo - 30h
     2.1 -1h
         X Algorithmus zur Parallelen Verarbeitung anpassen

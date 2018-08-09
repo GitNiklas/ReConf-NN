@@ -512,7 +512,7 @@ PORT MAP(
 ---------------------------------------------
 
 -- Steuert die Generellen data ports der mat cpu
-proc_cpu_data : PROCESS(s_ix_arr_data_o, s_data_o, s_mul_scalar)
+proc_cpu_data : PROCESS(s_data_port_mode, s_ix_arr_data_o, s_data_o, s_mul_scalar)
 BEGIN
     IF s_data_port_mode = DPMScalarSubIx THEN
         s_data_i <= s_ix_arr_data_o; -- Matrix Address to decrement

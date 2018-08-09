@@ -3,6 +3,7 @@ USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
 USE work.pkg_tools.ALL;
 USE work.fixed_pkg.ALL;
+USE std.textio.ALL;
     
 PACKAGE pkg_test IS  
     PROCEDURE delete_reg(
@@ -13,6 +14,18 @@ PACKAGE pkg_test IS
         SIGNAL s_wren: OUT STD_LOGIC;
         SIGNAL s_syn_rst: OUT STD_LOGIC; 
         SIGNAL s_finished: IN t_op_std_logics
+    );
+    
+    PROCEDURE save_mat_reg_to_file(
+        CONSTANT filename       : IN STRING;
+        CONSTANT reg            : IN INTEGER;
+        
+        SIGNAL sel_a            : OUT t_mat_reg_ix;      
+        SIGNAL read_a           : OUT STD_LOGIC;
+        SIGNAL data_a           : IN t_mat_word;
+        SIGNAL ix_a             : OUT t_mat_ix;
+        SIGNAL size_a           : IN t_mat_size;
+        SIGNAL row_by_row_a     : IN STD_LOGIC
     );
     
     PROCEDURE print_mat_reg(
@@ -96,6 +109,57 @@ PACKAGE BODY pkg_test IS
         s_wren  <= '0';
         s_opcode(2) <= NoOp;
     END delete_reg;
+    
+    PROCEDURE save_mat_reg_to_file(
+        CONSTANT filename       : IN STRING;
+        CONSTANT reg            : IN INTEGER;
+        
+        SIGNAL sel_a            : OUT t_mat_reg_ix;      
+        SIGNAL read_a           : OUT STD_LOGIC;
+        SIGNAL data_a           : IN t_mat_word;
+        SIGNAL ix_a             : OUT t_mat_ix;
+        SIGNAL size_a           : IN t_mat_size;
+        SIGNAL row_by_row_a     : IN STD_LOGIC
+    ) IS
+        VARIABLE row_by_row : STD_LOGIC;
+        VARIABLE size : t_mat_size;
+        VARIABLE data : t_mat_elem;
+        VARIABLE index_word : INTEGER;
+        FILE mat_file : TEXT;
+        VARIABLE tmp_line : LINE;
+    BEGIN
+        read_a <= '1';         
+        sel_a <= to_mat_reg_ix(reg);
+        WAIT FOR c_clk_per;        
+        
+        row_by_row := row_by_row_a;
+        size := size_a;
+        
+        file_open(mat_file, filename, write_mode);
+        
+        REPORT infomsg("Schreibe Matrix Register " & INTEGER'IMAGE(reg) & " in Datei " & filename); 
+        WRITE(tmp_line, "Matrix Register " & INTEGER'IMAGE(reg) & " : size = " &  mat_size_to_str(size) & "; row_by_row = " & STD_LOGIC'IMAGE(row_by_row));
+        WRITELINE(mat_file, tmp_line);
+               
+        FOR y IN 0 TO to_integer(size.max_row) LOOP
+            FOR x IN 0 TO to_integer(size.max_col) LOOP
+                ix_a <= to_mat_ix(y, x);
+                IF row_by_row = '1' THEN
+                   index_word := x mod 32;
+                ELSE
+                   index_word := y mod 32;
+                END IF; 
+                
+                WAIT FOR 2*c_clk_per;
+                data := data_a(index_word);
+                
+                WRITE(tmp_line, to_real(data), right, 8, 4);
+            END LOOP;
+            WRITELINE(mat_file, tmp_line);
+        END LOOP; 
+        read_a <= '0';  
+        file_close(mat_file);
+    END save_mat_reg_to_file;
     
     PROCEDURE print_mat_reg(
         CONSTANT reg            : IN INTEGER;
