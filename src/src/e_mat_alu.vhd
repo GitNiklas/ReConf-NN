@@ -175,7 +175,6 @@ COMPONENT e_mat_scalar_mul
 END COMPONENT;
 
 COMPONENT e_mat_scalar_div
-    GENERIC(scalar : UNSIGNED(7 DOWNTO 0) := TO_UNSIGNED(c_batch_size, 8));
     PORT (    
         p_rst_i                 : IN STD_LOGIC;
         p_clk_i                 : IN STD_LOGIC;

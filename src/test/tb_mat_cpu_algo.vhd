@@ -103,9 +103,11 @@ CONSTANT x_train : t_mat_reg_ix := to_mat_reg_ix(5);
 CONSTANT x_train_t : t_mat_reg_ix := to_mat_reg_ix(6);
 CONSTANT w2_t : t_mat_reg_ix := to_mat_reg_ix(8);
 
+CONSTANT dhidden : t_mat_reg_ix := to_mat_reg_ix(5);
+
 CONSTANT dummy : t_mat_reg_ix := to_mat_reg_ix(0);
 
-SIGNAL s_program : t_program(0 TO 7) := (
+SIGNAL s_program : t_program(0 TO 8) := (
     ((MatMul, x_train, w1, d, '1'), c_noop_instr, c_noop_instr),
     ((VecAdd, d, b1, hl, '1'), c_noop_instr, (MatTrans, x_train, dummy, x_train_t, '1')),
     (c_noop_instr, (ScalarMax, hl, dummy, hl_ReLu, '1'), c_noop_instr),
@@ -113,7 +115,8 @@ SIGNAL s_program : t_program(0 TO 7) := (
     ((VecAdd, d2, b2, scores, '1'), c_noop_instr, (MatTrans, w2, dummy, w2_t, '0')),
     (c_noop_instr, (ScalarMax, scores, dummy, scores, '1'), c_noop_instr),
     (c_noop_instr, (ScalarSubIx, scores, dummy, scores, '1'), c_noop_instr),
-    (c_noop_instr, (ScalarDiv, scores, dummy, scores, '1'), c_noop_instr)
+    (c_noop_instr, (ScalarDiv, scores, dummy, scores, '1'), c_noop_instr),
+    ((MatMul, scores, w2_t, dhidden, '0'), c_noop_instr, c_noop_instr) -- 0.0625 * 0.0625 ist zu klein um vom zahlenformat dargestellt zu werden !!!!!!
 );
 
 ---------------------------------------------
@@ -268,12 +271,15 @@ BEGIN
             save_mat_reg_to_file("03 d2.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSIF pc = 4 THEN
             save_mat_reg_to_file("04 scores.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("04 w2_t.txt", 8, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSIF pc = 5 THEN
             save_mat_reg_to_file("05 scores.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSIF pc = 6 THEN
             save_mat_reg_to_file("06 scores.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSIF pc = 7 THEN
             save_mat_reg_to_file("07 scores.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+        ELSIF pc = 8 THEN
+            save_mat_reg_to_file("08 dhidden.txt", 5, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSE
             save_mat_reg_to_file("dummy.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         END IF;

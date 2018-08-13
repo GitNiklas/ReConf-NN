@@ -4,8 +4,8 @@ use IEEE.NUMERIC_STD.all;
 USE work.fixed_pkg.ALL;
 USE work.pkg_tools.ALL;
 
+-- division by 64
 ENTITY e_mat_scalar_div IS
-    GENERIC(scalar : UNSIGNED := TO_UNSIGNED(c_batch_size, 8)); -- division by next lower power of 2
     PORT (    
         p_rst_i                 : IN STD_LOGIC;
         p_clk_i                 : IN STD_LOGIC;
@@ -87,21 +87,25 @@ p_mat_c_size_o <= p_mat_a_size_i;
 --  Prozesse
 ----------------------------------------------------------------------------------------------------
 
--- 6 magic no
 proc_calc : PROCESS(p_mat_a_data_i)
     VARIABLE tmp : t_mat_elem_slv;
-    VARIABLE shift_val : INTEGER;
+    VARIABLE data_slv : STD_LOGIC_VECTOR(1 DOWNTO 0);
 BEGIN
-    -- determine highest bit set
-    FOR i IN scalar'LOW TO scalar'HIGH LOOP
-        IF scalar(i) = '1' THEN 
-            shift_val := i;
-        END IF;
-    END LOOP;
-  
+
     FOR i IN p_mat_a_data_i'RANGE LOOP
+        data_slv := to_slv(p_mat_a_data_i(i))(7 DOWNTO 6);
+        
         tmp := (OTHERS => p_mat_a_data_i(i)(t_mat_elem'HIGH)); -- fill tmp with SIGN Bits
-        p_mat_c_data_o(i) <= to_mat_elem(tmp(tmp'HIGH DOWNTO tmp'LENGTH - shift_val) & to_slv(p_mat_a_data_i(i))(t_mat_elem_slv'HIGH DOWNTO shift_val));
+        
+        IF data_slv = "00" THEN -- 0.0 <= x < 4.0
+            p_mat_c_data_o(i) <= to_mat_elem(tmp(7 DOWNTO 2) & "01"); -- 0.0625
+        ELSIF data_slv = "01" THEN -- 4.0 <= x < 8.0
+            p_mat_c_data_o(i) <= to_mat_elem(tmp(7 DOWNTO 2) & "10"); -- 0.1250
+        ELSIF data_slv = "11" THEN -- 4.0 <= x < 0.0
+            p_mat_c_data_o(i) <= to_mat_elem(tmp(7 DOWNTO 2) & "11"); -- -0.0625
+        ELSE -- data_slv = "10" -- 4.0 <= x < 0.0
+            p_mat_c_data_o(i) <= to_mat_elem(tmp(7 DOWNTO 2) & "10"); -- -0.1250
+        END IF;
     END LOOP;
 END PROCESS proc_calc;
 
