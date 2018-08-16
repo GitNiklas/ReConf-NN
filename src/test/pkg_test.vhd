@@ -5,17 +5,7 @@ USE work.pkg_tools.ALL;
 USE work.fixed_pkg.ALL;
 USE std.textio.ALL;
     
-PACKAGE pkg_test IS  
-    PROCEDURE delete_reg(
-        CONSTANT reg: INTEGER;
-        
-        SIGNAL s_sel_c: OUT t_mat_reg_ixs;
-        SIGNAL s_opcode: OUT t_opcodes;
-        SIGNAL s_wren: OUT STD_LOGIC;
-        SIGNAL s_syn_rst: OUT STD_LOGIC; 
-        SIGNAL s_finished: IN t_op_std_logics
-    );
-    
+PACKAGE pkg_test IS     
     PROCEDURE save_mat_reg_to_file(
         CONSTANT filename       : IN STRING;
         CONSTANT reg            : IN INTEGER;
@@ -63,13 +53,26 @@ PACKAGE pkg_test IS
         SIGNAL s_c_row_by_row   : IN STD_LOGIC
     );
     
-    PROCEDURE set_mat(
-        CONSTANT c_val  : IN t_mat_elem;
+    PROCEDURE delete_reg(
+        CONSTANT reg: INTEGER; 
+        
+        SIGNAL s_sel    : OUT t_mat_reg_ix;
         SIGNAL s_wren   : OUT STD_LOGIC;
         SIGNAL s_data_i : OUT t_mat_word;
-        SIGNAL s_ix_w   : OUT t_mat_ix
+        SIGNAL s_ix_w   : OUT t_mat_ix;
+        SIGNAL s_row_by_row : OUT STD_LOGIC
     );
     
+    PROCEDURE set_reg(
+        CONSTANT reg: INTEGER; 
+        CONSTANT c_val  : IN t_mat_elem;
+        
+        SIGNAL s_sel    : OUT t_mat_reg_ix;
+        SIGNAL s_wren   : OUT STD_LOGIC;
+        SIGNAL s_data_i : OUT t_mat_word;
+        SIGNAL s_ix_w   : OUT t_mat_ix;
+        SIGNAL s_row_by_row : OUT STD_LOGIC
+    );
 END;
 
 PACKAGE BODY pkg_test IS
@@ -84,31 +87,6 @@ PACKAGE BODY pkg_test IS
             WAIT;
         END IF;
     END ensure;
-    
-    PROCEDURE delete_reg(
-        CONSTANT reg: INTEGER; 
-        
-        SIGNAL s_sel_c: OUT t_mat_reg_ixs;
-        SIGNAL s_opcode: OUT t_opcodes;
-        SIGNAL s_wren: OUT STD_LOGIC;
-        SIGNAL s_syn_rst: OUT STD_LOGIC; 
-        SIGNAL s_finished: IN t_op_std_logics
-    ) IS
-    BEGIN
-        --REPORT infomsg("Loesche Register " & INTEGER'IMAGE(reg));
-        s_sel_c(2) <= to_mat_reg_ix(reg); 
-        s_opcode(2) <= MatDel;
-    
-        s_wren  <= '1';
-        s_syn_rst <= '1';
-        WAIT FOR c_clk_per;
-        s_syn_rst <= '0';
-        
-        WAIT UNTIL s_finished(2) = '1';
-        WAIT FOR c_clk_per / 2;
-        s_wren  <= '0';
-        s_opcode(2) <= NoOp;
-    END delete_reg;
     
     PROCEDURE save_mat_reg_to_file(
         CONSTANT filename       : IN STRING;
@@ -318,22 +296,46 @@ PACKAGE BODY pkg_test IS
             END LOOP;
         END LOOP;
     END assert_mat_eq;
-
-    PROCEDURE set_mat(
-        CONSTANT c_val  : in t_mat_elem;
+    
+    PROCEDURE delete_reg(
+        CONSTANT reg: INTEGER; 
+        
+        SIGNAL s_sel    : OUT t_mat_reg_ix;
         SIGNAL s_wren   : OUT STD_LOGIC;
         SIGNAL s_data_i : OUT t_mat_word;
-        SIGNAL s_ix_w   : OUT t_mat_ix
-    ) IS BEGIN  
-        s_wren <= '1';
-        s_data_i <= (others => c_val  );
-        FOR y IN 0 TO c_max_mat_dim - 1 LOOP
-            FOR x IN 0 TO c_max_mat_dim - 1 LOOP
-                s_ix_w <= to_mat_ix(y, x);
+        SIGNAL s_ix_w   : OUT t_mat_ix;
+        SIGNAL s_row_by_row : OUT STD_LOGIC
+    ) IS 
+    BEGIN  
+        set_reg(reg, to_mat_elem(0.0), s_sel, s_wren, s_data_i, s_ix_w, s_row_by_row);
+    END delete_reg;
+    
+    PROCEDURE set_reg(
+        CONSTANT reg: INTEGER; 
+        CONSTANT c_val  : IN t_mat_elem;
+        
+        SIGNAL s_sel        : OUT t_mat_reg_ix;
+        SIGNAL s_wren       : OUT STD_LOGIC;
+        SIGNAL s_data_i     : OUT t_mat_word;
+        SIGNAL s_ix_w       : OUT t_mat_ix;
+        SIGNAL s_row_by_row : OUT STD_LOGIC
+    ) IS 
+    BEGIN  
+        s_wren <= '1';         
+        s_sel <= to_mat_reg_ix(reg);
+        s_row_by_row <= '1';
+        s_data_i <= (OTHERS => c_val);
+        WAIT FOR c_clk_per;        
+       
+        FOR lines_ix IN 0 TO c_max_mat_dim - 1 LOOP        
+            FOR word IN 0 TO c_max_mat_dim/t_mat_word'LENGTH - 1 LOOP -- Schleife ueber Woerter
+                s_ix_w <= to_mat_ix(lines_ix, word * 32);         
                 WAIT FOR c_clk_per;
             END LOOP;
         END LOOP;
+        
+        WAIT FOR c_clk_per;
         s_wren <= '0';
-    END set_mat;
+    END set_reg;
 
 END PACKAGE BODY;

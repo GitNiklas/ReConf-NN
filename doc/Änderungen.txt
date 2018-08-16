@@ -1,0 +1,8 @@
+1.
+	- W2 wird mit kleinen Werten (0.0625) initialisiert
+	- scores bekommt durch die Division mit 64 ebenfalls kleine Werte (0.125 bzw 0.0625)
+	- Multiplikation von 0.0625*0.0625 kann im Zahlenformat nicht dargestellt werden! => ergibt 0
+	=> Lösung: w2 mit werten -1.0 und +1.0 initialisieren
+
+2.
+	dHidden darf auch nicht zu große Werte haben, da jeweils die Colsum gebildet wird

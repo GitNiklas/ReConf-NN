@@ -94,29 +94,43 @@ CONSTANT db1 : t_mat_reg_ix := to_mat_reg_ix(5);
 CONSTANT dw2 : t_mat_reg_ix := to_mat_reg_ix(6);
 CONSTANT db2 : t_mat_reg_ix := to_mat_reg_ix(7);
 
-CONSTANT d2 : t_mat_reg_ix := to_mat_reg_ix(7);
-CONSTANT scores : t_mat_reg_ix := to_mat_reg_ix(7);
-CONSTANT d : t_mat_reg_ix := to_mat_reg_ix(9);
-CONSTANT hl : t_mat_reg_ix := to_mat_reg_ix(9);
-CONSTANT hl_ReLu : t_mat_reg_ix := to_mat_reg_ix(9);
-CONSTANT x_train : t_mat_reg_ix := to_mat_reg_ix(5);
-CONSTANT x_train_t : t_mat_reg_ix := to_mat_reg_ix(6);
-CONSTANT w2_t : t_mat_reg_ix := to_mat_reg_ix(8);
+CONSTANT d2 : t_mat_reg_ix := to_mat_reg_ix(8);
+CONSTANT scores : t_mat_reg_ix := to_mat_reg_ix(8);
+CONSTANT d : t_mat_reg_ix := to_mat_reg_ix(7);
+CONSTANT hl : t_mat_reg_ix := to_mat_reg_ix(7);
+CONSTANT hl_ReLu : t_mat_reg_ix := to_mat_reg_ix(7);
+CONSTANT x_train : t_mat_reg_ix := to_mat_reg_ix(6);
+CONSTANT x_train_t : t_mat_reg_ix := to_mat_reg_ix(5);
+CONSTANT w2_t : t_mat_reg_ix := to_mat_reg_ix(4);
+CONSTANT dhidden : t_mat_reg_ix := to_mat_reg_ix(6);
 
-CONSTANT dhidden : t_mat_reg_ix := to_mat_reg_ix(5);
+CONSTANT tmp0 : t_mat_reg_ix := to_mat_reg_ix(10);
+CONSTANT tmp1 : t_mat_reg_ix := to_mat_reg_ix(9); 
+CONSTANT tmp2 : t_mat_reg_ix := to_mat_reg_ix(10);
 
 CONSTANT dummy : t_mat_reg_ix := to_mat_reg_ix(0);
 
-SIGNAL s_program : t_program(0 TO 8) := (
-    ((MatMul, x_train, w1, d, '1'), c_noop_instr, c_noop_instr),
-    ((VecAdd, d, b1, hl, '1'), c_noop_instr, (MatTrans, x_train, dummy, x_train_t, '1')),
-    (c_noop_instr, (ScalarMax, hl, dummy, hl_ReLu, '1'), c_noop_instr),
-    ((MatMul, hl_ReLu, w2, d2, '1'), c_noop_instr, c_noop_instr),
-    ((VecAdd, d2, b2, scores, '1'), c_noop_instr, (MatTrans, w2, dummy, w2_t, '0')),
-    (c_noop_instr, (ScalarMax, scores, dummy, scores, '1'), c_noop_instr),
-    (c_noop_instr, (ScalarSubIx, scores, dummy, scores, '1'), c_noop_instr),
-    (c_noop_instr, (ScalarDiv, scores, dummy, scores, '1'), c_noop_instr),
-    ((MatMul, scores, w2_t, dhidden, '0'), c_noop_instr, c_noop_instr) -- 0.0625 * 0.0625 ist zu klein um vom zahlenformat dargestellt zu werden !!!!!!
+CONSTANT test_image_steps : INTEGER := 4; -- Schritte 0 bis 4 dienen zur Erkennung
+
+CONSTANT s_program : t_program(0 TO 17) := (
+    ((MatMul, x_train, w1, d, '1'),             c_noop_instr,                               c_noop_instr),
+    ((VecAdd, d, b1, hl, '1'),                  c_noop_instr,                               (MatTrans, x_train, dummy, x_train_t, '1')),
+    (c_noop_instr,                              (ScalarMax, hl, dummy, hl_ReLu, '1'),       c_noop_instr),
+    ((MatMul, hl_ReLu, w2, d2, '1'),            c_noop_instr,                               c_noop_instr),
+    ((VecAdd, d2, b2, scores, '1'),             c_noop_instr,                               (MatTrans, w2, dummy, w2_t, '0')), 
+    (c_noop_instr,                              (ScalarMax, scores, dummy, scores, '1'),    c_noop_instr),
+    (c_noop_instr,                              (ScalarSubIx, scores, dummy, scores, '1'),  c_noop_instr),
+    (c_noop_instr,                              (ScalarDiv, scores, dummy, scores, '1'),    c_noop_instr),
+    ((MatMul, scores, w2_t, dhidden, '0'),      c_noop_instr,                               c_noop_instr),
+    (c_noop_instr,                              (ScalarMax, dhidden, dummy, dhidden, '0'),  c_noop_instr),
+    ((MatMul, x_train_t, dhidden, dw1, '0'),    (ScalarMul, w1, dummy, tmp0, '0'),          (MatTrans, scores, dummy, tmp1, '0')),
+    ((MatAdd, dw1, tmp0, dw1, '0'),             c_noop_instr,                               (ColSum, dhidden, dummy, db1, '1')),
+    ((MatMul, hl_ReLu, tmp1, dw2, '0'),         (ScalarMul, dw1, dummy, dw1, '0'),          c_noop_instr),
+    ((MatAdd, w1, dw1, w1, '0'),                (ScalarMul, w2, dummy, tmp2, '0'),          (ColSum, tmp1, dummy, db2, '1')),
+    ((MatAdd, dw2, tmp2, dw2, '0'),             (ScalarMul, db1, dummy, db1, '1'),          c_noop_instr),
+    ((MatAdd, b1, db1, b1, '1'),                (ScalarMul, dw2, dummy, dw2, '0'),          c_noop_instr),
+    ((MatAdd, w2, dw2, w2, '0'),                (ScalarMul, db2, dummy, db2, '1'),          c_noop_instr),
+    ((MatAdd, b2, db2, b2, '1'),                c_noop_instr,                               c_noop_instr)
 );
 
 ---------------------------------------------
@@ -189,6 +203,15 @@ BEGIN
     END IF;
 END PROCESS proc_cpu_data;
 
+proc_scalar : PROCESS(s_sel_a)
+BEGIN
+    IF s_sel_a(1) = w1 OR s_sel_a(1) = w2 THEN
+        s_mul_scalar <= t_mat_elem_slv(to_mat_elem(0.125)); -- reg
+    ELSE
+        s_mul_scalar <= t_mat_elem_slv(to_mat_elem(-0.125)); -- -step size
+    END IF;
+END PROCESS proc_scalar;
+
 proc_test : PROCESS
 VARIABLE opcore : INTEGER := 1;
 BEGIN
@@ -198,7 +221,7 @@ BEGIN
 ----------------------------------------------------------------------------------------------------
     REPORT infomsg("Initialisiere Signale");
     s_rst <= '1'; 
-    s_syn_rst <= '0';
+    s_syn_rst <= '1';
     s_wren <= '0';
     
     FOR i IN c_num_parallel_op-1 DOWNTO 0 LOOP
@@ -216,8 +239,6 @@ BEGIN
     s_size_a0_i <= to_mat_size(7, 7);
     s_row_by_row_a0_i <= '1';
    
-    s_mul_scalar <= (OTHERS => '0');
-    
     s_ytrain_data_i <= (OTHERS => '0');
     s_ytrain_write <= (OTHERS => '0');
     s_ytrain_wren <= '0';
@@ -226,12 +247,12 @@ BEGIN
     s_rst <= '0';
    
     REPORT infomsg("Initialisierung abgeschlossen");
-    init_mat_x_train_rbr(5, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    init_mat_x_train_rbr(6, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     
-    init_mat_b1_rbr(1, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    init_mat_b2_rbr(3, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    init_mat_w1_cbc(0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
-    init_mat_w2_cbc(2, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a, s_sel_c, s_opcode, s_wren, s_syn_rst, s_finished);
+    init_mat_b1_rbr(1, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
+    init_mat_b2_rbr(3, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
+    init_mat_w1_cbc(0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
+    init_mat_w2_cbc(2, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     init_y_train(s_ytrain_data_i, s_ytrain_write, s_ytrain_wren);
     
     FOR pc IN s_program'RANGE LOOP
@@ -251,35 +272,64 @@ BEGIN
         END IF;
         
         s_wren  <= '1';
-        s_syn_rst <= '1';
-        WAIT FOR c_clk_per;
         s_syn_rst <= '0';
+            
         
         WAIT UNTIL s_finished = "111";
         WAIT FOR c_clk_per / 2;
         s_wren  <= '0';
         s_opcode <= (NoOp, NoOp, NoOp);
+        s_syn_rst <= '1';
         REPORT infomsg("... done");
         IF pc = 0 THEN
-            save_mat_reg_to_file("00 d.txt", 9, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("00 d.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("00 w2.txt", 2, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSIF pc = 1 THEN
-            save_mat_reg_to_file("01 hl.txt", 9, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("01 hl.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSIF pc = 2 THEN
-            save_mat_reg_to_file("02 hl_ReLu.txt", 9, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-            save_mat_reg_to_file("02 x_train_trans.txt", 6, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("02 hl_ReLu.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("02 x_train_trans.txt", 5, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSIF pc = 3 THEN
-            save_mat_reg_to_file("03 d2.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("03 d2.txt", 8, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSIF pc = 4 THEN
-            save_mat_reg_to_file("04 scores.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-            save_mat_reg_to_file("04 w2_t.txt", 8, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("04 scores.txt", 8, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);      
         ELSIF pc = 5 THEN
-            save_mat_reg_to_file("05 scores.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("05 scores.txt", 8, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("05 w2_t.txt", 4, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSIF pc = 6 THEN
-            save_mat_reg_to_file("06 scores.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("06 scores.txt", 8, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSIF pc = 7 THEN
-            save_mat_reg_to_file("07 scores.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("07 scores.txt", 8, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSIF pc = 8 THEN
-            save_mat_reg_to_file("08 dhidden.txt", 5, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("08 dhidden.txt", 6, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+        ELSIF pc = 9 THEN
+            save_mat_reg_to_file("09 dhidden.txt", 6, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("09 w1.txt", 0, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+        ELSIF pc = 10 THEN
+            save_mat_reg_to_file("10 dw1.txt", 4, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("10 tmp0.txt", 10, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("10 tmp1.txt", 9, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+        ELSIF pc = 11 THEN
+            save_mat_reg_to_file("11 db1.txt", 5, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("11 dw1.txt", 4, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);    
+        ELSIF pc = 12 THEN
+            save_mat_reg_to_file("12 dw2.txt", 6, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("12 dw1.txt", 4, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);    
+        ELSIF pc = 13 THEN
+            save_mat_reg_to_file("13 w1.txt", 0, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("13 tmp2.txt", 10, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o); 
+            save_mat_reg_to_file("13 db2.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);  
+        ELSIF pc = 14 THEN
+            save_mat_reg_to_file("14 db1.txt", 5, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("14 dw2.txt", 6, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);  
+        ELSIF pc = 15 THEN
+            save_mat_reg_to_file("15 b1.txt", 1, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("15 dw2.txt", 6, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);  
+        ELSIF pc = 16 THEN
+            save_mat_reg_to_file("16 w2.txt", 2, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("16 db2.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o); 
+        ELSIF pc = 17 THEN
+            save_mat_reg_to_file("17 b2.txt", 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSE
             save_mat_reg_to_file("dummy.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         END IF;
