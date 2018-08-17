@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------------------------
 --  Testbench fuer e_nn_algo
---  Simulationszeit: ??
+--  Simulationszeit: 2 ms
 --
 --  Autor: Niklas Kuehl
 --  Datum: 06.08.2018
@@ -153,8 +153,31 @@ BEGIN
     init_mat_w1_cbc(0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a0);
     init_mat_w2_cbc(2, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a0);
     init_y_train(s_ytrain_data_i, s_ytrain_write, s_ytrain_wren);
-    
+   
+    save_mat_reg_to_file("IN w1.txt", 0, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    save_mat_reg_to_file("IN b1.txt", 1, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    save_mat_reg_to_file("IN w2.txt", 2, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    save_mat_reg_to_file("IN b2.txt", 3, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
 
+    s_syn_rst <= '0';
+    WAIT FOR c_clk_per;
+    REPORT infomsg("Fuehre Algorithmus aus...");  
+    WAIT UNTIL s_finished = '1';
+    WAIT FOR c_clk_per / 2;
+    REPORT infomsg("Algorithmus beendet");
+    
+    save_mat_reg_to_file("07 scores.txt", 8, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    save_mat_reg_to_file("10 tmp1.txt", 9, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    save_mat_reg_to_file("12 dw1.txt", 4, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);    
+    save_mat_reg_to_file("13 w1.txt", 0, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    save_mat_reg_to_file("13 tmp2.txt", 10, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o); 
+    save_mat_reg_to_file("14 db1.txt", 5, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    save_mat_reg_to_file("15 b1.txt", 1, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    save_mat_reg_to_file("15 dw2.txt", 6, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);  
+    save_mat_reg_to_file("16 w2.txt", 2, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    save_mat_reg_to_file("16 db2.txt", 7, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o); 
+    save_mat_reg_to_file("17 b2.txt", 3, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    
     REPORT infomsg("Testende");
     WAIT;
 END PROCESS proc_test;

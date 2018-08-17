@@ -634,7 +634,7 @@ BEGIN
         data(i+1) := (c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0);
         data(i+2) := (c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1);
         data(i+3) := (c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2, c_rv_3, c_rv_0, c_rv_1, c_rv_2);
-        i := i +4;
+        i := i + 4;
     END LOOP;
     
     init_reg(data, '0', to_mat_size(64, 64), reg, "w1", s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a0);

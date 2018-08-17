@@ -130,8 +130,8 @@ CONSTANT s_program : t_program(0 TO 17) := (
     ((MatAdd, b2, db2, b2, '1'),                c_noop_instr,                               c_noop_instr)
 );
 
-CONSTANT test_algo_steps : INTEGER := 4;
-CONSTANT train_algo_steps : INTEGER := 17;
+CONSTANT test_algo_last_step : INTEGER := 4;
+CONSTANT train_algo_last_step : INTEGER := 17;
 
 CONSTANT c_scalar_opcore : INTEGER := 1;
 
@@ -176,10 +176,10 @@ PORT MAP(
 ----------------------------------------------------------------------------------------------------
 
 s_rst_cpu_1 <= p_syn_rst_i OR s_rst_cpu;
-s_sel_a_1 <= (p_sel_a_0_i, (OTHERS => '0'), (OTHERS => '0')) WHEN (p_write_a0_i OR p_read_a0_i) = '1' ELSE s_sel_a;
+s_sel_a_1 <= ((OTHERS => '0'), (OTHERS => '0'), p_sel_a_0_i) WHEN (p_write_a0_i OR p_read_a0_i) = '1' ELSE s_sel_a;
 
-s_last_algo_step <= train_algo_steps WHEN p_do_train_i = '1' ELSE test_algo_steps;
-s_step_finished <= s_finished(0) XNOR s_finished(1) XNOR s_finished(2);
+s_last_algo_step <= train_algo_last_step WHEN p_do_train_i = '1' ELSE test_algo_last_step;
+s_step_finished <= s_finished(0) AND s_finished(1) AND s_finished(2);
 p_ytrain_ix_o <= s_data_o(5 DOWNTO 0);
 s_data_i <= p_ytrain_data_i WHEN s_opcode(c_scalar_opcore) = ScalarSubIx ELSE t_mat_elem_slv(s_mul_scalar); -- Bestimmt, welcher zusaetzliche Operand (p_data_i) verwendet wird
 
@@ -199,15 +199,16 @@ END PROCESS proc_scalar;
 
 
 proc_prog_interpreter : PROCESS(p_rst_i, p_clk_i, p_syn_rst_i, s_last_algo_step)
-VARIABLE pc : INTEGER := 0;
+    VARIABLE pc : INTEGER := 0;
+    VARIABLE wait_cpu_rst : BOOLEAN := FALSE;
 BEGIN    
     IF p_rst_i = '1' THEN      
         pc := 0; 
         s_wren  <= '0';
         s_opcode <= (NoOp, NoOp, NoOp);
-        s_sel_a <= (OTHERS => (OTHERS => '-'));
-        s_sel_b <= (OTHERS => (OTHERS => '-'));
-        s_sel_c <= (OTHERS => (OTHERS => '-'));
+        s_sel_a <= (OTHERS => to_mat_reg_ix(0)); -- beliebiger Wert (dont care erzeugt modelsim fehler)
+        s_sel_b <= (OTHERS => to_mat_reg_ix(0)); -- beliebiger Wert (dont care erzeugt modelsim fehler)
+        s_sel_c <= (OTHERS => to_mat_reg_ix(0)); -- beliebiger Wert (dont care erzeugt modelsim fehler)
         s_row_by_row_c <= (OTHERS => '-');              
         p_finished_o <= '0'; 
         s_rst_cpu <= '1';
@@ -216,9 +217,9 @@ BEGIN
         -- Default values
         s_wren  <= '0';
         s_opcode <= (NoOp, NoOp, NoOp);
-        s_sel_a <= (OTHERS => (OTHERS => '-'));
-        s_sel_b <= (OTHERS => (OTHERS => '-'));
-        s_sel_c <= (OTHERS => (OTHERS => '-'));
+        s_sel_a <= (OTHERS => to_mat_reg_ix(0)); -- beliebiger Wert (dont care erzeugt modelsim fehler)
+        s_sel_b <= (OTHERS => to_mat_reg_ix(0)); -- beliebiger Wert (dont care erzeugt modelsim fehler)
+        s_sel_c <= (OTHERS => to_mat_reg_ix(0)); -- beliebiger Wert (dont care erzeugt modelsim fehler)
         s_row_by_row_c <= (OTHERS => '-');              
         p_finished_o <= '0'; 
         s_rst_cpu <= '1';
@@ -237,8 +238,12 @@ BEGIN
                 END LOOP;
                 s_rst_cpu <= '0';
                 pc := pc;
-            ELSE
+            ELSIF wait_cpu_rst = FALSE THEN
+                wait_cpu_rst := TRUE;
+                REPORT infomsg("Algorithmus-Schritt " & INTEGER'IMAGE(pc) & " beendet");
                 pc := pc + 1;
+            ELSE
+                wait_cpu_rst := FALSE;
             END IF;
         ELSE
             pc := pc;

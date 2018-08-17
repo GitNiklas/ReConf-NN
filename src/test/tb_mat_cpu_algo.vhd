@@ -255,6 +255,11 @@ BEGIN
     init_mat_w2_cbc(2, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     init_y_train(s_ytrain_data_i, s_ytrain_write, s_ytrain_wren);
     
+    save_mat_reg_to_file("IN w1.txt", 0, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    save_mat_reg_to_file("IN b1.txt", 1, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    save_mat_reg_to_file("IN w2.txt", 2, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    save_mat_reg_to_file("IN b2.txt", 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    
     FOR pc IN s_program'RANGE LOOP
         REPORT infomsg("Executing Algorithm Step " & INTEGER'IMAGE(pc) & " ...");
         FOR core IN s_program(pc)'RANGE LOOP
@@ -284,6 +289,9 @@ BEGIN
         IF pc = 0 THEN
             save_mat_reg_to_file("00 d.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
             save_mat_reg_to_file("00 w2.txt", 2, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("00 w1.txt", 0, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("00 b1.txt", 1, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("00 b2.txt", 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSIF pc = 1 THEN
             save_mat_reg_to_file("01 hl.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSIF pc = 2 THEN
