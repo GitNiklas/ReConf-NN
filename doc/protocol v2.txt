@@ -4,19 +4,23 @@ Protokoll:
 Übertragung der Klassen (y_train): Standard binär kodiert (4 -> 0100)
 
 [FPGA init]
-1. FPGA übertragt Ready-Byte 0x4A
-2. Übertrage Startbyte: 0xAB
-3. Übertrage x_train (4096 Bytes)
-4. Trennbyte 0xE0
-5. Übertrage y_train (64 Bytes)
-6. Trennbyte 0xE1
-7. Übertrage w1 (4096 Bytes)
-8. Trennbyte 0xE2
-9. Übertrage w2 (640 Bytes)
-10. Trennbyte 0xE3
+1. FPGA übertragt Ready-Byte 0xF0
+2. Übertrage Startbyte: 0xE0
+3. Übertrage w1 (4096 Bytes)
+4. Trennbyte 0xE1
+5. Übertrage w2 (640 Bytes)
+6. Trennbyte 0xE2
+
+7. Übertrage x_train (4096 Bytes)
+8. Trennbyte 0xE3
+9. Übertrage y_train (64 Bytes)
+10. Trennbyte 0xE4
 [FPGA rechnet]
-11. Signal v. FPGA 0xF0
-12. Übertrage Testdaten (4096 Bytes)
-13. Trennnbyte 0xE4
+11. FPGA überträgt 0xF1
+12. Übertrage Byte
+    - 0xE2 => Zurück zu Punkt 7. (Neuer Durchlauf)
+    - 0xA1 => Weiter mit Punkt 13. (Test)
+
+13. Übertrage x_test (4096 Bytes)
 [FPGA rechnet]
 14. FPGA übertragt scores (640 Bytes)

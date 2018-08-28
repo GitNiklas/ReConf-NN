@@ -1,0 +1,30 @@
+﻿Protokoll:
+
+- Init
+- Initialisierung b1 mit 0.0
+- Initialisierung b2 mit 0.0
+- Sende Ready-Byte 0xF0
+
+- Warte auf Serial Byte
+	- Wenn nicht 0xE0 => Err
+- Schreibe w1 von serial
+
+- Warte auf Serial Byte
+	- Wenn nicht 0xE1 => Err
+- Schreibe w2 von serial
+
+dec: - Warte auf Serial Byte
+	- Wenn nicht 0xE2 oder 0xA1 => Err
+
+Wenn 0xE2:
+- Schreibe xTrain von serial
+- Warte auf Serial Byte
+	- Wenn nicht 0xE3 => Err
+	- Schreibe ytrain von serial	
+- Warte auf Serial Byte
+	- Wenn nicht 0xE4 => Err
+- Starte Algo. warte bis fertig
+
+Wenn 0xA1:
+- Schreibe xTrain(xTest) von serial
+- Sende scores
