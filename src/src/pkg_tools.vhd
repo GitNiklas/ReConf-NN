@@ -107,7 +107,7 @@ PACKAGE pkg_tools IS
 --  Serial
 ----------------------------------------------------------------------------------------------------
     SUBTYPE t_byte IS STD_LOGIC_VECTOR(7 DOWNTO 0);
-    CONSTANT c_baudrate : POSITIVE  :=  9600;
+    CONSTANT c_baudrate : POSITIVE  :=  115200;
     
     ----------------------------------------------------------------------------------------------------
     -- Function f_calc_serial_wait
@@ -122,6 +122,7 @@ PACKAGE pkg_tools IS
 ----------------------------------------------------------------------------------------------------
     FUNCTION infomsg(x: STRING) RETURN STRING;
     FUNCTION err(x: STRING) RETURN STRING;
+    FUNCTION to_hex(x: t_byte) RETURN STRING;
 END;
 
 PACKAGE BODY pkg_tools IS    
@@ -269,4 +270,14 @@ PACKAGE BODY pkg_tools IS
     BEGIN
         RETURN c_err_prefix & x;
     END;
+    
+    FUNCTION to_hex(x: t_byte) RETURN STRING IS
+    VARIABLE tmp : STRING(1 TO 4) := "____";
+    BEGIN
+    --pragma synthesis_off
+        tmp := "0x" & to_hstring(to_ufixed(x, 7, 0))(1 TO 2);
+    --pragma synthesis_on
+        RETURN tmp;
+    END;
+
 END PACKAGE BODY;

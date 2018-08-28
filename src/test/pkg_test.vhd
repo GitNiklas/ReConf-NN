@@ -1,11 +1,30 @@
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
+USE ieee.math_real.ALL;
 USE work.pkg_tools.ALL;
 USE work.fixed_pkg.ALL;
 USE std.textio.ALL;
+
+PACKAGE pkg_test IS    
     
-PACKAGE pkg_test IS     
+    CONSTANT c_test_baudrate : POSITIVE;
+    
+    PROCEDURE serial_send(data : t_byte; SIGNAL s_tx : OUT STD_LOGIC);
+    PROCEDURE serial_receive(VARIABLE data : OUT t_byte; SIGNAL s_rx : IN STD_LOGIC);
+    
+    PROCEDURE debug_save_mat_reg_to_file(
+        CONSTANT filename       : IN STRING;
+        CONSTANT reg            : IN INTEGER;
+        CONSTANT m              : IN INTEGER;
+        CONSTANT n              : IN INTEGER;
+        CONSTANT row_by_row     : IN BOOLEAN;
+        
+        SIGNAL s_tx             : OUT STD_LOGIC;
+        SIGNAL s_rx             : IN STD_LOGIC;
+        SIGNAL s_set_dbg        : OUT STD_LOGIC
+    );
+   
     PROCEDURE save_mat_reg_to_file(
         CONSTANT filename       : IN STRING;
         CONSTANT reg            : IN INTEGER;
@@ -73,20 +92,112 @@ PACKAGE pkg_test IS
         SIGNAL s_ix_w   : OUT t_mat_ix;
         SIGNAL s_row_by_row : OUT STD_LOGIC
     );
+    
+    PROCEDURE random_elem(
+        min, max : REAL;
+        VARIABLE seed1, seed2 : INOUT POSITIVE;
+        VARIABLE res : OUT REAL
+    );      
 END;
 
 PACKAGE BODY pkg_test IS
+    
+    CONSTANT c_test_baudrate : POSITIVE := 10_000_000;
+    CONSTANT c_test_serial_wait : TIME := f_calc_serial_wait_time(c_test_baudrate);
     
     PROCEDURE ensure(
         x: BOOLEAN;
         msg: STRING
     ) IS
     BEGIN
-        IF NOT x THEN
-            ASSERT FALSE REPORT err(msg);
-            WAIT;
-        END IF;
+        ASSERT x REPORT err(msg) SEVERITY FAILURE;
     END ensure;
+    
+    PROCEDURE serial_send(data : t_byte; SIGNAL s_tx : OUT STD_LOGIC) IS 
+    BEGIN
+        --REPORT infomsg("Sende Byte: " & to_hex(data));
+        --REPORT infomsg("Sende Startbit");
+        s_tx <= '0';
+        WAIT FOR c_test_serial_wait;
+        
+        FOR i IN 0 TO 7 LOOP
+            --REPORT infomsg("Sende Bit: " & STD_LOGIC'IMAGE(data(i)));
+            s_tx <= data(i);
+            WAIT FOR c_test_serial_wait;
+        END LOOP;
+        
+        --REPORT infomsg("Sende Stoppbit");
+        s_tx <= '1';
+        WAIT FOR c_test_serial_wait;
+    END serial_send;
+
+    PROCEDURE serial_receive(VARIABLE data : OUT t_byte; SIGNAL s_rx : IN STD_LOGIC) IS 
+    VARIABLE    
+        res : t_byte;
+    BEGIN
+        IF s_rx /= '0' THEN
+            WAIT UNTIl s_rx = '0';
+            WAIT FOR c_clk_per / 2;
+        END IF;
+        --REPORT infomsg("Startbit empfangen");
+        WAIT FOR c_test_serial_wait;
+        
+        WAIT FOR c_test_serial_wait / 2;   
+        FOR i IN 0 TO 7 LOOP
+            res(i) := s_rx;
+            --REPORT infomsg("Bit empfangen: " & STD_LOGIC'IMAGE(s_rx));
+            WAIT FOR c_test_serial_wait;
+        END LOOP;
+        
+        IF s_rx /= '1' THEN
+            WAIT UNTIl s_rx = '1';
+            WAIT FOR c_clk_per / 2;
+        END IF;
+        --REPORT infomsg("Stoppbit empfangen");
+        --REPORT infomsg("Byte empfangen: " & to_hex(res));
+        data := res;
+    END serial_receive;
+
+    PROCEDURE debug_save_mat_reg_to_file(
+        CONSTANT filename       : IN STRING;
+        CONSTANT reg            : IN INTEGER;
+        CONSTANT m              : IN INTEGER;
+        CONSTANT n              : IN INTEGER;
+        CONSTANT row_by_row     : IN BOOLEAN;
+        
+        SIGNAL s_tx             : OUT STD_LOGIC;
+        SIGNAL s_rx             : IN STD_LOGIC;
+        SIGNAL s_set_dbg        : OUT STD_LOGIC
+    ) IS
+        FILE mat_file : TEXT;
+        VARIABLE tmp_line : LINE;
+        VARIABLE elem : t_byte;
+    BEGIN
+        s_set_dbg <= '1';
+        WAIT FOR 2*c_clk_per;
+        s_set_dbg <= '0';
+        WAIT FOR c_clk_per;
+        serial_send("0000" & STD_LOGIC_VECTOR(to_mat_reg_ix(reg)), s_tx);
+        
+        file_open(mat_file, filename, write_mode);
+        
+        REPORT infomsg("Schreibe Matrix Register " & INTEGER'IMAGE(reg) & " in Datei " & filename); 
+        WRITE(tmp_line, "Matrix Register " & INTEGER'IMAGE(reg) & " : size = " &  INTEGER'IMAGE(m) & "x" & INTEGER'IMAGE(n) & "; row_by_row = " & BOOLEAN'IMAGE(row_by_row));
+        WRITELINE(mat_file, tmp_line);
+        IF NOT row_by_row THEN
+            WRITE(tmp_line, "row_by_row = " & BOOLEAN'IMAGE(row_by_row) & "; Matrix ist transponiert!");
+            WRITELINE(mat_file, tmp_line);
+        END IF;
+
+        FOR i IN 1 TO m LOOP
+            FOR j IN 1 TO n LOOP
+                serial_receive(elem, s_rx);
+                WRITE(tmp_line, to_real(to_mat_elem(elem)), right, 8, 4);
+            END LOOP;
+            WRITELINE(mat_file, tmp_line);          
+        END LOOP;
+        file_close(mat_file);
+    END debug_save_mat_reg_to_file;
     
     PROCEDURE save_mat_reg_to_file(
         CONSTANT filename       : IN STRING;
@@ -337,5 +448,16 @@ PACKAGE BODY pkg_test IS
         WAIT FOR c_clk_per;
         s_wren <= '0';
     END set_reg;
+    
+    PROCEDURE random_elem(
+        min, max : REAL;
+        VARIABLE seed1, seed2 : INOUT POSITIVE;
+        VARIABLE res : OUT REAL
+    ) IS
+    VARIABLE rand, val_range : REAL;
+    BEGIN
+        uniform(seed1, seed2, rand);
+        res := rand * (max - min) + min;        
+    END random_elem; 
 
 END PACKAGE BODY;
