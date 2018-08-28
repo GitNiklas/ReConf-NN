@@ -4,7 +4,7 @@
 -- Die Baudrate ist variabel.
 --
 --  Generics:
---      g_clk_periode   : Periodendauer des Taktes p_clk_i
+--      g_clk_period    : Periodendauer des Taktes p_clk_i
 --      g_baudrate      : Baudrate mit der kommuniziert werden soll
 --
 --  Port:
@@ -35,7 +35,7 @@ USE work.pkg_tools.ALL;
 ----------------------------------------------------------------------------------------------------
 ENTITY e_serial IS
     GENERIC(
-        g_clk_periode       : TIME      := 20 ns;
+        g_clk_period        : TIME      := 20 ns;
         g_baudrate          : POSITIVE  := 9600 
     );
     PORT(
@@ -68,7 +68,7 @@ ARCHITECTURE a_serial OF e_serial IS
 
 COMPONENT e_serial_send
     GENERIC(  
-        g_clk_periode           : TIME := 20 ns;
+        g_clk_period            : TIME := 20 ns;
         g_baudrate              : POSITIVE := 115200
     );
     PORT (
@@ -85,7 +85,7 @@ END COMPONENT;
 
 COMPONENT e_serial_receive
     GENERIC(  
-        g_clk_periode           : TIME := 20 ns;
+        g_clk_period            : TIME := 20 ns;
         g_baudrate              : POSITIVE := 115200
     );
     PORT (
@@ -111,7 +111,7 @@ END COMPONENT;
 BEGIN
 
 SENDER : e_serial_send
-GENERIC MAP(g_clk_periode, g_baudrate)
+GENERIC MAP(g_clk_period, g_baudrate)
 PORT MAP(
     p_rst_i         => p_rst_i,
     p_clk_i         => p_clk_i,
@@ -123,7 +123,7 @@ PORT MAP(
 );
 
 RECEIVER : e_serial_receive
-GENERIC MAP(g_clk_periode, g_baudrate)
+GENERIC MAP(g_clk_period, g_baudrate)
 PORT MAP(
     p_rst_i         => p_rst_i,
     p_clk_i         => p_clk_i,

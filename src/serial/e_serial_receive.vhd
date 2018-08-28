@@ -4,7 +4,7 @@
 -- Die Baudrate ist variabel.
 --
 --  Generics:
---      g_clk_periode   : Periodendauer des Taktes p_clk_i
+--      g_clk_period    : Periodendauer des Taktes p_clk_i
 --      g_baudrate      : Baudrate mit der kommuniziert werden soll
 --
 --  Port:
@@ -30,7 +30,7 @@ USE work.pkg_tools.ALL;
 ----------------------------------------------------------------------------------------------------
 ENTITY e_serial_receive IS
     GENERIC(
-        g_clk_periode       : TIME      := 20 ns;
+        g_clk_period        : TIME      := 20 ns;
         g_baudrate          : POSITIVE  := 115200 
     );
     PORT(
@@ -58,7 +58,7 @@ ARCHITECTURE a_serial_receive OF e_serial_receive IS
 
 COMPONENT e_timer
     GENERIC(  
-        g_clk_periode           : TIME := 20 ns;
+        g_clk_period            : TIME := 20 ns;
         g_t0                    : TIME := 50 us;
         g_t1                    : TIME := 100 us;
         g_t2                    : TIME := 200 us
@@ -96,7 +96,7 @@ END COMPONENT;
 ----------------------------------------------------------------------------------------------------
 
 CONSTANT frame_len          : POSITIVE  := 10;
-CONSTANT serial_wait_time   : TIME      := f_calc_serial_wait_time(g_baudrate);
+CONSTANT timer_wait_time    : TIME      := f_calc_serial_wait_time(g_baudrate) - 2 * g_clk_period; --Zustandswechsel benoetigen 2 Taktperioden
 
 -- Zustaende
 TYPE t_state IS (st_init, st_rec, st_wait, st_new_data, st_err); 
@@ -114,10 +114,10 @@ BEGIN
 
 timer : e_timer
 GENERIC MAP(
-    g_clk_periode       => g_clk_periode,
-    g_t0                => serial_wait_time,
-    g_t1                => serial_wait_time,
-    g_t2                => serial_wait_time
+    g_clk_period        => g_clk_period,
+    g_t0                => timer_wait_time,
+    g_t1                => timer_wait_time,
+    g_t2                => timer_wait_time
 )
 PORT MAP(
     p_rst_i             => p_rst_i,

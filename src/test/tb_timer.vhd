@@ -16,7 +16,7 @@ ARCHITECTURE a_tb_timer OF tb_timer IS
 
 COMPONENT e_timer
     GENERIC( 
-        g_clk_periode       : TIME;
+        g_clk_period        : TIME;
         g_t0                : TIME;
         g_t1                : TIME;
         g_t2                : TIME
@@ -39,7 +39,7 @@ BEGIN
 
 dut : e_timer
 GENERIC MAP(
-    g_clk_periode       => c_clk_per,
+    g_clk_period        => c_clk_per,
     g_t0                => 50 us,
     g_t1                => 100 us,
     g_t2                => 160 us

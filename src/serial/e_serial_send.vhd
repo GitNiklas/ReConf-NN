@@ -4,7 +4,7 @@
 -- Die Baudrate ist variabel.
 --
 --  Generics:
---      g_clk_periode   : Periodendauer des Taktes p_clk_i
+--      g_clk_period    : Periodendauer des Taktes p_clk_i
 --      g_baudrate      : Baudrate mit der kommuniziert werden soll
 --
 --  Port:
@@ -29,7 +29,7 @@ USE work.pkg_tools.ALL;
 ----------------------------------------------------------------------------------------------------
 ENTITY e_serial_send IS
     GENERIC(
-        g_clk_periode       : TIME      := 20 ns;
+        g_clk_period        : TIME      := 20 ns;
         g_baudrate          : POSITIVE  := 115200 
     );
     PORT(
@@ -56,7 +56,7 @@ ARCHITECTURE a_serial_send OF e_serial_send IS
 
 COMPONENT e_timer
     GENERIC(  
-        g_clk_periode           : TIME := 20 ns;
+        g_clk_period            : TIME := 20 ns;
         g_t0                    : TIME := 50 us;
         g_t1                    : TIME := 100 us;
         g_t2                    : TIME := 200 us
@@ -93,8 +93,8 @@ END COMPONENT;
 --  Typen / Signale
 ----------------------------------------------------------------------------------------------------
 
-CONSTANT frame_len          : POSITIVE  := 10;
-CONSTANT serial_wait_time   : TIME      := f_calc_serial_wait_time(g_baudrate);
+CONSTANT frame_len          : POSITIVE  := 11; -- 1 zusatzliches Bit, damit tx zwischen Sendevorgaengen durchgehend high ist
+CONSTANT timer_wait_time    : TIME      := f_calc_serial_wait_time(g_baudrate) - 2 * g_clk_period; -- Zustandswechsel benoetigen 2 Taktperioden
 
 -- Zustaende
 TYPE t_state IS (st_init, st_send, st_shift); 
@@ -112,10 +112,10 @@ BEGIN
 
 timer : e_timer
 GENERIC MAP(
-    g_clk_periode       => g_clk_periode,
-    g_t0                => serial_wait_time,
-    g_t1                => serial_wait_time,
-    g_t2                => serial_wait_time
+    g_clk_period        => g_clk_period,
+    g_t0                => timer_wait_time,
+    g_t1                => timer_wait_time,
+    g_t2                => timer_wait_time
 )
 PORT MAP(
     p_rst_i             => p_rst_i,
@@ -146,7 +146,7 @@ PORT MAP(
 --  Zuweisungen
 ----------------------------------------------------------------------------------------------------
 
-s_reg_data_i <= '1' & p_data_i & '0';
+s_reg_data_i <= "11" & p_data_i & '0';
 
 ----------------------------------------------------------------------------------------------------
 --  Zustandsautomat
@@ -172,7 +172,7 @@ BEGIN
                                 s_next_state <= s_cur_state;
                             END IF;
     
-        WHEN st_send =>     IF s_reg_data_o = b"0_0000_0000_0" THEN 
+        WHEN st_send =>     IF s_reg_data_o = b"00_0000_0000_1" THEN 
                                 s_next_state <= st_init;
                             ELSIF s_timer_finished = '1' THEN
                                 s_next_state <= st_shift;

@@ -19,7 +19,7 @@ CONSTANT c_serial_wait_time : TIME := f_calc_serial_wait_time(c_baudrate);
 
 COMPONENT e_serial
     GENERIC(
-        g_clk_periode       : TIME      := 20 ns;
+        g_clk_period        : TIME      := 20 ns;
         g_baudrate          : POSITIVE  := 115200
     );
     PORT(
@@ -170,7 +170,7 @@ BEGIN
 
 dut : e_serial
 GENERIC MAP(
-    g_clk_periode       => c_clk_per,
+    g_clk_period        => c_clk_per,
     g_baudrate          => c_baudrate
 )
 PORT MAP(
