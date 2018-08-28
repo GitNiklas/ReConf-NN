@@ -27,7 +27,7 @@ COMPONENT e_nn_algo
         p_do_train_i            : IN STD_LOGIC; -- 1 -> Training (kompletter Algo); 0-> Test
         p_finished_o            : OUT STD_LOGIC;
         
-        p_ytrain_data_i         : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+        p_ytrain_data_i         : IN t_byte;
         p_ytrain_ix_o           : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);
         
         p_sel_a_0_i             : IN t_mat_reg_ix;
@@ -67,7 +67,7 @@ SIGNAL s_ix_a0 : t_mat_ix;
 SIGNAL s_size_a0_i, s_size_a0_o : t_mat_size;
 SIGNAL s_row_by_row_a0_i, s_row_by_row_a0_o : STD_LOGIC;
 
-SIGNAL s_ytrain_data_i, s_ytrain_data_o : STD_LOGIC_VECTOR(7 DOWNTO 0);
+SIGNAL s_ytrain_data_i, s_ytrain_data_o : t_byte;
 SIGNAL s_ytrain_read, s_ytrain_write : STD_LOGIC_VECTOR(5 DOWNTO 0);
 SIGNAL s_ytrain_wren : STD_LOGIC;
 

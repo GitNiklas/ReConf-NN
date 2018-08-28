@@ -42,7 +42,7 @@ BEGIN
 p_mat_ix_t0_o       <= s_ix_t0;
 p_mat_ix_t2_o       <= s_ix_t2;
 
-p_finished_o        <= s_last_col_t1 AND s_last_row_t1 AND p_word_done_i AND NOT s_first_elem;
+p_finished_o        <= s_last_col_t1 AND s_last_row_t1 AND NOT s_first_elem;
 p_first_elem_t1_o   <= s_first_elem;
 
 c_inc_ix <= t_mat_word'LENGTH WHEN inc_by_wordlen ELSE 1;

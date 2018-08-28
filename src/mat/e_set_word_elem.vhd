@@ -51,7 +51,7 @@ s_next_word         <= (to_sl(s_word_index = s_c_max_word_index) OR to_sl(s_word
 --  Prozesse
 ----------------------------------------------------------------------------------------------------
 
-proc_reg : PROCESS(p_rst_i, p_clk_i, s_word_o)
+proc_reg : PROCESS(p_rst_i, p_clk_i)
 BEGIN
     IF p_rst_i = '1' THEN
         s_word_reg <= c_mat_word_zero;
@@ -66,7 +66,7 @@ END PROCESS proc_reg;
 
 proc_generate_s_word_o : PROCESS(s_word_ix, s_word_reg, p_elem_i)
 BEGIN
-    s_word_o <= (s_word_reg(31 DOWNTO 1) & p_elem_i);
+    s_word_o <= (OTHERS => (OTHERS => '-'));
     
     FOR i IN 31 DOWNTO 0 LOOP
         IF RESIZE(s_word_ix mod 32, 5) = TO_UNSIGNED( i, 5) THEN

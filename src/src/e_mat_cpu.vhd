@@ -13,8 +13,8 @@ ENTITY e_mat_cpu IS
         
         p_finished_o            : OUT t_op_std_logics;
         p_opcode_i              : IN t_opcodes;
-        p_data_i                : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-        p_data_o                : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        p_data_i                : IN t_byte;
+        p_data_o                : OUT t_byte;
         
         p_sel_a_i               : IN t_mat_reg_ixs;
         p_sel_b_i               : IN t_mat_reg_ixs;

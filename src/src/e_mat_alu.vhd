@@ -21,8 +21,8 @@ ENTITY e_mat_alu IS
         p_finished_o            : OUT t_op_std_logics;
         
         p_opcode_i              : IN t_opcodes;
-        p_data_i                : IN STD_LOGIC_VECTOR(7 DOWNTO 0); -- scalar fuer scalarmul, ix fuer scalarsubix
-        p_data_o                : OUT STD_LOGIC_VECTOR(7 DOWNTO 0); -- ix fuer array bei scalarsubix
+        p_data_i                : IN t_byte; -- scalar fuer scalarmul, ix fuer scalarsubix
+        p_data_o                : OUT t_byte; -- ix fuer array bei scalarsubix
         
         p_mat_a_size_i          : IN t_mat_sizes;
         p_mat_a_ix_o            : OUT t_mat_ixs;
@@ -161,7 +161,7 @@ COMPONENT e_mat_scalar_mul
         p_syn_rst_i             : IN STD_LOGIC;
         p_finished_o            : OUT STD_LOGIC;
         
-        p_scalar_i              : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+        p_scalar_i              : IN t_byte;
         
         p_mat_a_size_i          : IN t_mat_size;
         p_mat_a_ix_o            : OUT t_mat_ix;
@@ -222,8 +222,8 @@ COMPONENT e_mat_scalar_sub_ix
         p_syn_rst_i             : IN STD_LOGIC;
         p_finished_o            : OUT STD_LOGIC;
         
-        p_ix_i                  : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-        p_ix_o                  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0); -- Index fuer ix-array
+        p_ix_i                  : IN t_byte;
+        p_ix_o                  : OUT t_byte; -- Index fuer ix-array
         
         p_mat_c_size_i          : IN t_mat_size;
         p_mat_c_r_ix_o          : OUT t_mat_ix;

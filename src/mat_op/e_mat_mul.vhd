@@ -186,7 +186,7 @@ s_last_result_t2        <= s_result_t2 WHEN s_last_col_a_row_b_t2 = '0' ELSE to_
 
 s_c_size                <= (p_mat_a_size_i.max_row, p_mat_b_size_i.max_col);
 p_mat_c_size_o          <= s_c_size;
-p_finished_o            <= s_finished_t1;
+p_finished_o            <= s_finished_t1 AND s_last_col_a_row_b_t1;
 
 s_col_a_row_b_t0        <=  to_mat_ix_el(0) WHEN to_bool(s_first_elem_t1 OR s_last_col_a_row_b_t1) ELSE
                             s_col_a_row_b_t1 + t_mat_word'LENGTH;
@@ -260,7 +260,7 @@ END ENTITY e_mat_mul_reg;
 ARCHITECTURE  a_mat_mul_reg OF e_mat_mul_reg IS
 BEGIN
 
-proc_registers : PROCESS(p_rst_i, p_clk_i, p_syn_rst_i, p_last_result_i, p_col_a_row_b_i, p_last_col_a_row_b_i)
+proc_registers : PROCESS(p_rst_i, p_clk_i)
 BEGIN
     IF p_rst_i = '1' THEN
         p_last_result_o <= to_mat_elem(0.0);

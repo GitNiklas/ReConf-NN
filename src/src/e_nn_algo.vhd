@@ -13,7 +13,7 @@ ENTITY e_nn_algo IS
         p_do_train_i            : IN STD_LOGIC; -- 1 -> Training (kompletter Algo); 0-> Test
         p_finished_o            : OUT STD_LOGIC;
         
-        p_ytrain_data_i         : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+        p_ytrain_data_i         : IN t_byte;
         p_ytrain_ix_o           : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);
         
         p_sel_a_0_i             : IN t_mat_reg_ix;
@@ -47,8 +47,8 @@ COMPONENT e_mat_cpu
         
         p_finished_o            : OUT t_op_std_logics;
         p_opcode_i              : IN t_opcodes;
-        p_data_i                : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-        p_data_o                : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        p_data_i                : IN t_byte;
+        p_data_o                : OUT t_byte;
         
         p_sel_a_i               : IN t_mat_reg_ixs;
         p_sel_b_i               : IN t_mat_reg_ixs;
@@ -74,7 +74,7 @@ SIGNAL s_wren, s_step_finished, s_rst_cpu, s_rst_cpu_1 : STD_LOGIC;
 SIGNAL s_finished, s_row_by_row_c : t_op_std_logics;
 SIGNAL s_opcode : t_opcodes;
 SIGNAL s_sel_a, s_sel_b, s_sel_c, s_sel_a_1 : t_mat_reg_ixs;
-SIGNAL s_data_i, s_data_o : STD_LOGIC_VECTOR(7 DOWNTO 0);
+SIGNAL s_data_i, s_data_o : t_byte;
 
 SIGNAL s_mul_scalar : t_mat_elem;
 SIGNAL s_last_algo_step : INTEGER;
@@ -198,7 +198,7 @@ BEGIN
 END PROCESS proc_scalar;
 
 
-proc_prog_interpreter : PROCESS(p_rst_i, p_clk_i, p_syn_rst_i, s_last_algo_step)
+proc_prog_interpreter : PROCESS(p_rst_i, p_clk_i)
     VARIABLE pc : INTEGER := 0;
     VARIABLE wait_cpu_rst : BOOLEAN := FALSE;
 BEGIN    

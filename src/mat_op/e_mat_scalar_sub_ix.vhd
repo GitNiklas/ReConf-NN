@@ -13,8 +13,8 @@ ENTITY e_mat_scalar_sub_ix IS
         p_syn_rst_i             : IN STD_LOGIC;
         p_finished_o            : OUT STD_LOGIC;
         
-        p_ix_i                  : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-        p_ix_o                  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0); -- Index fuer ix-array
+        p_ix_i                  : IN t_byte;
+        p_ix_o                  : OUT t_byte; -- Index fuer ix-array
         
         p_mat_c_size_i          : IN t_mat_size; -- hier ist a IMMER gleich c -> weniger kopieraufwand
         p_mat_c_r_ix_o          : OUT t_mat_ix; -- c muss ausserdem row_by_row = 1 sein

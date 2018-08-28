@@ -82,7 +82,7 @@ s_mix_row_col <= s_row_by_row WHEN p_wren_i = '0' ELSE p_row_by_row_i;
 --  Prozesse
 ----------------------------------------------------------------------------------------------------
 
-proc_save_row_by_row : PROCESS(p_clk_i, p_rst_i, p_row_by_row_i)
+proc_save_row_by_row : PROCESS(p_clk_i, p_rst_i)
 BEGIN
     IF p_rst_i = '1' THEN
         s_row_by_row <= '0';
@@ -94,7 +94,7 @@ BEGIN
 END PROCESS proc_save_row_by_row;
 
 
-proc_save_size : PROCESS(p_clk_i, p_rst_i, p_mat_size_i, p_wren_i)
+proc_save_size : PROCESS(p_clk_i, p_rst_i)
 BEGIN
     IF p_rst_i = '1' THEN
         p_mat_size_o <= c_mat_size_zero;
