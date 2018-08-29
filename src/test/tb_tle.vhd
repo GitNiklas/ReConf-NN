@@ -47,7 +47,7 @@ END COMPONENT;
 
 SIGNAL s_clk, s_rst : STD_LOGIC;
 SIGNAL s_rx, s_tx : STD_LOGIC;
-SIGNAL s_wait_data, s_set_debug : STD_LOGIC;
+SIGNAL s_wait_data, s_set_debug, s_run_algo : STD_LOGIC;
 
 ---------------------------------------------
 --  Port Maps
@@ -71,7 +71,7 @@ PORT MAP(
     p_init_o                => OPEN,
     p_wait_data_o           => s_wait_data,
     p_rw_mat_o              => OPEN,
-    p_run_algo              => OPEN,
+    p_run_algo              => s_run_algo,
     p_train_o               => OPEN,
     p_test_o                => OPEN
 );
@@ -104,7 +104,7 @@ BEGIN
     s_rst <= '0';
         
     REPORT infomsg("Initialisierung abgeschlossen");
-    
+
     REPORT infomsg("Empfange Byte");
     serial_receive(v_byte, s_rx);
         
@@ -138,8 +138,43 @@ BEGIN
         serial_send(to_slv(to_mat_elem(x_train(i))), s_tx);
     END LOOP;
     REPORT infomsg("x_train initialisiert");
-  
-    debug_save_mat_reg_to_file("x_train.txt", 5, 64, 64, TRUE, s_tx, s_rx, s_set_debug);
+    
+    REPORT infomsg("Initialisiere y_train...");
+    serial_send(x"E3", s_tx); 
+    FOR i IN y_train'RANGE LOOP
+        serial_send(STD_LOGIC_VECTOR(TO_UNSIGNED(y_train(i), 8)), s_tx);
+    END LOOP;
+    REPORT infomsg("y_train initialisiert");
+    
+    REPORT infomsg("Fuehre Algorithmus aus ..."); 
+    
+    WAIT FOR 4*c_clk_per;
+    WAIT UNTIL s_run_algo = '0';
+    WAIT FOR c_clk_per / 2;
+    REPORT infomsg("Trainingsphase beendet");
+      
+--    debug_save_mat_reg_to_file("tb_tle/07 scores.txt", 8, 64, 10, TRUE, s_tx, s_rx, s_set_debug);
+--    debug_save_mat_reg_to_file("tb_tle/10 tmp1.txt", 9, 64, 10, FALSE, s_tx, s_rx, s_set_debug);
+--    debug_save_mat_reg_to_file("tb_tle/12 dw1.txt", 4, 64, 64, FALSE, s_tx, s_rx, s_set_debug);
+--    debug_save_mat_reg_to_file("tb_tle/13 w1.txt", 0, 64, 64, FALSE, s_tx, s_rx, s_set_debug);
+--    debug_save_mat_reg_to_file("tb_tle/13 tmp2.txt", 10, 64, 10, FALSE, s_tx, s_rx, s_set_debug); 
+--    debug_save_mat_reg_to_file("tb_tle/14 db1.txt", 5, 1, 64, TRUE, s_tx, s_rx, s_set_debug); 
+--    debug_save_mat_reg_to_file("tb_tle/15 b1.txt", 1, 1, 64, TRUE, s_tx, s_rx, s_set_debug);
+--    debug_save_mat_reg_to_file("tb_tle/15 dw2.txt", 6, 64, 10, FALSE, s_tx, s_rx, s_set_debug);
+--    debug_save_mat_reg_to_file("tb_tle/16 w2.txt", 2, 64, 10, FALSE, s_tx, s_rx, s_set_debug);
+--    debug_save_mat_reg_to_file("tb_tle/16 db2.txt", 7, 1, 10, TRUE, s_tx, s_rx, s_set_debug);
+--    debug_save_mat_reg_to_file("tb_tle/17 b2.txt", 3, 1, 10, TRUE, s_tx, s_rx, s_set_debug);
+    
+    REPORT infomsg("Starte Testphase - Initialisiere x_test...");
+    serial_send(x"A1", s_tx); 
+    FOR i IN x_train'RANGE LOOP
+        serial_send(to_slv(to_mat_elem(x_train(i))), s_tx);
+    END LOOP;
+    REPORT infomsg("x_test initialisiert");  
+    
+    REPORT infomsg("Fuehre Algorithmus aus ...");
+    
+    receive_mat_save_to_file("res_scores.txt", 8, 64, 10, TRUE, s_rx);
     
     REPORT infomsg("Testende");
     WAIT;

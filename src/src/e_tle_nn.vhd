@@ -147,12 +147,13 @@ CONSTANT w1 : t_mat_reg_ix := to_mat_reg_ix(0);
 CONSTANT b1 : t_mat_reg_ix := to_mat_reg_ix(1);
 CONSTANT w2 : t_mat_reg_ix := to_mat_reg_ix(2);
 CONSTANT b2 : t_mat_reg_ix := to_mat_reg_ix(3);
-CONSTANT x_train : t_mat_reg_ix := to_mat_reg_ix(5);
-CONSTANT scores : t_mat_reg_ix := to_mat_reg_ix(7);
+CONSTANT x_train : t_mat_reg_ix := to_mat_reg_ix(6);
+CONSTANT scores : t_mat_reg_ix := to_mat_reg_ix(8);
 SIGNAL s_mat_reg, s_dbg_mat_reg : t_mat_reg_ix;
 SIGNAL s_set_dbg_mat_reg : STD_LOGIC;
 
-SIGNAL s_rx_synced, s_set_debug_synced : STD_LOGIC;
+SIGNAL s_rx_synced : STD_LOGIC;
+SIGNAL s_set_debug_synced : STD_LOGIC := '0';
 
 SIGNAL s_rst_algo, s_do_train, s_algo_finished : STD_LOGIC;
 
@@ -337,9 +338,9 @@ BEGIN
         ELSIF s_mat_reg = scores THEN
             s_row_by_row <= '1';
             s_mat_size <= to_mat_size(64, 10);
-        ELSE 
+        ELSE
             s_row_by_row <= '-';
-            s_mat_size <= (OTHERS => (OTHERS => '0')); -- Ein beliebiger Wert (Don't care erzeugt Fehler in Modelsim)
+            s_mat_size <= to_mat_size(64, 64); -- Ein beliebiger Wert (Don't care erzeugt Fehler in Modelsim)
         END IF;
     ELSE
         s_row_by_row <= '1';
@@ -478,7 +479,7 @@ BEGIN
                                     
                                     
         WHEN st_do_test =>          IF s_algo_finished = '1' THEN
-                                        s_next_state <= st_sel_mode;
+                                        s_next_state <= st_read_scores;
                                     ELSE
                                         s_next_state <= s_cur_state;
                                     END IF;

@@ -93,8 +93,8 @@ SIGNAL s_new_data_t1: STD_LOGIC;
 
 SIGNAL s_read_mat_r, s_read_mat_rr : STD_LOGIC;
 SIGNAL s_word_ix : t_mat_ix_elem;
-SIGNAL s_send, s_send_reg : STD_LOGIC;
-SIGNAL s_finished_t1, s_finished_t2 : STD_LOGIC;
+SIGNAL s_send : STD_LOGIC;
+SIGNAL s_finished_t1, s_finished_t2, s_finished_send : STD_LOGIC;
 
 ----------------------------------------------------------------------------------------------------
 --  Port Maps
@@ -139,7 +139,9 @@ PORT MAP(
 ----------------------------------------------------------------------------------------------------
 --  Zuweisungen
 ----------------------------------------------------------------------------------------------------
+-- Beim auslesen geht s_accesss_finished schon auf 1, wenn das letzte word aus ram ausgelesen wird, das muss dann aber noch gesendcet werden!!!
 s_inc_ix <= s_inc_ix_read WHEN p_read_mat_i = '1' ELSE s_inc_ix_write;
+p_finished_o <= s_finished_send WHEN p_read_mat_i = '1' ELSE s_finished_t2;
 
 s_ena_write <= p_write_mat_i AND s_new_data_t1;
 p_write_a0_o <= s_ena_write;
@@ -147,22 +149,20 @@ s_elem <= to_mat_elem(p_data_i);
 f_reg(p_rst_i, p_clk_i, p_syn_rst_i, p_new_data_i, s_new_data_t1);
 s_inc_ix_write <= p_new_data_i AND NOT s_first_elem;
 p_data_read_o <= '1';
+f_reg(p_rst_i, p_clk_i, p_syn_rst_i, s_finished_t1, s_finished_t2);
  
 p_read_a0_o <= p_read_mat_i;
 f_reg(p_rst_i, p_clk_i, p_syn_rst_i, p_read_mat_i, s_read_mat_r);
 f_reg(p_rst_i, p_clk_i, p_syn_rst_i, s_read_mat_r, s_read_mat_rr); -- Verzoegerung um Daten aus RAM zu lesen
 s_send <= s_read_mat_rr AND NOT p_busy_send_i;
-f_reg(p_rst_i, p_clk_i, p_syn_rst_i, s_send, s_send_reg);
-p_send_o <= s_send_reg;
-s_inc_ix_read <= p_busy_send_i AND s_send_reg;
+f_reg(p_rst_i, p_clk_i, p_syn_rst_i, s_send, s_inc_ix_read);
+p_send_o <= s_send;
 s_word_ix <= s_ix.col WHEN p_row_by_row_i = '1' ELSE s_ix.row;
+s_finished_send <= s_finished_t1 AND NOT p_busy_send_i;
 
 p_ytrain_wren_o <= p_write_ytrain_i AND p_new_data_i;
 p_ytrain_data_o <= p_data_i;
 p_ytrain_wraddress_o <= STD_LOGIC_VECTOR(s_ix.col);
-
-f_reg(p_rst_i, p_clk_i, p_syn_rst_i, s_finished_t1, s_finished_t2);
-p_finished_o <= s_finished_t2;
 
 ----------------------------------------------------------------------------------------------------
 --  Prozesse

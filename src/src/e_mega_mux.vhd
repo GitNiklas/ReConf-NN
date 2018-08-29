@@ -105,7 +105,7 @@ proc_mux_a : PROCESS(p_opcode_i, p_sel_a_i, p_reg_word_i, p_reg_mat_size_i, p_re
 BEGIN
     FOR opnum IN c_num_parallel_op-1 DOWNTO 0 LOOP
         s_a_word_i(opnum)           <= set_mat_word('-');
-        s_a_size_i(opnum)           <= ((OTHERS => '-'), (OTHERS => '-'));
+        s_a_size_i(opnum)           <= to_mat_size(64, 64); -- Ein beliebiger Wert (Don't care erzeugt Fehler in Modelsim)
         s_reg_row_by_row_i(opnum)   <= '-'; 
         
         FOR reg IN c_num_mat_regs-1 DOWNTO 0 LOOP
@@ -122,7 +122,7 @@ proc_mux_b : PROCESS(p_opcode_i, p_sel_b_i, p_reg_word_i, p_reg_mat_size_i, p_re
 BEGIN
     FOR opnum IN c_num_parallel_op-1 DOWNTO 0 LOOP
         p_alu_b_data_o(opnum)       <= set_mat_word('-');
-        p_alu_b_size_o(opnum)       <= ((OTHERS => '-'), (OTHERS => '-'));
+        p_alu_b_size_o(opnum)       <= to_mat_size(64, 64); -- Ein beliebiger Wert (Don't care erzeugt Fehler in Modelsim)
         p_alu_b_row_by_row_o(opnum) <= '-';
         
         FOR reg IN c_num_mat_regs-1 DOWNTO 0 LOOP
@@ -140,7 +140,7 @@ BEGIN
     FOR reg IN c_num_mat_regs-1 DOWNTO 0 LOOP 
         -- Standardwerte
         s_reg_wren(reg) <= '0';
-        p_reg_mat_size_o(reg) <= ((OTHERS => '-'), (OTHERS => '-'));
+        p_reg_mat_size_o(reg) <= to_mat_size(64, 64); -- Ein beliebiger Wert (Don't care erzeugt Fehler in Modelsim)
         p_reg_row_by_row_o(reg) <= '-';
         p_reg_ix_write_o(reg) <= p_ix_a0_i; -- Ein beliebiger Wert (Don't care erzeugt Fehler in Modelsim)
         p_reg_word_o(reg) <= set_mat_word('-');

@@ -44,6 +44,9 @@ PROCEDURE init_mat_x_train_rbr( reg : INTEGER; SIGNAL s_write_a0 : OUT STD_LOGIC
 TYPE t_x_train IS ARRAY(0 TO 4095) OF REAL;
 CONSTANT x_train : t_x_train;
 
+TYPE t_y_train IS ARRAY(0 TO 63) OF NATURAL;
+CONSTANT y_train : t_y_train;
+
 TYPE t_x_train2 IS ARRAY(0 TO 11) OF REAL;
 CONSTANT x_train2 : t_x_train2;
 
@@ -669,11 +672,8 @@ PROCEDURE init_y_train(
     SIGNAL s_ram_wraddress : OUT STD_LOGIC_VECTOR (5 DOWNTO 0);
     SIGNAL s_ram_wren : OUT STD_LOGIC
 ) IS
-VARIABLE data : t_ix_arr_const(0 TO 63);
 BEGIN
-    data := (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 9, 5, 5, 6, 5, 0, 9, 8, 9, 8, 4, 1, 7, 7, 3, 5, 1, 0, 0, 2, 2, 7, 8, 2, 0, 1, 2, 6, 3, 3, 7, 3, 3);
-
-    init_ix_arr(data, s_ram_data, s_ram_wraddress, s_ram_wren);
+    init_ix_arr(t_ix_arr_const(y_train), s_ram_data, s_ram_wraddress, s_ram_wren);
 END init_y_train;
 
 PROCEDURE init_mat_x_train_rbr(
@@ -698,6 +698,8 @@ CONSTANT x_train2 : t_x_train2 := (
     0.0, 5.0, 6.0, 2.0, 
     0.0, 2.0, 7.0, 5.0
 );
+
+CONSTANT y_train : t_y_train := (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 9, 5, 5, 6, 5, 0, 9, 8, 9, 8, 4, 1, 7, 7, 3, 5, 1, 0, 0, 2, 2, 7, 8, 2, 0, 1, 2, 6, 3, 3, 7, 3, 3);
 
 CONSTANT x_train : t_x_train := (
     0.0, 0.0, 2.0, 6.0, 4.0, 0.0, 0.0, 0.0, 0.0, 0.0, 6.0, 7.0, 4.0, 7.0, 2.0, 0.0, 0.0, 1.0, 7.0, 1.0, 0.0, 5.0, 4.0, 0.0, 0.0, 2.0, 5.0, 0.0, 0.0, 4.0, 4.0, 0.0, 0.0, 2.0, 4.0, 0.0, 0.0, 4.0, 4.0, 0.0, 0.0, 2.0, 5.0, 0.0, 0.0, 5.0, 3.0, 0.0, 0.0, 1.0, 6.0, 2.0, 4.0, 5.0, 0.0, 0.0, 0.0, 0.0, 3.0, 6.0, 4.0, 0.0, 0.0, 0.0,

@@ -24,6 +24,16 @@ PACKAGE pkg_test IS
         SIGNAL s_rx             : IN STD_LOGIC;
         SIGNAL s_set_dbg        : OUT STD_LOGIC
     );
+    
+    PROCEDURE receive_mat_save_to_file(
+        CONSTANT filename       : IN STRING;
+        CONSTANT reg            : IN INTEGER;
+        CONSTANT m              : IN INTEGER;
+        CONSTANT n              : IN INTEGER;
+        CONSTANT row_by_row     : IN BOOLEAN;
+        
+        SIGNAL s_rx             : IN STD_LOGIC
+    );
    
     PROCEDURE save_mat_reg_to_file(
         CONSTANT filename       : IN STRING;
@@ -169,9 +179,6 @@ PACKAGE BODY pkg_test IS
         SIGNAL s_rx             : IN STD_LOGIC;
         SIGNAL s_set_dbg        : OUT STD_LOGIC
     ) IS
-        FILE mat_file : TEXT;
-        VARIABLE tmp_line : LINE;
-        VARIABLE elem : t_byte;
     BEGIN
         s_set_dbg <= '1';
         WAIT FOR 2*c_clk_per;
@@ -179,6 +186,23 @@ PACKAGE BODY pkg_test IS
         WAIT FOR c_clk_per;
         serial_send("0000" & STD_LOGIC_VECTOR(to_mat_reg_ix(reg)), s_tx);
         
+        receive_mat_save_to_file(filename, reg, m, n, row_by_row, s_rx);
+    END debug_save_mat_reg_to_file;
+    
+    PROCEDURE receive_mat_save_to_file(
+        CONSTANT filename       : IN STRING;
+        CONSTANT reg            : IN INTEGER;
+        CONSTANT m              : IN INTEGER;
+        CONSTANT n              : IN INTEGER;
+        CONSTANT row_by_row     : IN BOOLEAN;
+        
+        SIGNAL s_rx             : IN STD_LOGIC
+    ) IS
+        FILE mat_file : TEXT;
+        VARIABLE tmp_line : LINE;
+        VARIABLE elem : t_byte;
+        VARIABLE tmp : INTEGER;
+    BEGIN        
         file_open(mat_file, filename, write_mode);
         
         REPORT infomsg("Schreibe Matrix Register " & INTEGER'IMAGE(reg) & " in Datei " & filename); 
@@ -189,15 +213,18 @@ PACKAGE BODY pkg_test IS
             WRITELINE(mat_file, tmp_line);
         END IF;
 
+        tmp := 1;
         FOR i IN 1 TO m LOOP
             FOR j IN 1 TO n LOOP
                 serial_receive(elem, s_rx);
                 WRITE(tmp_line, to_real(to_mat_elem(elem)), right, 8, 4);
+                REPORT infomsg("received byte " & INTEGER'IMAGE(tmp));
+                tmp := tmp + 1;
             END LOOP;
             WRITELINE(mat_file, tmp_line);          
         END LOOP;
         file_close(mat_file);
-    END debug_save_mat_reg_to_file;
+    END receive_mat_save_to_file;
     
     PROCEDURE save_mat_reg_to_file(
         CONSTANT filename       : IN STRING;
