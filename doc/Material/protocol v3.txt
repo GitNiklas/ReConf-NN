@@ -1,0 +1,25 @@
+Protokoll:
+
+Übertragung der Pixel (x_train, w1, w2): als Bytes entsprechend der Tabelle (z.B. 4 -> 01000000)
+Übertragung der Klassen (y_train): Standard binär kodiert (4 -> 0100)
+
+[FPGA init]
+1. FPGA übertragt Ready-Byte 0xF0
+2. Übertrage Startbyte: 0xE0
+3. Übertrage w1 (4096 Bytes)
+4. Trennbyte 0xE1
+5. Übertrage w2 (640 Bytes)
+6. Trennbyte 0xE2
+
+7. Übertrage x_train (4096 Bytes)
+8. Trennbyte 0xE3
+9. Übertrage y_train (64 Bytes)
+[FPGA rechnet]
+11. FPGA überträgt 0xF1
+12. Übertrage Byte
+    - 0xE2 => Zurück zu Punkt 7. (Neuer Durchlauf)
+    - 0xA1 => Weiter mit Punkt 13. (Test)
+
+13. Übertrage x_test (4096 Bytes)
+[FPGA rechnet]
+14. FPGA übertragt scores (640 Bytes)

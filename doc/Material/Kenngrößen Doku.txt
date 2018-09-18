@@ -1,0 +1,9 @@
+- Kenngrößen fpr Doku:
+        - Max Taktrate 
+            - Taktrate die der Algo benötigt, bis er fertig ist
+        - Platzbedarf des Designs
+        - Benötigte RAM-Blöcke
+        - Verwendete Multiplizierer
+        - Besserer FPGA
+            - Schnellere Taktrate
+            - Mehr Parallelität möglich

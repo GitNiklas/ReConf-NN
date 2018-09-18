@@ -1,0 +1,4 @@
+Schlechte Timing-Eigenschaften:
+
+Verursacht durch mega mux (pfad von jeder matrix-op zu jedem register)
+
