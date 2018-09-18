@@ -1,3 +1,7 @@
+----------------------------------------------------------------------------------------------------
+-- Package pkg_test
+-- Enthaelt Typen, Hilfsfunktionen und Konstanten zur Verwendung in den Testbenches.
+----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
@@ -8,11 +12,51 @@ USE std.textio.ALL;
 
 PACKAGE pkg_test IS    
     
+    -- Baudrate zum Testen
     CONSTANT c_test_baudrate : POSITIVE;
     
+    ----------------------------------------------------------------------------------------------------
+    -- Sendet ein Byte ueber die serielle Schnittstelle
+    -- Parameter:
+    --    IN:   data:   Zu sendende Daten 
+    --    OUT:  s_tx:   Sendekanal  
+    ----------------------------------------------------------------------------------------------------
     PROCEDURE serial_send(data : t_byte; SIGNAL s_tx : OUT STD_LOGIC);
+    
+    ----------------------------------------------------------------------------------------------------
+    -- Empfaengt ein Byte ueber die serielle Schnittstelle
+    -- Parameter:
+    --    OUT:  data:   Empfangene Daten 
+    --    IN:  s_rx:    Empfangskanal  
+    ----------------------------------------------------------------------------------------------------
     PROCEDURE serial_receive(VARIABLE data : OUT t_byte; SIGNAL s_rx : IN STD_LOGIC);
     
+    ----------------------------------------------------------------------------------------------------
+    -- Generiert ein zufaelliges Element in einem bestimmten Wertebereich
+    -- Parameter:
+    --      IN:     min, max:       Wertebereich
+    --      INOUT:  seed1, seed2:   Seeds fuer die Zufallszahlengenerierung
+    --      OUT:    res:            Zufaelliges Element           
+    ----------------------------------------------------------------------------------------------------
+    PROCEDURE random_elem(
+        min, max : REAL;
+        VARIABLE seed1, seed2 : INOUT POSITIVE;
+        VARIABLE res : OUT REAL
+    ); 
+    
+    ----------------------------------------------------------------------------------------------------
+    -- Aktiviert den Debug-Modus von e_tle_nn, um den Inhalt eines Matrixregisters 
+    -- in eine Datei zu schreiben
+    -- Parameter:
+    --    IN:   filename:       Dateiname
+    --    IN:   reg:            Matrixregister
+    --    IN:   m:              Groesse der Matrix (Anzahl Zeilen)
+    --    IN:   n:              Groesse der Matrix (Anzahl Spalten)
+    --    IN:   row_by_row:     Orientierung der Matrix
+    --    OUT:  s_tx:           Sendekanal
+    --    IN:   s_rx:           Empfangskanal 
+    --    OUT:  s_set_dbg:      Leitung zum Aktivieren des Debug-Modus 
+    ----------------------------------------------------------------------------------------------------
     PROCEDURE debug_save_mat_reg_to_file(
         CONSTANT filename       : IN STRING;
         CONSTANT reg            : IN INTEGER;
@@ -25,6 +69,16 @@ PACKAGE pkg_test IS
         SIGNAL s_set_dbg        : OUT STD_LOGIC
     );
     
+    ----------------------------------------------------------------------------------------------------
+    -- Empfaengt den Inhalt eines Matrix-Registers von der e_tle_nn und schreibt die Daten in eine Datei
+    -- Parameter:
+    --    IN:   filename:       Dateiname
+    --    IN:   reg:            Matrixregister
+    --    IN:   m:              Groesse der Matrix (Anzahl Zeilen)
+    --    IN:   n:              Groesse der Matrix (Anzahl Spalten)
+    --    IN:   row_by_row:     Orientierung der Matrix
+    --    IN:   s_rx:           Empfangskanal 
+    ----------------------------------------------------------------------------------------------------
     PROCEDURE receive_mat_save_to_file(
         CONSTANT filename       : IN STRING;
         CONSTANT reg            : IN INTEGER;
@@ -35,6 +89,18 @@ PACKAGE pkg_test IS
         SIGNAL s_rx             : IN STD_LOGIC
     );
    
+    ----------------------------------------------------------------------------------------------------
+    -- Schreibt den Inhalt eines Matrix-Registers in eine Datei
+    -- Parameter:
+    --    IN:   filename:           Dateiname
+    --    IN:   reg:                Matrixregister
+    --    OUT:  sel_a               Auswahl Matrixregister     
+    --    IN:   read_a:             Signalisiert einen Lesevorgang eines Matrixregisters
+    --    OUT:  data_a:             Gelesende Daten
+    --    OUT:  ix_a                Leseposition  
+    --    IN:   size_a:             Groesse der Matrix
+    --    IN:   row_by_row_a:       Orientierung der Matrix
+    ----------------------------------------------------------------------------------------------------
     PROCEDURE save_mat_reg_to_file(
         CONSTANT filename       : IN STRING;
         CONSTANT reg            : IN INTEGER;
@@ -47,6 +113,17 @@ PACKAGE pkg_test IS
         SIGNAL row_by_row_a     : IN STD_LOGIC
     );
     
+    ----------------------------------------------------------------------------------------------------
+    -- Gibt den Inhalt eines Matrix-Registers aus
+    -- Parameter:
+    --  IN:   reg:                Matrixregister
+    --  OUT:  sel_a               Auswahl Matrixregister     
+    --  IN:   read_a:             Signalisiert einen Lesevorgang eines Matrixregisters
+    --  OUT:  data_a:             Gelesende Daten
+    --  OUT:  ix_a                Leseposition  
+    --  IN:   size_a:             Groesse der Matrix
+    --  IN:   row_by_row_a:       Orientierung der Matrix
+    ----------------------------------------------------------------------------------------------------
     PROCEDURE print_mat_reg(
         CONSTANT reg            : IN INTEGER;
         
@@ -58,6 +135,18 @@ PACKAGE pkg_test IS
         SIGNAL row_by_row_a     : IN STD_LOGIC
     );
     
+    ----------------------------------------------------------------------------------------------------
+    -- Testet zwei Matrix-Register auf Gleichheit
+    -- Parameter:
+    --  IN:   reg_x:              1.  Matrixregister
+    --  IN:   reg_y:              2.  Matrixregister  
+    --  OUT:  sel_a               Auswahl Matrixregister     
+    --  IN:   read_a:             Signalisiert einen Lesevorgang eines Matrixregisters
+    --  OUT:  data_a:             Gelesende Daten
+    --  OUT:  ix_a                Leseposition  
+    --  IN:   size_a:             Groesse der Matrix
+    --  IN:   row_by_row_a:       Orientierung der Matrix
+    ----------------------------------------------------------------------------------------------------
     PROCEDURE assert_mat_reg_eq(
         CONSTANT reg_x          : IN INTEGER;
         CONSTANT reg_y          : IN INTEGER;
@@ -70,18 +159,16 @@ PACKAGE pkg_test IS
         SIGNAL row_by_row_a     : IN STD_LOGIC
     );
     
-    PROCEDURE assert_mat_eq(
-        SIGNAL s_a_data_o       : IN t_mat_word;
-        SIGNAL s_a_ix_r         : OUT t_mat_ix;
-        SIGNAL s_a_size         : IN t_mat_size;
-        SIGNAL s_a_row_by_row   : IN STD_LOGIC;
-        
-        SIGNAL s_c_data_o       : IN t_mat_word;
-        SIGNAL s_c_ix_r         : OUT t_mat_ix;
-        SIGNAL s_c_size         : IN t_mat_size;
-        SIGNAL s_c_row_by_row   : IN STD_LOGIC
-    );
-    
+    ----------------------------------------------------------------------------------------------------
+    -- Loescht ein Matrix-Register
+    -- Parameter:
+    --  IN:     reg:            Matrixregister
+    --  OUT:    s_sel:          Auswahl Matrixregister   
+    --  OUT:    s_wren          Schreiberlaubnis Matrixregister     
+    --  OUT:    s_data_i:       Zu schreibende Daten Matrixregister
+    --  OUT:    s_ix_w:         Schreibposition
+    --  OUT:    s_row_by_row    Orientierung der Matrix  
+    ----------------------------------------------------------------------------------------------------
     PROCEDURE delete_reg(
         CONSTANT reg: INTEGER; 
         
@@ -92,6 +179,17 @@ PACKAGE pkg_test IS
         SIGNAL s_row_by_row : OUT STD_LOGIC
     );
     
+    ----------------------------------------------------------------------------------------------------
+    -- Initialisiert ein Matrix-Register mit einem konstanten Wert
+    -- Parameter:
+    --  IN:     reg:            Matrixregister
+    --  IN:     c_val:          Konstanter Wert zur Initialisierung
+    --  OUT:    s_sel:          Auswahl Matrixregister   
+    --  OUT:    s_wren          Schreiberlaubnis Matrixregister     
+    --  OUT:    s_data_i:       Zu schreibende Daten Matrixregister
+    --  OUT:    s_ix_w:         Schreibposition
+    --  OUT:    s_row_by_row    Orientierung der Matrix  
+    ----------------------------------------------------------------------------------------------------
     PROCEDURE set_reg(
         CONSTANT reg: INTEGER; 
         CONSTANT c_val  : IN t_mat_elem;
@@ -102,18 +200,9 @@ PACKAGE pkg_test IS
         SIGNAL s_ix_w   : OUT t_mat_ix;
         SIGNAL s_row_by_row : OUT STD_LOGIC
     );
-    
-    PROCEDURE random_elem(
-        min, max : REAL;
-        VARIABLE seed1, seed2 : INOUT POSITIVE;
-        VARIABLE res : OUT REAL
-    );      
 END;
 
 PACKAGE BODY pkg_test IS
-    
-    CONSTANT c_test_baudrate : POSITIVE := 10_000_000;
-    CONSTANT c_test_serial_wait : TIME := f_calc_serial_wait_time(c_test_baudrate);
     
     PROCEDURE ensure(
         x: BOOLEAN;
@@ -122,23 +211,23 @@ PACKAGE BODY pkg_test IS
     BEGIN
         ASSERT x REPORT err(msg) SEVERITY FAILURE;
     END ensure;
-    
+        
+    CONSTANT c_test_baudrate : POSITIVE := 2_500_000;
+    CONSTANT c_test_serial_wait : TIME := f_calc_serial_wait_time(c_test_baudrate);
+        
     PROCEDURE serial_send(data : t_byte; SIGNAL s_tx : OUT STD_LOGIC) IS 
     BEGIN
-        --REPORT infomsg("Sende Byte: " & to_hex(data));
-        --REPORT infomsg("Sende Startbit");
         s_tx <= '0';
         WAIT FOR c_test_serial_wait;
         
         FOR i IN 0 TO 7 LOOP
-            --REPORT infomsg("Sende Bit: " & STD_LOGIC'IMAGE(data(i)));
             s_tx <= data(i);
             WAIT FOR c_test_serial_wait;
         END LOOP;
         
-        --REPORT infomsg("Sende Stoppbit");
         s_tx <= '1';
         WAIT FOR c_test_serial_wait;
+        WAIT FOR 4*c_clk_per;
     END serial_send;
 
     PROCEDURE serial_receive(VARIABLE data : OUT t_byte; SIGNAL s_rx : IN STD_LOGIC) IS 
@@ -149,13 +238,11 @@ PACKAGE BODY pkg_test IS
             WAIT UNTIl s_rx = '0';
             WAIT FOR c_clk_per / 2;
         END IF;
-        --REPORT infomsg("Startbit empfangen");
         WAIT FOR c_test_serial_wait;
         
         WAIT FOR c_test_serial_wait / 2;   
         FOR i IN 0 TO 7 LOOP
             res(i) := s_rx;
-            --REPORT infomsg("Bit empfangen: " & STD_LOGIC'IMAGE(s_rx));
             WAIT FOR c_test_serial_wait;
         END LOOP;
         
@@ -163,11 +250,23 @@ PACKAGE BODY pkg_test IS
             WAIT UNTIl s_rx = '1';
             WAIT FOR c_clk_per / 2;
         END IF;
-        --REPORT infomsg("Stoppbit empfangen");
-        --REPORT infomsg("Byte empfangen: " & to_hex(res));
         data := res;
     END serial_receive;
 
+    PROCEDURE random_elem(
+        min, max : REAL;
+        VARIABLE seed1, seed2 : INOUT POSITIVE;
+        VARIABLE res : OUT REAL
+    ) IS
+    VARIABLE rand, val_range : REAL;
+    BEGIN
+        uniform(seed1, seed2, rand);
+        res := rand * (max - min) + min;        
+    END random_elem; 
+    
+ 
+
+ 
     PROCEDURE debug_save_mat_reg_to_file(
         CONSTANT filename       : IN STRING;
         CONSTANT reg            : IN INTEGER;
@@ -218,7 +317,7 @@ PACKAGE BODY pkg_test IS
             FOR j IN 1 TO n LOOP
                 serial_receive(elem, s_rx);
                 WRITE(tmp_line, to_real(to_mat_elem(elem)), right, 8, 4);
-                REPORT infomsg("received byte " & INTEGER'IMAGE(tmp));
+                REPORT infomsg("Byte Nr. " & INTEGER'IMAGE(tmp) & " empfangen: " & to_hex(elem));
                 tmp := tmp + 1;
             END LOOP;
             WRITELINE(mat_file, tmp_line);          
@@ -246,7 +345,7 @@ PACKAGE BODY pkg_test IS
     BEGIN
         read_a <= '1';         
         sel_a <= to_mat_reg_ix(reg);
-        WAIT FOR c_clk_per;        
+        WAIT FOR 3*c_clk_per;        
         
         row_by_row := row_by_row_a;
         size := size_a;
@@ -266,7 +365,7 @@ PACKAGE BODY pkg_test IS
                    index_word := y mod 32;
                 END IF; 
                 
-                WAIT FOR 2*c_clk_per;
+                WAIT FOR 5*c_clk_per;
                 data := data_a(index_word);
                 
                 WRITE(tmp_line, to_real(data), right, 8, 4);
@@ -294,7 +393,7 @@ PACKAGE BODY pkg_test IS
     BEGIN
         read_a <= '1';         
         sel_a <= to_mat_reg_ix(reg);
-        WAIT FOR c_clk_per;        
+        WAIT FOR 3*c_clk_per;        
         
         row_by_row := row_by_row_a;
         size := size_a;
@@ -310,7 +409,7 @@ PACKAGE BODY pkg_test IS
                    index_word := y mod 32;
                 END IF; 
                 
-                WAIT FOR 2*c_clk_per;
+                WAIT FOR 5*c_clk_per;
                 data := data_a(index_word);
                 
                 IF data /= to_mat_elem(0.0) THEN
@@ -344,12 +443,12 @@ PACKAGE BODY pkg_test IS
         read_a <= '1';  
         
         sel_a <= to_mat_reg_ix(reg_x);
-        WAIT FOR c_clk_per;        
+        WAIT FOR 3*c_clk_per;        
         row_by_row_x := row_by_row_a;
         size_x := size_a;
         
         sel_a <= to_mat_reg_ix(reg_y);
-        WAIT FOR c_clk_per;         
+        WAIT FOR 3*c_clk_per;         
         row_by_row_y := row_by_row_a;
         size_y := size_a; 
         
@@ -365,11 +464,11 @@ PACKAGE BODY pkg_test IS
                 END IF;
                 
                 sel_a <= to_mat_reg_ix(reg_x);
-                WAIT FOR 2*c_clk_per;
+                WAIT FOR 5*c_clk_per;
                 word_x := data_a;
                 
                 sel_a <= to_mat_reg_ix(reg_y);
-                WAIT FOR 2*c_clk_per;
+                WAIT FOR 5*c_clk_per;
                 word_y := data_a;
                 
                 FOR word_index IN 0 TO t_mat_word'LENGTH-1 LOOP
@@ -423,7 +522,7 @@ PACKAGE BODY pkg_test IS
                    v_index_word_c := y mod 32;
                 END IF; 
                 
-                WAIT FOR 2*c_clk_per;
+                WAIT FOR 5*c_clk_per;
                 
                 val_a := s_a_data_o(v_index_word_a); 
                 val_c := s_c_data_o(v_index_word_c);  
@@ -475,16 +574,5 @@ PACKAGE BODY pkg_test IS
         WAIT FOR c_clk_per;
         s_wren <= '0';
     END set_reg;
-    
-    PROCEDURE random_elem(
-        min, max : REAL;
-        VARIABLE seed1, seed2 : INOUT POSITIVE;
-        VARIABLE res : OUT REAL
-    ) IS
-    VARIABLE rand, val_range : REAL;
-    BEGIN
-        uniform(seed1, seed2, rand);
-        res := rand * (max - min) + min;        
-    END random_elem; 
-
+   
 END PACKAGE BODY;

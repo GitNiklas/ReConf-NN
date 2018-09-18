@@ -1,9 +1,6 @@
 ----------------------------------------------------------------------------------------------------
 --  Testbench fuer e_mat_reg
---  Simulationszeit: 100 us
---
---  Autor: Niklas Kuehl
---  Datum: 30.05.2018
+--  Simulationszeit: 1 ms
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;
@@ -22,7 +19,7 @@ COMPONENT e_mat_reg
         p_clk_i             : IN STD_LOGIC;
         p_rst_i             : IN STD_LOGIC;
         
-        p_mat_size_i        : IN t_mat_size; -- wird bei wren='1' aktualisiert
+        p_mat_size_i        : IN t_mat_size;
         p_mat_size_o        : OUT t_mat_size;
         
         p_ix_read_i         : IN t_mat_ix;
@@ -30,7 +27,7 @@ COMPONENT e_mat_reg
         
         p_wren_i            : IN STD_LOGIC;
         
-        p_row_by_row_i      : IN STD_LOGIC; -- '1' -> zeilenweise, '0' -> spaltenweise; wird bei wren='1' aktualisiert
+        p_row_by_row_i      : IN STD_LOGIC;
         p_row_by_row_o      : OUT STD_LOGIC;
         
         p_word_i            : IN t_mat_word;

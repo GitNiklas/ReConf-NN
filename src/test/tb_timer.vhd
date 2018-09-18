@@ -1,9 +1,6 @@
 ----------------------------------------------------------------------------------------------------
 --  Testbench fuer e_timer
 --  Simulationszeit: 300 us
---
---  Autor: Niklas Kuehl
---  Datum: 27.04.2018
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;
@@ -92,8 +89,6 @@ BEGIN
     ASSERT( s_t2_finish = '1');
     REPORT "Timer erfolgreich bis 160 us gezaehlt";
     
-    
-  
     REPORT "Reset Testen";
     s_start <= '1';
     WAIT FOR c_clk_per;

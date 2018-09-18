@@ -15,9 +15,6 @@
 --      p_t0_finished_o : '1' wenn g_t0 abgelaufen
 --      p_t1_finished_o : '1' wenn g_t1 abgelaufen
 --      p_t2_finished_o : '1' wenn g_t2 abgelaufen
---
---  Autor: Niklas Kuehl
---  Datum: 27.04.2018
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;

@@ -1,9 +1,6 @@
 ----------------------------------------------------------------------------------------------------
---  Testbench fuer e_nn_algo
---  Simulationszeit: 2 ms
---
---  Autor: Niklas Kuehl
---  Datum: 06.08.2018
+--  Testbench fuer tb_access_mat
+--  Simulationszeit: 100 us
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;
@@ -13,10 +10,10 @@ USE work.pkg_test.ALL;
 USE work.fixed_pkg.ALL;
 USE work.pkg_test_matrices.ALL;
 
-ENTITY tb_access IS
-END ENTITY tb_access;
+ENTITY tb_access_mat IS
+END ENTITY tb_access_mat;
 
-ARCHITECTURE atb_access OF tb_access IS
+ARCHITECTURE a_tb_access_mat OF tb_access_mat IS
 
 COMPONENT e_nn_algo
     PORT (    
@@ -24,7 +21,8 @@ COMPONENT e_nn_algo
         p_clk_i                 : IN STD_LOGIC;
         p_syn_rst_i             : IN STD_LOGIC;
         
-        p_do_train_i            : IN STD_LOGIC; -- 1 -> Training (kompletter Algo); 0-> Test
+        p_exec_algo_i          : IN STD_LOGIC;   
+        p_do_train_i            : IN STD_LOGIC;
         p_finished_o            : OUT STD_LOGIC;
         
         p_ytrain_data_i         : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -90,7 +88,7 @@ END COMPONENT;
 --  Signale
 ---------------------------------------------
 SIGNAL s_clk, s_rst, s_syn_rst : STD_LOGIC;
-SIGNAL s_algo_finished, s_access_mat_finished, s_do_train : STD_LOGIC;
+SIGNAL s_algo_finished, s_access_mat_finished, s_do_train, s_exec_algo : STD_LOGIC;
 
 SIGNAL s_sel_a0 : t_mat_reg_ix;
 SIGNAL s_write_a0, s_read_a0 : STD_LOGIC;
@@ -118,8 +116,9 @@ dut : e_nn_algo
 PORT MAP(
     p_rst_i                 => s_rst,
     p_clk_i                 => s_clk,    
-    p_syn_rst_i             => '1',
+    p_syn_rst_i             => s_syn_rst,
     
+    p_exec_algo_i           => s_exec_algo,
     p_do_train_i            => s_do_train,
     p_finished_o            => s_algo_finished,
   
@@ -199,6 +198,7 @@ BEGIN
     s_rst <= '1'; 
     s_syn_rst <= '1';
     s_do_train <= '1';
+    s_exec_algo <= '0';
     
     s_write_mat <= '0';
     s_read_mat <= '0';
@@ -220,13 +220,14 @@ BEGIN
     s_rst <= '0';
     REPORT infomsg("Initialisierung abgeschlossen");   
     
+    REPORT infomsg("Testfall: Matrix schreiben");  
     s_sel_a0 <= to_mat_reg_ix(0);
     s_size_a0_i <= to_mat_size(4, 4);
     s_write_mat <= '1';
     s_syn_rst <= '0';
     FOR i IN 1 TO 4*4 LOOP       
         WAIT FOR 5*c_clk_per;
-        REPORT "Sende Byte " & INTEGER'IMAGE(i);
+        REPORT infomsg("Sende Byte " & INTEGER'IMAGE(i));
         byte_i <= STD_LOGIC_VECTOR(TO_UNSIGNED(i, 8));
         s_new_data <= '1';
         WAIT FOR c_clk_per;
@@ -239,18 +240,18 @@ BEGIN
     END IF;
     s_syn_rst <= '1';
     s_write_mat <= '0';
-    
     WAIT FOR 5*c_clk_per;
-    REPORT "Sende Matrix";
+    
+    REPORT infomsg("Testfall: Matrix lesen");  
     s_syn_rst <= '0';
     s_read_mat <= '1';
     
     FOR i IN 1 TO 4*4 LOOP
-        REPORT "Warte auf s_send";
+        REPORT infomsg("Warte auf s_send");       
         WAIT UNTIL s_send = '1';
         WAIT FOR c_clk_per/2;
-        REPORT "Byte " & INTEGER'IMAGE(i) & " ist = " & mat_elem_to_str(to_mat_elem(byte_o));
-        WAIT FOR 2*c_clk_per;
+        ASSERT byte_o = STD_LOGIC_VECTOR(TO_UNSIGNED(i, 8)) REPORT err("Byte " & INTEGER'IMAGE(i) & " ist = " & to_hex(byte_o) & ", sollte aber sein: " & to_hex(STD_LOGIC_VECTOR(TO_UNSIGNED(i, 8))));
+        WAIT FOR c_clk_per;
         s_busy_send <= '1';
         WAIT FOR 10* c_clk_per;
         s_busy_send <= '0';
@@ -258,11 +259,12 @@ BEGIN
     s_read_mat <= '0';
     s_syn_rst <= '1';
     WAIT FOR 5*c_clk_per;
+    WAIT FOR c_clk_per/2;
     
-    -- write y train
+    REPORT infomsg("Testfall: y_train schreiben"); 
     s_syn_rst <= '0';
-    s_size_a0_i <= to_mat_size(1, 64); -- size for y_train
-    s_row_by_row_a0_i <= '1'; -- rbr for ytrain
+    s_size_a0_i <= to_mat_size(1, 64);
+    s_row_by_row_a0_i <= '1';
     s_write_ytrain <= '1';
     s_syn_rst <= '0';
     FOR i IN 0 TO 63 LOOP
@@ -278,16 +280,14 @@ BEGIN
         WAIT UNTIL s_access_mat_finished = '1';
         WAIT FOR c_clk_per / 2;
     END IF;
-    s_syn_rst <= '1';
     s_write_ytrain <= '0';
     
-    
+    REPORT infomsg("Testfall: y_train lesen"); 
     FOR i IN 0 TO 63 LOOP
         s_ytrain_read <= STD_LOGIC_VECTOR(TO_UNSIGNED(i, 6));
         WAIT FOR 2*c_clk_per;
-            REPORT "          y train an pos " & INTEGER'IMAGE(i) & " = " & INTEGER'IMAGE(TO_INTEGER(UNSIGNED(s_ytrain_data_o)));
+        ASSERT s_ytrain_data_o = STD_LOGIC_VECTOR(TO_UNSIGNED(i * 2, 8)) REPORT err("y_train an Position " & INTEGER'IMAGE(i) & " ist = " & to_hex(s_ytrain_data_o) & ", sollte aber sein: " & to_hex(STD_LOGIC_VECTOR(TO_UNSIGNED(i * 2, 8))));
     END LOOP;
-    
     
     s_read_mat_proc <= '1';  
     save_mat_reg_to_file("access.txt", 0, s_sel_a0, s_read_mat, s_data_a0_o, s_read_ix, s_size_a0_o, s_row_by_row_a0_o);
@@ -296,4 +296,4 @@ BEGIN
     WAIT;
 END PROCESS proc_test;
 
-END ARCHITECTURE atb_access;
+END ARCHITECTURE a_tb_access_mat;

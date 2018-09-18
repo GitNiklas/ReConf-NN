@@ -1,3 +1,30 @@
+----------------------------------------------------------------------------------------------------
+-- Matrix-Register zur Speicherung einer Matrix im RAM.
+--
+-- Maximale Groesse: 64x64; Ein Matrixelement ist 8 Byte lang
+-- Die Matrix wird in Woertern organisiert, jedes Wort enthaelt 32 Matrix-Elemente. 
+-- Die Wörter koennen entweder zeilen- oder spaltenweise gespeichert werden.
+-- Die Indizes sind element-basiert, es wird jeweils das Wort geschrieben/ausgelesen, in dem das durch den Index
+-- gewaehlte Element liegt.
+--
+--  Port:
+--      p_rst_i         : Asynchroner Reset
+--      p_clk_i         : Takt
+--
+--      p_mat_size_i    : Setzt die Matrix-Groesse, wenn p_wren_i = 1 
+--      p_mat_size_o    : Aktuelle Matrix-Groesse
+--
+--      p_ix_read_i     : Leseposition. Es dauert 2 Takte, bis das entsprechende Wort an p_word_o anliegt
+--      p_ix_write_i    : Schreibposition
+--
+--      p_wren_i        : Aktiviert Schreiben der Matrixdaten
+--
+--      p_row_by_row_i  : Setzt die Matrix-Orientierung, wenn p_wren_i = 1 
+--      p_row_by_row_o  : Aktuelle Matrix-Orientierung (1 -> zeilenweise, 0 -> spaltenweise)
+--
+--      p_word_i        : Zu schreibendes Matrix-Wort
+--      p_word_o        : Gelesenes Matrix-Wort
+----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.all;
@@ -9,7 +36,7 @@ ENTITY e_mat_reg IS
         p_clk_i             : IN STD_LOGIC;
         p_rst_i             : IN STD_LOGIC;
         
-        p_mat_size_i        : IN t_mat_size; -- wird bei wren='1' aktualisiert
+        p_mat_size_i        : IN t_mat_size;
         p_mat_size_o        : OUT t_mat_size;
         
         p_ix_read_i         : IN t_mat_ix;
@@ -17,7 +44,7 @@ ENTITY e_mat_reg IS
         
         p_wren_i            : IN STD_LOGIC;
         
-        p_row_by_row_i      : IN STD_LOGIC; -- '1' -> zeilenweise, '0' -> spaltenweise; wird bei wren='1' aktualisiert
+        p_row_by_row_i      : IN STD_LOGIC;
         p_row_by_row_o      : OUT STD_LOGIC;
         
         p_word_i            : IN t_mat_word;

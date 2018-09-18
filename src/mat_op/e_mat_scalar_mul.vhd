@@ -1,3 +1,29 @@
+----------------------------------------------------------------------------------------------------
+-- Matrixoperation: Elementweise Multiplikation Matrix mit Skalar
+--
+-- Operand A:   MxN, beliebige Orientierung       
+-- Resultat C:  Gleiche Groesse und Orientierung wie A  
+--
+-- Destruktiver Modus: Ja
+-- Geschwindigkeit: 1 Takte pro Matrix-Wort
+--
+--  Port:
+--      p_rst_i                 : Asynchroner Reset
+--      p_clk_i                 : Takt
+--      p_syn_rst_i             : Synchroner Reset
+--
+--      p_finished_o            : Signalisiert, dass die Operation abgeschlossen ist
+--      p_scalar_i              : Skalarer Wert, mit dem multipliziert werden soll. Kodierung entsprechend der Matrix-Elemente
+--        
+--      p_mat_a_size_i          : Groesse von Matrix A und C   
+--      p_mat_a_ix_o            : Leseposition Matrix A 
+--      p_mat_a_data_i          : Gelesende Daten Matrix A 
+--  
+--      p_mat_c_ix_o            : Schreibposition Matrix C 
+--      p_mat_c_data_o          : Zu schreibende Daten Matrix C
+--      p_mat_c_row_by_row_i    : Orientierung Matrix A und C
+--      p_mat_c_size_o          : Groesse Matrix C
+----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.all;
@@ -47,7 +73,7 @@ COMPONENT e_mat_ix_gen
         p_size_i                : IN t_mat_size;
         p_row_by_row_i          : IN STD_LOGIC;
         p_mat_ix_t0_o           : OUT t_mat_ix;
-        p_mat_ix_t2_o           : OUT t_mat_ix;
+        p_mat_ix_t4_o           : OUT t_mat_ix;
         p_first_elem_t1_o       : OUT STD_LOGIC
     );
 END COMPONENT;
@@ -75,7 +101,7 @@ PORT MAP(
     p_size_i            => p_mat_a_size_i,
     p_row_by_row_i      => p_mat_c_row_by_row_i,
     p_mat_ix_t0_o       => s_mat_ab_ix,
-    p_mat_ix_t2_o       => p_mat_c_ix_o,
+    p_mat_ix_t4_o       => p_mat_c_ix_o,
     p_first_elem_t1_o   => OPEN
 );
 

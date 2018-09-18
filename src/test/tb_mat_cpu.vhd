@@ -1,9 +1,6 @@
 ----------------------------------------------------------------------------------------------------
 --  Testbench fuer e_mat_cpu
---  Simulationszeit: 2 ms
---
---  Autor: Niklas Kuehl
---  Datum: 29.06.2018
+--  Simulationszeit: 6 ms
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;
@@ -33,9 +30,9 @@ COMPONENT e_mat_cpu
         p_sel_a_i               : IN t_mat_reg_ixs;
         p_sel_b_i               : IN t_mat_reg_ixs;
         p_sel_c_i               : IN t_mat_reg_ixs;
-        p_row_by_row_c_i        : IN t_op_std_logics; -- Bestimmt, ob die Matrix C Zeilen- oder Spaltenweise gespeichert wird
+        p_row_by_row_c_i        : IN t_op_std_logics;
         
-        p_write_a0_i            : IN STD_LOGIC; -- signalisiert, dass Elemente in Matrix A(0) geschrieben werden soll
+        p_write_a0_i            : IN STD_LOGIC;
         p_read_a0_i             : IN STD_LOGIC;
         p_data_a0_i             : IN t_mat_word;
         p_data_a0_o             : OUT t_mat_word;
@@ -81,6 +78,7 @@ BEGIN
         REPORT infomsg(" Warte auf OpCore " & INTEGER'IMAGE(i));
         IF s_finished(i) /= '1' THEN
             WAIT UNTIL s_finished(i) = '1';
+            WAIT FOR c_clk_per/2;
         END IF;
         s_opcode(i) <= NoOp;
     END LOOP;
@@ -128,7 +126,7 @@ END exec_add;
 PROCEDURE exec_trans(wait_finish: BOOLEAN; reg_a: INTEGER; reg_b: INTEGER; reg_c: INTEGER; row_by_row: STD_LOGIC;SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_b: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_c_row_by_row: OUT t_op_std_logics; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN t_op_std_logics) IS
 BEGIN
     REPORT infomsg("Starte Matrix-Transponierung: Reg" & INTEGER'IMAGE(reg_c) & " = Trans(Reg" & INTEGER'IMAGE(reg_a) & ")");
-    exec_op(MatTrans, wait_finish, 2, reg_a, reg_b, reg_c, row_by_row, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
+    exec_op(MatTrans, wait_finish, 0, reg_a, reg_b, reg_c, row_by_row, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
 END exec_trans;
 
 PROCEDURE exec_scalar_mul(scalar: REAL; wait_finish: BOOLEAN; reg_a: INTEGER; reg_b: INTEGER; reg_c: INTEGER; row_by_row: STD_LOGIC; SIGNAL s_scalar: OUT t_mat_elem_slv; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_b: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_c_row_by_row: OUT t_op_std_logics; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN t_op_std_logics) IS
@@ -159,7 +157,7 @@ END exec_vec_add;
 PROCEDURE exec_col_sum(wait_finish: BOOLEAN; reg_a: INTEGER; reg_b: INTEGER; reg_c: INTEGER; row_by_row: STD_LOGIC;SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_b: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_c_row_by_row: OUT t_op_std_logics; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN t_op_std_logics) IS
 BEGIN
     REPORT infomsg("Starte Matrix-ColSum: Reg" & INTEGER'IMAGE(reg_c) & " = ColSum(Reg" & INTEGER'IMAGE(reg_a) & ")");
-    exec_op(ColSum, wait_finish, 2, reg_a, reg_b, reg_c, row_by_row, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
+    exec_op(ColSum, wait_finish, 1, reg_a, reg_b, reg_c, row_by_row, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
 END exec_col_sum;
 
 PROCEDURE exec_scalar_sub_ix(wait_finish: BOOLEAN; reg_a: INTEGER; reg_b: INTEGER; reg_c: INTEGER; row_by_row: STD_LOGIC; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_b: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_c_row_by_row: OUT t_op_std_logics; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN t_op_std_logics) IS
@@ -176,20 +174,21 @@ BEGIN
     init_mat_2x3_rbr(0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     init_mat_3x3_cbc(1, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     exec_mul(TRUE, 0, 1, 2, '1', s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
+
     init_mat_result_2x3_mul_3x3_rbr(3, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
 --    print_mat_reg(0, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
 --    print_mat_reg(1, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
 --    print_mat_reg(2, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
 --    print_mat_reg(3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
     assert_mat_reg_eq(2, 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-
+    
     REPORT infomsg(test_prefix & "Test 2: Reg0(2x36) * Reg1(36x3)");
     init_mat_2x36_rbr(0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     init_mat_36x3_cbc(1, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     exec_mul(TRUE, 0, 1, 2, '1', s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
     init_mat_result_2x36_mul_36x3_rbr(3, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     assert_mat_reg_eq(2, 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-
+  
     REPORT infomsg(test_prefix & "Test 3: A(36x1) * B(1x2) (C Spaltenweise)");
     init_mat_36x1_rbr(0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     init_mat_1x2_cbc(1, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
@@ -199,46 +198,6 @@ BEGIN
 
     REPORT infomsg("Test: Matrix-Multiplikation BEENDET");
 END test_mul;
-
-PROCEDURE test_del(SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_read_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_size_a0_o: IN t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC; SIGNAL s_row_by_row_a0_o: IN STD_LOGIC; SIGNAL s_ix_a0: OUT t_mat_ix; SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_data_a0_o: IN t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_b: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_c_row_by_row: OUT t_op_std_logics; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN t_op_std_logics) IS
-BEGIN
-    REPORT infomsg("Test: Matrix Loeschen");
-    
-    set_reg(0, to_mat_elem(1.0), s_sel_a(0), s_write_a0, s_data_a0_i, s_ix_a0, s_row_by_row_a0_i);
-    
-    s_sel_c(2) <= to_mat_reg_ix(0); 
-    s_opcode(2) <= MatDel;
-
-    s_wren  <= '1';
-    s_syn_rst <= '1';
-    WAIT FOR c_clk_per;
-    s_syn_rst <= '0';
-    
-    WAIT UNTIL s_finished(2) = '1';
-    WAIT FOR c_clk_per / 2;
-    s_wren  <= '0';
-    s_opcode(2) <= NoOp;
-    
-    -- Ueberschreiben der Matrix verhinndern & Groesse setzen
-    s_write_a0 <= '1';
-    s_size_a0_i <= to_mat_size(64, 64);
-    s_row_by_row_a0_i <= '1';
-    s_data_a0_i <= to_mat_word((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    WAIT FOR c_clk_per;
-    s_write_a0 <= '0';
-
-    -- Vergleichsregister initialisieren
-    delete_reg(1, s_sel_a(0), s_write_a0, s_data_a0_i, s_ix_a0, s_row_by_row_a0_i);
-    s_write_a0 <= '1';
-    s_size_a0_i <= to_mat_size(64, 64);
-    s_row_by_row_a0_i <= '1';
-    WAIT FOR c_clk_per;
-    s_write_a0 <= '0';
-    
-    assert_mat_reg_eq(0, 1, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-    
-    REPORT infomsg("Test: Matrix Loeschen BEENDET");
-END test_del;
 
 PROCEDURE test_add(SIGNAL s_write_a0: OUT STD_LOGIC; SIGNAL s_read_a0: OUT STD_LOGIC; SIGNAL s_size_a0_i: OUT t_mat_size; SIGNAL s_size_a0_o: IN t_mat_size; SIGNAL s_row_by_row_a0_i: OUT STD_LOGIC; SIGNAL s_row_by_row_a0_o: IN STD_LOGIC; SIGNAL s_ix_a0: OUT t_mat_ix; SIGNAL s_data_a0_i: OUT t_mat_word; SIGNAL s_data_a0_o: IN t_mat_word; SIGNAL s_sel_a: OUT t_mat_reg_ixs; SIGNAL s_sel_b: OUT t_mat_reg_ixs; SIGNAL s_sel_c: OUT t_mat_reg_ixs; SIGNAL s_opcode: OUT t_opcodes; SIGNAL s_c_row_by_row: OUT t_op_std_logics; SIGNAL s_wren: OUT STD_LOGIC; SIGNAL s_syn_rst: OUT STD_LOGIC; SIGNAL s_finished: IN t_op_std_logics) IS
 BEGIN
@@ -257,7 +216,7 @@ BEGIN
     exec_add(TRUE, 0, 1, 0, '1', s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
     init_mat_result_a0_add_a0(3, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     assert_mat_reg_eq(0, 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-    
+
     REPORT infomsg(test_prefix & "Test 3: Spaltenweise Addition: a1 + a1");
     init_mat_a1_64x64_cbc(0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     init_mat_a1_64x64_cbc(1, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
@@ -320,9 +279,9 @@ BEGIN
     REPORT infomsg(test_prefix & "Test 2: Destruktive Variante: a0 * 2");
     init_mat_a0_64x64_rbr(0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     exec_scalar_mul(2.0, TRUE, 0, 1, 0, '1', s_scalar, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
-    init_mat_result_a0_add_a0(2, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
+    init_mat_result_a0_add_a0(2, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0)); 
     assert_mat_reg_eq(0, 2, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);   
-    
+
     REPORT infomsg("Test: Skalare Multiplikation BEENDET");
 END test_scalar_mul;
 
@@ -383,6 +342,7 @@ BEGIN
     delete_reg(2, s_sel_a(0), s_write_a0, s_data_a0_i, s_ix_a0, s_row_by_row_a0_i);
     exec_col_sum(TRUE, 0, 1, 2, '1', s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
     init_mat_result_a1_col_sum_rbr(3, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
+
     assert_mat_reg_eq(2, 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
 
     REPORT infomsg(test_prefix & "Test 2: ColSum(a1) Col-by-Col");
@@ -391,7 +351,7 @@ BEGIN
     exec_col_sum(TRUE, 0, 1, 2, '0', s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
     init_mat_result_a1_col_sum_cbc(3, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     assert_mat_reg_eq(2, 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-    
+
     REPORT infomsg("Test: ColSum BEENDET");
 END test_col_sum;
 
@@ -407,7 +367,7 @@ BEGIN
     exec_scalar_sub_ix(TRUE, 0, 1, 0, '1', s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
     init_mat_result_a0_scalar_sub_ix(3, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     assert_mat_reg_eq(0, 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-    
+
     REPORT infomsg("Test: ScalarSubIx BEENDET");
 END test_scalar_sub_ix;
 
@@ -423,26 +383,20 @@ BEGIN
     init_mat_1x2_cbc(1, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     delete_reg(2, s_sel_a(0), s_write_a0, s_data_a0_i, s_ix_a0, s_row_by_row_a0_i);
     -- ScalarMul Operand
-    init_mat_a0_64x64_rbr(4, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
-    -- MatTrans Operand
-    init_mat_a0_64x64_rbr(6, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
+    init_mat_a0_64x64_rbr(2, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
 
     -- Ausfuehren der Operationen
-    exec_mul(FALSE, 0, 1, 2, '0', s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
-    exec_scalar_mul(2.0, FALSE, 4, 0, 4, '1', s_scalar, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
-    exec_trans(FALSE, 6, 1, 7, '1', s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
+    exec_mul(FALSE, 0, 1, 5, '0', s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
+    exec_scalar_mul(2.0, FALSE, 2, 0, 2, '1', s_scalar, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
     
     wait_all_finished(s_opcode, s_wren, s_syn_rst, s_finished);
     
     REPORT infomsg(test_prefix & "Teste Ergebnis MatMul");
     init_mat_result_36x1_mul_1x2_cbc(3, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
-    assert_mat_reg_eq(2, 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    assert_mat_reg_eq(5, 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
     REPORT infomsg(test_prefix & "Teste Ergebnis ScalarMul");
-    init_mat_result_a0_add_a0(5, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
-    assert_mat_reg_eq(4, 5, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);   
-    REPORT infomsg(test_prefix & "Teste Ergebnis MatTrans");
-    init_mat_result_a0_trans(8, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
-    assert_mat_reg_eq(7, 8, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    init_mat_result_a0_add_a0(4, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
+    assert_mat_reg_eq(2, 4, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);   
     
     REPORT infomsg("Test: Matrix-Parallele Operations-Ausfuehrung BEENDET");
 END test_parallel;
@@ -571,8 +525,7 @@ BEGIN
     s_rst <= '0';
    
     REPORT infomsg("Initialisierung abgeschlossen");
-
-    test_del(s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
+    
     test_mul(s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
     test_add(s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished);
     test_trans(s_write_a0, s_read_a0, s_size_a0_i, s_size_a0_o, s_row_by_row_a0_i, s_row_by_row_a0_o, s_ix_a0, s_data_a0_i, s_data_a0_o, s_sel_a, s_sel_b, s_sel_c, s_opcode, s_c_row_by_row, s_wren, s_syn_rst, s_finished); 

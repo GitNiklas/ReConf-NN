@@ -1,3 +1,33 @@
+----------------------------------------------------------------------------------------------------
+-- Matrixoperation: Matrix-Multiplikation
+--
+-- Operand A:   MxN, zeilenweise
+-- Operand B:   NXO, spaltenweise
+-- Resultat C:  MXO, beliebige Orientierung
+--
+-- Destruktiver Modus: Nein
+-- Geschwindigkeit: 2 Takte pro Matrix-Element von C
+--
+--  Port:
+--      p_rst_i                 : Asynchroner Reset
+--      p_clk_i                 : Takt
+--      p_syn_rst_i             : Synchroner Reset
+--
+--      p_finished_o            : Signalisiert, dass die Operation abgeschlossen ist
+--        
+--      p_mat_a_size_i          : Groesse von Matrix A    
+--      p_mat_a_ix_o            : Leseposition Matrix A 
+--      p_mat_a_data_i          : Gelesende Daten Matrix A 
+--
+--      p_mat_b_size_i          : Groesse von Matrix B    
+--      p_mat_b_ix_o            : Leseposition Matrix B 
+--      p_mat_b_data_i          : Gelesende Daten Matrix B 
+--  
+--      p_mat_c_ix_o            : Schreibposition Matrix C 
+--      p_mat_c_data_o          : Zu schreibende Daten Matrix C
+--      p_mat_c_row_by_row_i    : Orientierung Matrix C
+--      p_mat_c_size_o          : Groesse Matrix C
+----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.all;
@@ -14,11 +44,11 @@ ENTITY e_mat_mul IS
         
         p_mat_a_size_i          : IN t_mat_size;
         p_mat_a_ix_o            : OUT t_mat_ix;
-        p_mat_a_data_i          : IN t_mat_word; -- a has to be row_by_row = 1
+        p_mat_a_data_i          : IN t_mat_word;
         
         p_mat_b_size_i          : IN t_mat_size;
         p_mat_b_ix_o            : OUT t_mat_ix;
-        p_mat_b_data_i          : IN t_mat_word; -- b has to be row_by_row = 0
+        p_mat_b_data_i          : IN t_mat_word;
 
         p_mat_c_ix_o            : OUT t_mat_ix; 
         p_mat_c_data_o          : OUT t_mat_word;
@@ -67,7 +97,7 @@ COMPONENT e_mat_ix_gen
         p_size_i                : IN t_mat_size;
         p_row_by_row_i          : IN STD_LOGIC;
         p_mat_ix_t0_o           : OUT t_mat_ix;
-        p_mat_ix_t2_o           : OUT t_mat_ix;
+        p_mat_ix_t4_o           : OUT t_mat_ix;
         p_first_elem_t1_o       : OUT STD_LOGIC
     );
 END COMPONENT;
@@ -102,14 +132,14 @@ END COMPONENT;
 --  Signale
 ----------------------------------------------------------------------------------------------------
 -- t0: Adressen fuer A/B setzen [Werte um 0 Takte verzoegert]
--- t1: Warten [Werte um 1 Takte verzoegert]
--- t2: Daten aus A/B liegen vor; Ergebnis berechnen, in C speichern [Werte um 2 Takte verzoegert]
--- t3: Ergebnis aus t2 + Neues Ergebnis wird berechnet [Werte um 3 Takte verzoegert]
+-- t1-3: Warten
+-- t4: Daten aus A/B liegen vor; Ergebnis berechnen, in C speichern [Werte um 4 Takte verzoegert]
+-- t5: Ergebnis aus t2 + Neues Ergebnis wird berechnet [Werte um 5 Takte verzoegert]
 SIGNAL s_result_t2, s_last_result_t2, s_last_result_t3: t_mat_elem;
-SIGNAL s_ix_c_t0, s_ix_c_t2 : t_mat_ix;
+SIGNAL s_ix_c_t0, s_ix_c_t4 : t_mat_ix;
 SIGNAL s_col_a_row_b_t0, s_col_a_row_b_t1: t_mat_ix_elem;
-SIGNAL s_first_elem_t1, s_finished_t1, s_finished_t2 : STD_LOGIC;
-SIGNAL s_last_col_a_row_b_t1, s_last_col_a_row_b_t2 : STD_LOGIC;
+SIGNAL s_first_elem_t1, s_first_elem_t2, s_first_elem_t3, s_first_elem_t4, s_finished_t1, s_finished_t2 : STD_LOGIC;
+SIGNAL s_last_col_a_row_b_t1, s_last_col_a_row_b_t2, s_last_col_a_row_b_t3, s_last_col_a_row_b_t4 : STD_LOGIC;
 SIGNAL s_c_size : t_mat_size;
 
 ----------------------------------------------------------------------------------------------------
@@ -123,8 +153,8 @@ PORT MAP(
     p_clk_i             => p_clk_i,
     p_syn_rst_i         => p_syn_rst_i,
     
-    p_ix_write_i        => s_ix_c_t2,
-    p_word_done_i       => s_last_col_a_row_b_t2,
+    p_ix_write_i        => s_ix_c_t4,
+    p_word_done_i       => s_last_col_a_row_b_t4,
     
     p_elem_i            => s_result_t2,
     p_row_by_row_i      => p_mat_c_row_by_row_i,
@@ -147,7 +177,7 @@ PORT MAP(
     p_size_i            => s_c_size,
     p_row_by_row_i      => p_mat_c_row_by_row_i,
     p_mat_ix_t0_o       => s_ix_c_t0,
-    p_mat_ix_t2_o       => s_ix_c_t2,
+    p_mat_ix_t4_o       => s_ix_c_t4,
     p_first_elem_t1_o   => s_first_elem_t1
 );
 
@@ -182,7 +212,9 @@ PORT MAP(
 p_mat_a_ix_o            <= (s_ix_c_t0.row, s_col_a_row_b_t0);
 p_mat_b_ix_o            <= (s_col_a_row_b_t0, s_ix_c_t0.col);
 s_last_col_a_row_b_t1   <= to_sl((p_mat_a_size_i.max_col < t_mat_word'LENGTH) OR (s_col_a_row_b_t1 = t_mat_word'LENGTH)) OR s_finished_t2;
-s_last_result_t2        <= s_result_t2 WHEN s_last_col_a_row_b_t2 = '0' ELSE to_mat_elem(0.0);
+
+s_last_result_t2        <= s_result_t2 WHEN to_bool((s_first_elem_t4 OR NOT s_last_col_a_row_b_t4) AND NOT s_first_elem_t3)
+                           ELSE to_mat_elem(0.0);
 
 s_c_size                <= (p_mat_a_size_i.max_row, p_mat_b_size_i.max_col);
 p_mat_c_size_o          <= s_c_size;
@@ -193,6 +225,12 @@ s_col_a_row_b_t0        <=  to_mat_ix_el(0) WHEN to_bool(s_first_elem_t1 OR s_la
                             
 
 f_reg(p_rst_i, p_clk_i, p_syn_rst_i, s_finished_t1, s_finished_t2);
+f_reg(p_rst_i, p_clk_i, p_syn_rst_i, s_last_col_a_row_b_t2, s_last_col_a_row_b_t3);
+f_reg(p_rst_i, p_clk_i, p_syn_rst_i, s_last_col_a_row_b_t3, s_last_col_a_row_b_t4);
+
+f_reg(p_rst_i, p_clk_i, p_syn_rst_i, s_first_elem_t1, s_first_elem_t2);
+f_reg(p_rst_i, p_clk_i, p_syn_rst_i, s_first_elem_t2, s_first_elem_t3);
+f_reg(p_rst_i, p_clk_i, p_syn_rst_i, s_first_elem_t3, s_first_elem_t4);
                             
 END ARCHITECTURE a_mat_mul;
 

@@ -1,9 +1,6 @@
 ----------------------------------------------------------------------------------------------------
 --  Testbench fuer e_nn_algo
---  Simulationszeit: 2 ms
---
---  Autor: Niklas Kuehl
---  Datum: 06.08.2018
+--  Simulationszeit: 11 ms
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;
@@ -24,7 +21,8 @@ COMPONENT e_nn_algo
         p_clk_i                 : IN STD_LOGIC;
         p_syn_rst_i             : IN STD_LOGIC;
         
-        p_do_train_i            : IN STD_LOGIC; -- 1 -> Training (kompletter Algo); 0-> Test
+        p_exec_algo_i          : IN STD_LOGIC;
+        p_do_train_i            : IN STD_LOGIC;
         p_finished_o            : OUT STD_LOGIC;
         
         p_ytrain_data_i         : IN t_byte;
@@ -71,6 +69,8 @@ SIGNAL s_ytrain_data_i, s_ytrain_data_o : t_byte;
 SIGNAL s_ytrain_read, s_ytrain_write : STD_LOGIC_VECTOR(5 DOWNTO 0);
 SIGNAL s_ytrain_wren : STD_LOGIC;
 
+SIGNAL s_exec_algo : STD_LOGIC;
+
 ---------------------------------------------
 --  Port Maps
 ---------------------------------------------
@@ -82,6 +82,7 @@ PORT MAP(
     p_clk_i                 => s_clk,    
     p_syn_rst_i             => s_syn_rst,
     
+    p_exec_algo_i           => s_exec_algo,
     p_do_train_i            => s_do_train,
     p_finished_o            => s_finished,
   
@@ -128,8 +129,9 @@ BEGIN
     REPORT infomsg("Test Start");
     REPORT infomsg("Initialisiere Signale");
     s_rst <= '1'; 
-    s_syn_rst <= '1';
+    s_syn_rst <= '0';
     s_do_train <= '1';
+    s_exec_algo <= '0';
     
     s_sel_a0 <= to_mat_reg_ix(0);
     s_write_a0 <= '0';
@@ -146,7 +148,7 @@ BEGIN
     WAIT FOR c_clk_per;
     s_rst <= '0';
     REPORT infomsg("Initialisierung abgeschlossen");   
-    init_mat_x_train_rbr(6, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a0);
+    init_mat_x_train_rbr(4, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a0);
     
     init_mat_b1_rbr(1, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a0);
     init_mat_b2_rbr(3, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a0);
@@ -159,24 +161,27 @@ BEGIN
     save_mat_reg_to_file("IN w2.txt", 2, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
     save_mat_reg_to_file("IN b2.txt", 3, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
 
+    s_syn_rst <= '1';
+    WAIT FOR c_clk_per;
     s_syn_rst <= '0';
+    s_exec_algo <= '1';
     WAIT FOR c_clk_per;
     REPORT infomsg("Fuehre Algorithmus aus...");  
     WAIT UNTIL s_finished = '1';
     WAIT FOR c_clk_per / 2;
     REPORT infomsg("Algorithmus beendet");
+    s_exec_algo <= '0';
     
-    save_mat_reg_to_file("07 scores.txt", 8, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-    save_mat_reg_to_file("10 tmp1.txt", 9, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-    save_mat_reg_to_file("12 dw1.txt", 4, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);    
+    save_mat_reg_to_file("09 tmp0.txt", 9, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    save_mat_reg_to_file("12 dw1.txt", 4, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);  
     save_mat_reg_to_file("13 w1.txt", 0, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-    save_mat_reg_to_file("13 tmp2.txt", 10, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o); 
-    save_mat_reg_to_file("14 db1.txt", 5, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-    save_mat_reg_to_file("15 b1.txt", 1, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    save_mat_reg_to_file("13 tmp2.txt", 8, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o); 
     save_mat_reg_to_file("15 dw2.txt", 6, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);  
     save_mat_reg_to_file("16 w2.txt", 2, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
     save_mat_reg_to_file("16 db2.txt", 7, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o); 
     save_mat_reg_to_file("17 b2.txt", 3, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    save_mat_reg_to_file("17 db1.txt", 5, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+    save_mat_reg_to_file("18 b1.txt", 1, s_sel_a0, s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
     
     REPORT infomsg("Testende");
     WAIT;

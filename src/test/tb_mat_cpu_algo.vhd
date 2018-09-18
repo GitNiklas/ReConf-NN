@@ -1,10 +1,7 @@
 ----------------------------------------------------------------------------------------------------
 --  Testbench fuer e_mat_cpu 
 --      Fuehrt den NN-Algo aus
---  Simulationszeit: ??
---
---  Autor: Niklas Kuehl
---  Datum: 06.08.2018
+--  Simulationszeit: 35 ms
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;
@@ -34,9 +31,9 @@ COMPONENT e_mat_cpu
         p_sel_a_i               : IN t_mat_reg_ixs;
         p_sel_b_i               : IN t_mat_reg_ixs;
         p_sel_c_i               : IN t_mat_reg_ixs;
-        p_row_by_row_c_i        : IN t_op_std_logics; -- Bestimmt, ob die Matrix C Zeilen- oder Spaltenweise gespeichert wird
+        p_row_by_row_c_i        : IN t_op_std_logics;
         
-        p_write_a0_i            : IN STD_LOGIC; -- signalisiert, dass Elemente in Matrix A(0) geschrieben werden soll
+        p_write_a0_i            : IN STD_LOGIC; 
         p_read_a0_i             : IN STD_LOGIC;
         p_data_a0_i             : IN t_mat_word;
         p_data_a0_o             : OUT t_mat_word;
@@ -94,43 +91,45 @@ CONSTANT db1 : t_mat_reg_ix := to_mat_reg_ix(5);
 CONSTANT dw2 : t_mat_reg_ix := to_mat_reg_ix(6);
 CONSTANT db2 : t_mat_reg_ix := to_mat_reg_ix(7);
 
-CONSTANT d2 : t_mat_reg_ix := to_mat_reg_ix(8);
-CONSTANT scores : t_mat_reg_ix := to_mat_reg_ix(8);
+CONSTANT x_train : t_mat_reg_ix := to_mat_reg_ix(4);
+CONSTANT x_train_t : t_mat_reg_ix := to_mat_reg_ix(5);
+CONSTANT w2_t : t_mat_reg_ix := to_mat_reg_ix(4);
+
 CONSTANT d : t_mat_reg_ix := to_mat_reg_ix(7);
 CONSTANT hl : t_mat_reg_ix := to_mat_reg_ix(7);
 CONSTANT hl_ReLu : t_mat_reg_ix := to_mat_reg_ix(7);
-CONSTANT x_train : t_mat_reg_ix := to_mat_reg_ix(6);
-CONSTANT x_train_t : t_mat_reg_ix := to_mat_reg_ix(5);
-CONSTANT w2_t : t_mat_reg_ix := to_mat_reg_ix(4);
+CONSTANT d2 : t_mat_reg_ix := to_mat_reg_ix(8);
+CONSTANT scores : t_mat_reg_ix := to_mat_reg_ix(8);
 CONSTANT dhidden : t_mat_reg_ix := to_mat_reg_ix(6);
 
-CONSTANT tmp0 : t_mat_reg_ix := to_mat_reg_ix(10);
-CONSTANT tmp1 : t_mat_reg_ix := to_mat_reg_ix(9); 
-CONSTANT tmp2 : t_mat_reg_ix := to_mat_reg_ix(10);
+CONSTANT tmp0 : t_mat_reg_ix := to_mat_reg_ix(9);
+CONSTANT tmp1 : t_mat_reg_ix := to_mat_reg_ix(8); 
+CONSTANT tmp2 : t_mat_reg_ix := to_mat_reg_ix(8);
 
 CONSTANT dummy : t_mat_reg_ix := to_mat_reg_ix(0);
 
 CONSTANT test_image_steps : INTEGER := 4; -- Schritte 0 bis 4 dienen zur Erkennung
 
-CONSTANT s_program : t_program(0 TO 17) := (
-    ((MatMul, x_train, w1, d, '1'),             c_noop_instr,                               c_noop_instr),
-    ((VecAdd, d, b1, hl, '1'),                  c_noop_instr,                               (MatTrans, x_train, dummy, x_train_t, '1')),
-    (c_noop_instr,                              (ScalarMax, hl, dummy, hl_ReLu, '1'),       c_noop_instr),
-    ((MatMul, hl_ReLu, w2, d2, '1'),            c_noop_instr,                               c_noop_instr),
-    ((VecAdd, d2, b2, scores, '1'),             c_noop_instr,                               (MatTrans, w2, dummy, w2_t, '0')), 
-    (c_noop_instr,                              (ScalarMax, scores, dummy, scores, '1'),    c_noop_instr),
-    (c_noop_instr,                              (ScalarSubIx, scores, dummy, scores, '1'),  c_noop_instr),
-    (c_noop_instr,                              (ScalarDiv, scores, dummy, scores, '1'),    c_noop_instr),
-    ((MatMul, scores, w2_t, dhidden, '0'),      c_noop_instr,                               c_noop_instr),
-    (c_noop_instr,                              (ScalarMax, dhidden, dummy, dhidden, '0'),  c_noop_instr),
-    ((MatMul, x_train_t, dhidden, dw1, '0'),    (ScalarMul, w1, dummy, tmp0, '0'),          (MatTrans, scores, dummy, tmp1, '0')),
-    ((MatAdd, dw1, tmp0, dw1, '0'),             c_noop_instr,                               (ColSum, dhidden, dummy, db1, '1')),
-    ((MatMul, hl_ReLu, tmp1, dw2, '0'),         (ScalarMul, dw1, dummy, dw1, '0'),          c_noop_instr),
-    ((MatAdd, w1, dw1, w1, '0'),                (ScalarMul, w2, dummy, tmp2, '0'),          (ColSum, tmp1, dummy, db2, '1')),
-    ((MatAdd, dw2, tmp2, dw2, '0'),             (ScalarMul, db1, dummy, db1, '1'),          c_noop_instr),
-    ((MatAdd, b1, db1, b1, '1'),                (ScalarMul, dw2, dummy, dw2, '0'),          c_noop_instr),
-    ((MatAdd, w2, dw2, w2, '0'),                (ScalarMul, db2, dummy, db2, '1'),          c_noop_instr),
-    ((MatAdd, b2, db2, b2, '1'),                c_noop_instr,                               c_noop_instr)
+CONSTANT s_program : t_program(0 TO 18) := (
+    ((MatMul, x_train, w1, d, '1'),                 c_noop_instr),
+    ((VecAdd, d, b1, hl, '1'),                      c_noop_instr),
+    ((MatTrans, x_train, dummy, x_train_t, '1'),    (ScalarMax, hl, dummy, hl_ReLu, '1')),
+    ((MatMul, hl_ReLu, w2, d2, '1'),                c_noop_instr),
+    ((VecAdd, d2, b2, scores, '1'),                 c_noop_instr), 
+    ((MatTrans, w2, dummy, w2_t, '0'),              (ScalarMax, scores, dummy, scores, '1')),
+    (c_noop_instr,                                  (ScalarSubIx, scores, dummy, scores, '1')),
+    (c_noop_instr,                                  (ScalarDiv, scores, dummy, scores, '1')),
+    ((MatMul, scores, w2_t, dhidden, '0'),          c_noop_instr),
+    ((MatTrans, scores, dummy, tmp0, '0'),          (ScalarMax, dhidden, dummy, dhidden, '0')),    
+    ((MatMul, x_train_t, dhidden, dw1, '0'),        (ScalarMul, w1, dummy, tmp1, '0')),
+    ((MatAdd, dw1, tmp1, dw1, '0'),                 (ColSum, dhidden, dummy, db1, '1')),   
+    ((MatMul, hl_ReLu, tmp0, dw2, '0'),             (ScalarMul, dw1, dummy, dw1, '0')),
+    ((MatAdd, w1, dw1, w1, '0'),                    (ScalarMul, w2, dummy, tmp2, '0')),   
+    ((MatAdd, dw2, tmp2, dw2, '0'),                 (ColSum, tmp0, dummy, db2, '1')),
+    (c_noop_instr,                                  (ScalarMul, dw2, dummy, dw2, '0')),
+    ((MatAdd, w2, dw2, w2, '0'),                    (ScalarMul, db2, dummy, db2, '1')),
+    ((MatAdd, b2, db2, b2, '1'),                    (ScalarMul, db1, dummy, db1, '1')),
+    ((MatAdd, b1, db1, b1, '1'),                    c_noop_instr)
 );
 
 ---------------------------------------------
@@ -221,7 +220,7 @@ BEGIN
 ----------------------------------------------------------------------------------------------------
     REPORT infomsg("Initialisiere Signale");
     s_rst <= '1'; 
-    s_syn_rst <= '1';
+    s_syn_rst <= '0';
     s_wren <= '0';
     
     FOR i IN c_num_parallel_op-1 DOWNTO 0 LOOP
@@ -247,8 +246,9 @@ BEGIN
     s_rst <= '0';
    
     REPORT infomsg("Initialisierung abgeschlossen");
-    init_mat_x_train_rbr(6, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     
+    init_mat_x_train_rbr(4, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
+ 
     init_mat_b1_rbr(1, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     init_mat_b2_rbr(3, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
     init_mat_w1_cbc(0, s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a(0));
@@ -261,7 +261,7 @@ BEGIN
     save_mat_reg_to_file("IN b2.txt", 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
     
     FOR pc IN s_program'RANGE LOOP
-        REPORT infomsg("Executing Algorithm Step " & INTEGER'IMAGE(pc) & " ...");
+        REPORT infomsg("Fuehre Algorithmus-Schritt " & INTEGER'IMAGE(pc) & " aus ...");
         FOR core IN s_program(pc)'RANGE LOOP
             s_opcode(core) <= s_program(pc)(core).opcode;
             s_sel_a(core) <= s_program(pc)(core).sel_a; 
@@ -276,16 +276,17 @@ BEGIN
             s_data_port_mode <= DPMScalarMul;
         END IF;
         
+        s_syn_rst <= '1'; 
+        WAIT FOR c_clk_per;  
         s_wren  <= '1';
-        s_syn_rst <= '0';
-            
+        s_syn_rst <= '0';  
         
-        WAIT UNTIL s_finished = "111";
+        WAIT UNTIL s_finished = "11";
         WAIT FOR c_clk_per / 2;
         s_wren  <= '0';
-        s_opcode <= (NoOp, NoOp, NoOp);
-        s_syn_rst <= '1';
-        REPORT infomsg("... done");
+        s_opcode <= (NoOp, NoOp);
+        
+        REPORT infomsg("... fertig");
         IF pc = 0 THEN
             save_mat_reg_to_file("00 d.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
             save_mat_reg_to_file("00 w2.txt", 2, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
@@ -312,11 +313,10 @@ BEGIN
             save_mat_reg_to_file("08 dhidden.txt", 6, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSIF pc = 9 THEN
             save_mat_reg_to_file("09 dhidden.txt", 6, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-            save_mat_reg_to_file("09 w1.txt", 0, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("09 tmp0.txt", 9, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSIF pc = 10 THEN
             save_mat_reg_to_file("10 dw1.txt", 4, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-            save_mat_reg_to_file("10 tmp0.txt", 10, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-            save_mat_reg_to_file("10 tmp1.txt", 9, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("10 tmp1.txt", 8, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSIF pc = 11 THEN
             save_mat_reg_to_file("11 db1.txt", 5, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
             save_mat_reg_to_file("11 dw1.txt", 4, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);    
@@ -325,23 +325,27 @@ BEGIN
             save_mat_reg_to_file("12 dw1.txt", 4, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);    
         ELSIF pc = 13 THEN
             save_mat_reg_to_file("13 w1.txt", 0, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
-            save_mat_reg_to_file("13 tmp2.txt", 10, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o); 
-            save_mat_reg_to_file("13 db2.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);  
+            save_mat_reg_to_file("13 tmp2.txt", 8, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o); 
         ELSIF pc = 14 THEN
-            save_mat_reg_to_file("14 db1.txt", 5, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("14 db2.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);  
             save_mat_reg_to_file("14 dw2.txt", 6, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);  
         ELSIF pc = 15 THEN
-            save_mat_reg_to_file("15 b1.txt", 1, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
             save_mat_reg_to_file("15 dw2.txt", 6, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);  
         ELSIF pc = 16 THEN
             save_mat_reg_to_file("16 w2.txt", 2, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
             save_mat_reg_to_file("16 db2.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o); 
         ELSIF pc = 17 THEN
             save_mat_reg_to_file("17 b2.txt", 3, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+            save_mat_reg_to_file("17 db1.txt", 5, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
+        ELSIF pc = 18 THEN
+            save_mat_reg_to_file("18 b1.txt", 1, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         ELSE
             save_mat_reg_to_file("dummy.txt", 7, s_sel_a(0), s_read_a0, s_data_a0_o, s_ix_a0, s_size_a0_o, s_row_by_row_a0_o);
         END IF;
+    
     END LOOP;
+    
+    
       
     REPORT infomsg("Testende");
     WAIT;

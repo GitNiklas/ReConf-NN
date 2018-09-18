@@ -1,3 +1,7 @@
+----------------------------------------------------------------------------------------------------
+-- Package pkg_test_matrices
+-- Enthaelt Prozeduren zur Initialisierung der Matrixregister der Matrix-CPU mit Testwerten
+----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
@@ -47,11 +51,7 @@ CONSTANT x_train : t_x_train;
 TYPE t_y_train IS ARRAY(0 TO 63) OF NATURAL;
 CONSTANT y_train : t_y_train;
 
-TYPE t_x_train2 IS ARRAY(0 TO 11) OF REAL;
-CONSTANT x_train2 : t_x_train2;
-
 END;
-
 
 PACKAGE BODY pkg_test_matrices IS
 
@@ -692,12 +692,6 @@ BEGIN
     
     init_reg(data, '1', to_mat_size(64, 64), reg, "x_train", s_write_a0, s_size_a0_i, s_row_by_row_a0_i, s_ix_a0, s_data_a0_i, s_sel_a0);
 END init_mat_x_train_rbr;
-
-CONSTANT x_train2 : t_x_train2 := (
-    2.0, 6.0, 4.0, 0.0, 
-    0.0, 5.0, 6.0, 2.0, 
-    0.0, 2.0, 7.0, 5.0
-);
 
 CONSTANT y_train : t_y_train := (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 9, 5, 5, 6, 5, 0, 9, 8, 9, 8, 4, 1, 7, 7, 3, 5, 1, 0, 0, 2, 2, 7, 8, 2, 0, 1, 2, 6, 3, 3, 7, 3, 3);
 

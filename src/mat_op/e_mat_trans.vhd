@@ -1,3 +1,34 @@
+----------------------------------------------------------------------------------------------------
+-- Matrixoperation: Matrix-Transponierung
+--
+-- Normaler Modus:
+-- Operand A:   MxN, beliebige Orientierung       
+-- Resultat C:  NxM, gleiche Orientierung wie A
+--
+-- Wechseln der Matrix-Orientierung:
+-- Operand A:   MxN, beliebige Orientierung       
+-- Resultat C:  MxN, umgekehrte Orientierung wie A
+--
+-- Destruktiver Modus: Nein
+-- Geschwindigkeit: 1 Takt pro Matrix-Element
+--
+--  Port:
+--      p_rst_i                 : Asynchroner Reset
+--      p_clk_i                 : Takt
+--      p_syn_rst_i             : Synchroner Reset
+--
+--      p_finished_o            : Signalisiert, dass die Operation abgeschlossen ist
+--        
+--      p_mat_a_size_i          : Groesse von Matrix A   
+--      p_mat_a_ix_o            : Leseposition Matrix A 
+--      p_mat_a_row_by_row_i    : Orientierung Matrix A
+--      p_mat_a_data_i          : Gelesende Daten Matrix A 
+--  
+--      p_mat_c_ix_o            : Schreibposition Matrix C 
+--      p_mat_c_data_o          : Zu schreibende Daten Matrix C
+--      p_mat_c_row_by_row_i    : Orientierung Matrix C
+--      p_mat_c_size_o          : Groesse Matrix C
+----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.all;
@@ -64,7 +95,7 @@ COMPONENT e_mat_ix_gen
         p_size_i                : IN t_mat_size;
         p_row_by_row_i          : IN STD_LOGIC;
         p_mat_ix_t0_o           : OUT t_mat_ix;
-        p_mat_ix_t2_o           : OUT t_mat_ix;
+        p_mat_ix_t4_o           : OUT t_mat_ix;
         p_first_elem_t1_o       : OUT STD_LOGIC
     );
 END COMPONENT;
@@ -72,7 +103,7 @@ END COMPONENT;
 ----------------------------------------------------------------------------------------------------
 --  Signale
 ----------------------------------------------------------------------------------------------------
-SIGNAL s_mat_c_ix_t0, s_mat_c_ix_t2, s_mat_a_ix_t0, s_mat_a_ix_t2 : t_mat_ix;
+SIGNAL s_mat_c_ix_t0, s_mat_c_ix_t4, s_mat_a_ix_t0, s_mat_a_ix_t4 : t_mat_ix;
 SIGNAL s_c_size : t_mat_size;
 SIGNAL s_c_elem : t_mat_elem;
 SIGNAL s_word_ix : t_mat_ix_elem;
@@ -88,7 +119,7 @@ PORT MAP(
     p_clk_i             => p_clk_i,
     p_syn_rst_i         => p_syn_rst_i,
     
-    p_ix_write_i        => s_mat_c_ix_t2,
+    p_ix_write_i        => s_mat_c_ix_t4,
     p_word_done_i       => '1',
     
     p_elem_i            => s_c_elem,
@@ -112,7 +143,7 @@ PORT MAP(
     p_size_i            => s_c_size,
     p_row_by_row_i      => p_mat_c_row_by_row_i,
     p_mat_ix_t0_o       => s_mat_c_ix_t0,
-    p_mat_ix_t2_o       => s_mat_c_ix_t2,
+    p_mat_ix_t4_o       => s_mat_c_ix_t4,
     p_first_elem_t1_o   => OPEN
 );
 
@@ -121,23 +152,23 @@ PORT MAP(
 ----------------------------------------------------------------------------------------------------
 
 p_mat_c_size_o  <= s_c_size;
-p_mat_c_ix_o    <= s_mat_c_ix_t2;
+p_mat_c_ix_o    <= s_mat_c_ix_t4;
 p_mat_a_ix_o    <= s_mat_a_ix_t0;
 
-s_word_ix       <= s_mat_a_ix_t2.col WHEN p_mat_a_row_by_row_i = '1' ELSE s_mat_a_ix_t2.row;
+s_word_ix       <= s_mat_a_ix_t4.col WHEN p_mat_a_row_by_row_i = '1' ELSE s_mat_a_ix_t4.row;
 s_c_elem        <= p_mat_a_data_i(to_integer(s_word_ix mod 32));
 
 
-proc_trans_mode : PROCESS(p_mat_a_row_by_row_i, p_mat_c_row_by_row_i, p_mat_a_size_i, s_mat_c_ix_t0, s_mat_c_ix_t2)
+proc_trans_mode : PROCESS(p_mat_a_row_by_row_i, p_mat_c_row_by_row_i, p_mat_a_size_i, s_mat_c_ix_t0, s_mat_c_ix_t4)
 BEGIN
     IF p_mat_a_row_by_row_i /= p_mat_c_row_by_row_i THEN -- Change Matrix Orientation
         s_c_size <= p_mat_a_size_i;
         s_mat_a_ix_t0 <= s_mat_c_ix_t0;
-        s_mat_a_ix_t2 <= s_mat_c_ix_t2;
+        s_mat_a_ix_t4 <= s_mat_c_ix_t4;
     ELSE -- Normal Transpose
         s_c_size <= (p_mat_a_size_i.max_col, p_mat_a_size_i.max_row);
         s_mat_a_ix_t0 <= (s_mat_c_ix_t0.col, s_mat_c_ix_t0.row);
-        s_mat_a_ix_t2 <= (s_mat_c_ix_t2.col, s_mat_c_ix_t2.row);
+        s_mat_a_ix_t4 <= (s_mat_c_ix_t4.col, s_mat_c_ix_t4.row);
     END IF;
 END PROCESS proc_trans_mode;
 

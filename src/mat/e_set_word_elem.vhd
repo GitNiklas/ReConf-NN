@@ -1,3 +1,22 @@
+----------------------------------------------------------------------------------------------------
+-- Entity zum elementweisen Schreiben eines Matrix-Worts. Die Elemente werden zwischengespeichert, 
+-- bis das komplette Wort verfuegbar ist und in die Matrix geschrieben werden kann.
+--
+--  Port:
+--      p_rst_i         : Asynchroner Reset
+--      p_clk_i         : Takt
+--      p_syn_rst_i     : Synchroner Reset
+--        
+--      p_ix_write_i    : Elementposition und Schreibposition in der Matrix
+--      p_word_done_i   : Gibt an, dass das aktuelle Wort geloescht werden kann 
+--        
+--      p_elem_i        : Zzu schreibendes Element 
+--      p_row_by_row_i  : Orientierung der zu schreibenden Matrix
+--      p_size_i        : Groesse der zu schreibenden Matrix
+--        
+--      p_word_o        : Zu schreibendes Matrix-Wort
+--      p_ix_write_o    : Schreibposition in der Matrix
+----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.all;
