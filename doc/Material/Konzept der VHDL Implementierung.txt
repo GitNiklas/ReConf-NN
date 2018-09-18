@@ -8,12 +8,16 @@ Die Speicherung erfolgt in M4K Blöcken, das Cyclone II besitzt 105 M4K Blöcke 
 Matrix-Operationen
 
 Notwendige Operationen:
-    - Matrix Initialisieren
+    - Matrixmultiplikation (benötigt 32 9-Bit-Multiplizierer)
+    - Matrixaddition
+    - Addition von Matrix und Vektor
     - Matrix transponieren  
     - Skalare Multiplikation (benötigt 32 9-Bit-Multiplizierer)
-    - Skalare Division (2er Potenz)
+    - Skalare Division (Konstante 2er-Potenz)
     - Skalare Max-Funktion
-    - Matrixaddition
-    - Matrixmultiplikation (benötigt 32 9-Bit-Multiplizierer)
+    - Spaltenweise Summe einer Matrix bilden
+    - Bestimmtes Element in jeder Zeile einer Matix dekrementieren
+
+    
 
 Die Matrix-Operationen werden in einer "Matrix-ALU" zusammengefasst. Das Routing zwischen RAM und Matrix-ALU ist relativ aufwändig. Für die Auswahl der 2 Operanden werden pro Operand 256 10-auf-1 Multiplexer benötigt. Die Auswahl des Resultats benötigt 256 7-auf-1 Multiplexer. Ein 256 10-auf-1 MUX belegt etwa 5% der verfügbaren Logikzellen, somit wird für das Routing der Datenleitungen insgesamt 15% benötigt.

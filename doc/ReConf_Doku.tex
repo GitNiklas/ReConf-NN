@@ -1,0 +1,365 @@
+\documentclass
+[ 12pt,
+  parskip=half % Absätze durch einen vergrößerten Zeilenabstand getrennt
+]{scrreprt}
+
+\usepackage{mathpazo} %glourious palatino als Schriftart
+\usepackage{beramono} %tt
+\usepackage[scaled=0.95]{berasans} %ss
+
+\usepackage[a4paper,% Papierdimensionen festlegen
+inner=2.0cm, outer=2.0cm, bindingoffset=0.5cm,%
+top=1.5cm,bottom=1.5cm, %
+footskip=1.0cm,includeheadfoot]{geometry}
+
+\usepackage[utf8]{inputenc} % Input encoding (allow direct use of special characters like "ä")
+\usepackage[ngerman]{babel} % Sprache auf Deutsch
+\usepackage[T1]{fontenc} % Schöneres Inhaltsverzeichnis
+%\usepackage{quotchap} % Beautiful chapter decoration
+\usepackage{easyfig} % Bilder einfach einbinden
+\usepackage{hyperref} % Links auf anderes Stellen im Dokument, PDF-Lesezeichen
+\usepackage{tabularx} % Auto Spaltenbreite und Zeilenumbruch in Tabellen mit |X|
+\usepackage{tabulary} % Auto Spaltenbreite und Zeilenumbruch in Tabellen mit |L|R|C|J|
+\usepackage{xcolor} % Für Farben
+\usepackage{lipsum} % Für 'Lorem ipsum...' mit \lipsum[<Anzahl Absätze>]
+\usepackage[colorinlistoftodos]{todonotes} % Pretty Todo Notes & List of Todos
+\usepackage{datetime} % Zur Ausgabe des aktuellen Datums
+\usepackage[chapter]{minted} % Multi-Color-Listings
+\usepackage{caption} % Minted: Für Bildunterschriften bei Listings
+\usepackage{ulem} % Text unterstreichen (\uline) und durchstreichen (\sout)
+
+%%%%%%%%%% Farben
+\definecolor{darkblue}{rgb}{0, 0, 0.5}
+\definecolor{darkgreen}{rgb}{0, 0.5, 0}
+\definecolor{darkred}{rgb}{0.7, 0, 0}
+\definecolor{darkyellow}{rgb}{0.9, 0.6, 0}
+\definecolor{gray}{rgb}{0.5, 0.5, 0.5}
+
+%%%%%%%%%% Konstanten
+
+\newcommand{\titel}{ReConf}
+\newcommand{\untertitel}{}
+\newcommand{\authorname}{Niklas Kühl}
+\newcommand{\thesisname}{}
+%\newcommand{\Datum}{20. Februar 2017}
+\newcommand{\Datum}{\the\day. \monthname{} \the\year} % Aktuelles Datum
+
+\newcommand{\pdfdelta}{\texorpdfstring{$\delta$}{Delta}}
+	
+%%%%%%%%%% Befehle
+%\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}} % Todo ohne Package todonotes
+\newcommand{\todoinl}[1]{\todo[inline]{#1}}
+\newcommand{\todoPrioHigh}[1]{\todo[color=red!40, inline]{#1}}
+\newcommand{\todoPrioNormal}[1]{\todo[color=yellow!40, inline]{#1}}
+\newcommand{\todoPrioLow}[1]{\todo[color=green!40, inline]{#1}}
+
+\newcommand{\textGray}[1]{\textcolor{gray}{#1}}
+
+%%%%%%%%%% Konfiguration hyperref
+\hypersetup{ 
+	colorlinks=true,
+	breaklinks=true, % Erlaubt Links, über mehrere Zeilen zu gehen
+	linkcolor=darkblue, 	% Farbe aller Links auf andere Stellen im Dokument: Inhaltsverzeichnis, Glossar, Abkürzungen
+	urlcolor=blue,
+	citecolor=darkgreen,
+	pdftitle={\thesisname},
+	pdfsubject={\titel},
+	pdfauthor={\authorname},
+}
+
+%%%%%%%%%% Konfiguration minted
+\usemintedstyle[rust]{colorful} % Style. Siehe https://www.sharelatex.com/learn/Code_Highlighting_with_minted#Reference_guide
+\renewcommand\listoflistingscaption{Quellcodeverzeichnis}
+\setminted{
+	frame=single, 
+	breaklines=true, 
+	fontsize=\small,
+	tabsize=2, 
+	linenos
+}
+
+
+% Globales Escapeinside
+%\setminted[rust]{escapeinside=\%\%}
+
+% Listing Umgebung, um caption hinzuzufügen
+\newenvironment{mylisting}[1][H]
+{\captionsetup{aboveskip=-0.2\normalbaselineskip}\begin{listing}[#1]}
+{\end{listing}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\pagenumbering{Roman}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\titlehead{
+	\centering
+	\bigskip
+}
+
+\subject{\thesisname}
+\title{\titel}
+\subtitle{\Large \untertitel}
+\date{\vspace{-1cm}\Datum}
+
+\publishers{
+	\vfill
+	\normalsize
+	\raggedright
+	{\small Eingereicht von:}\\
+	\smallskip
+	{\Large \authorname}\\
+	inf102861@fh-wedel.de\\
+	
+
+}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tableofcontents
+\listoffigures
+\listoftables
+\listoflistings
+\cleardoublepage
+\pagenumbering{arabic}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Benutzerhandbuch}
+
+\section{Funktionsumfang}
+
+Auf dem FPGA ist ein Algorithmus für ein Neuronales Netz implementiert. Die Steuerung des Algorithmus erfolgt von einem PC über eine RS232-Schnittstelle. 
+
+\section{Bedienungsanleitung}
+
+\subsection{Kodierung der Matrizen}
+
+Die Elemente der Matrizen sind 8 Bit breit. Diese 8 Bit werden als vorzeichenbehafteter Festkommawert interpretiert. Es werden 4 Bit für das Vorzeichen und den Ganzzahlanteil benutzt. Der Gebrochene Anteil benutzt weitere 4 Bit. Der Wertebereich der Elemente beträgt somit $7.9375$ bis -$8.0000$. Der kleinste von $0.0$ verschiedene Wert ist $\pm0.0625$.
+
+\subsection{Kommunikation zwischen FPGA und PC}
+
+Die serielle Kommunikation zwischen FPGA und PC läuft mit einer Baudrate von 9600, 1 Stoppbit, kein Paritätsbit. Es wird folgendes Protokoll verwendet:
+\begin{enumerate}
+	\item Reset des FPGA per SW17
+	\item FPGA führt Initalisierung durch
+	\item FPGA sendet Steuerungsbyte an PC: 0xF0
+	\item PC sendet Steuerungsbyte an FPGA: 0xE0
+	\item PC sendet 4096 zufällige Werte zur Initialisierung der Gewichte w1
+	\item PC sendet Steuerungsbyte an FPGA: 0xE1
+	\item PC sendet 640 zufällige Werte zur Initialisierung der Gewichte w2
+	\item \label{enum:sel-mode} PC sendet Byte an FPGA zur Auswahl des Modus: 
+	\begin{itemize}
+		\item Training: 0xE2 (weiter mit \ref{enum:training})
+		\item Test: 0xA1 (weiter mit \ref{enum:test})
+	\end{itemize}
+	\item \label{enum:training} Training
+	\begin{enumerate}
+		\item PC sendet 4096 Werte zur Initialisierung der Trainingsdaten
+		\item PC sendet Steuerungsbyte an FPGA: 0xE3
+		\item PC sendet 64 Werte zur Initialisierung der Klassen y\_train
+		\item FPGA führt Algorithmus zum Training des Neuronalen Netzes aus
+		\item FPGA sendet Steuerungsbyte an PC: 0xF1
+		\item Zurück zu \ref{enum:sel-mode}
+	\end{enumerate} 
+	\item \label{enum:test} Test
+	\begin{enumerate}
+		\item PC sendet 4096 Werte zur Initialisierung der Testdaten
+		\item FPGA führt Algorithmus zum Test der Daten aus
+		\item FPGA überträgt die Bewertung der Testdaten (640 Bytes)
+		\item Zurück zu \ref{enum:sel-mode}
+	\end{enumerate} 
+\end{enumerate}
+
+\subsection{Bedienung des Altera DE2 Boards}
+
+Die LEDs LEDR1 und LEDR2 dienen zur Signalisierung von Fehlern:
+\begin{itemize}
+	\item LEDR1: Leuchtet, wenn ein Protokollfehler aufgetreten ist
+	\item LEDR2: Leuchtet, wenn ein Fehler bei der seriellen Kommunikation aufgetreten ist
+\end{itemize}
+
+Der Schalter SW17 dient zum zurücksetzten des Systems.
+
+Der Schalter SW0 dient zum aktivieren des Debug-Modus, über welchen interne Daten des Systems ausgelesen werden können. Das Verlassen des Debug-Modus ist nur mit einem Reset möglich. Eine genaue Beschreibung der Funktionsweise erfolgt in Kapitel \todo{Referenz}.
+ 
+Über die Sieben-Segment-Anzeige der Altera DE2 Boards wird der interne Zustand des Systems angezeigt. Die Bedeutung der Anzeige ist in Kapitel \todo{Referenz} beschrieben.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Planung}
+
+\section{Problemanalyse}
+
+\subsection{Analyse des Algorithmus}
+
+- möglichkeiten zur parallelisierung untersucht
+- parallele ausführung von 2 schritten gut geeignet
+- parallele ausführung von 3 schritten aufgrund von datenabhängigkeiten: bringt nur wenig gewinn
+
+\begin{center}
+	\begin{tabulary}{\columnwidth}{|C|C|C|}
+		\hline
+		Schritt & Operation 0 & Operation 1\\
+		\hline
+		0 & d = mul(x\_train, w1) & -\\
+		1 & hl = d + b1 & -\\
+		2 & x\_train\_trans = x\_train\textsuperscript{T} & hl\_ReLu = max(0, hl)\\
+		3 & - & d2 = mul(hl\_ReLu, w2)\\
+		4 & scores = d2 + b2 & -\\
+		5 & w2\_trans = w2\textsuperscript{T} & scores = max(scores, 0) \\
+		6 & - & scores: richtigen Wert um 1 verringern\\
+		7 & - & scores: Division durch 64\\
+		8 & dhidden = mul(scores, w2-trans) & -\\
+		9 & tmp0 = Orientierung von scores ändern & dhidden = max(dhidden, 0)\\
+		10 & dw1 = mul(x-train-trans, dhidden) & tmp1 = w1 * reg\\
+		11 & dw1 = dw1 + tmp1 & db1 = Spaltenweise Summe von dhidden\\
+		12 & dw2 = mul(hl-relu, tmp0) & dw1 = -step-size * dw1\\
+		13 & w1 = w1 + dw1 & tmp2 = w2 * reg\\
+		14 & dw2 = dw2 + tmp2 & db = spaltenweise summe tmp0\\
+		15 & - & dw2 = -stepsize * dw2\\
+		16 & w2 = w2 + dw2 & db2 = -stepsize * db2\\
+		17 & b2 = b2 + db2 & db1 = -stepsize * db1\\
+		18 & b1 = b1 + db1 & -\\
+		\hline
+	\end{tabulary}
+	\label{table:parallel-algo}
+	\captionof{table}{Parallele Anordnung der Algorithmus-Schritte}
+\end{center}
+
+
+Der Algorithmus operiert auf Matrizen, welche gespeichert werden müssen. Es müssen in jedem Fall 4 Speicherplätze (Register) für die statischen Matrizen w1, w2, b1 und b2 vorhanden sein. Zusätzliche werden allerdings Speicherplätze für temporäre Matrizen benötigt.
+
+Durch eine Analyse wurde festgestellt, dass der Algorithmus bei der in Tabelle \ref{table:parallel-algo} dargestellten Anordnung der Schritte maximal 10 Matrix-Speicherplätze benötigt. Die Verteilung der 4 statischen Matrizen auf die Speicherplätze ist in Tabelle \ref{table:algo-regs-static} dargestellt. Die Verteilung der temporären Matrizen auf die 6 übrigen Matrix-Register ist in Tabelle \ref{table:algo-regs} dargestellt. In einer Zeile der Tabelle ist dabei der Zustand vor dem jeweiligen Algorithmus-Schritt dargestellt.
+
+\begin{center}
+	\begin{tabulary}{\columnwidth}{|C|C|}
+		\hline
+		Matrix & Register\\
+		\hline
+		w1 & Reg 0\\
+		b1 & Reg 1\\
+		w2 & Reg 2\\
+		b2 & Reg 3\\
+		\hline
+	\end{tabulary}
+	\label{table:algo-regs-static}
+	\captionof{table}{Zuordnung der statischen Matrizen zu den Matrixregistern}
+\end{center}
+
+\begin{center}
+	\begin{tabulary}{\columnwidth}{|C|C|C|C|C|C|C|C|C|C|C|}
+		\hline
+		Schritt & Reg 4 & Reg 5 & Reg 6 & Reg 7 & Reg 8 & Reg 9\\
+		\hline
+		0 & x\_train & - & - & - & - & -\\	
+		1 & x\_train & - & - & d & - & -\\
+		2 & x\_train & - & - & hl & - & -\\
+		3 & - & x\_train\textsuperscript{T} & - & hl\_ReLu & - & -\\
+		4 & - & x\_train\textsuperscript{T} & - & hl\_ReLu & d2 & -\\
+		5 & - & x\_train\textsuperscript{T} & - & hl\_ReLu & scores & -\\	
+		6 & w2\textsuperscript{T} & x\_train\textsuperscript{T} & - & hl\_ReLu & scores & -\\
+		7 & w2\textsuperscript{T} & x\_train\textsuperscript{T} & - & hl\_ReLu & scores & -\\
+		8 & w2\textsuperscript{T} & x\_train\textsuperscript{T} & - & hl\_ReLu & scores & -\\
+		9 & - & x\_train\textsuperscript{T} & dhidden & hl\_ReLu & scores & -\\
+		10 & - & x\_train\textsuperscript{T} & dhidden & hl\_ReLu & - & tmp0\\
+		11 & dw1 & - & dhidden & hl\_ReLu & tmp1 & tmp0\\
+		12 & dw1 & db1 & - & hl\_ReLu & - & tmp0\\
+		13 & dw1 & db1 & dw2 & - & tmp2 & tmp0\\
+		14 & dw1 & db1 & dw2 & - & - & tmp0\\
+		15 & dw1 & db1 & dw2 & db2 & - & -\\
+		16 & dw1 & db1 & dw2 & db2 & - & -\\
+		17 & dw1 & db1 & dw2 & db2 & - & -\\
+		18 & dw1 & db1 & dw2 & db2 & - & -\\
+		\hline
+	\end{tabulary}
+	\label{table:algo-regs}
+	\captionof{table}{Zuordnung der temporären Matrizen zu den Matrixregistern}
+\end{center}
+
+\subsection{Aufteilung der RAM-Blöcke}
+
+Da für die Matrizen sehr viel Speicher benötigt wird, müssen die Daten im RAM abgelegt werden. Für die Verwaltung des RAM gibt es zwei verschiedene Ansätze:
+\begin{enumerate}
+	\item Benutzung eines großen RAM-Blocks
+	\item Für jede Matrix wird ein eigener, kleiner RAM-Block benutzt
+\end{enumerate}
+
+Die Nutzung eines großen RAM-Blocks besitzt den Vorteil, dass ein größerer Datenbus genutzt werden kann, wodurch eine größere Datenmenge verarbeitet werden kann. Allerdings wird die Menge der Daten, welche parallel verarbeitet werden kann, auch durch andere Faktoren begrenzt (z.B. Anzahl der HW-Multiplizierer). Dadurch ist nur eine geringe Steigerung der verarbeiteten Datenmenge möglich.
+
+Bei Nutzung eines großen RAM-Blocks besteht auch die  Möglichkeit, flexibel Speicher zuzuweisen. Dadurch kann der Speicherverschnitt minimiert werden, welcher bei Nutzung von separaten RAM-Blöcken entsteht. Allerdings erfordert dies ein komplexes Speichermanagement, da der Zugriff auf jede Matrix unter Berücksichtigung der Start-Speicheradresse erfolgen muss. 
+
+Die Nutzung seperater RAM-Blöcke bietet den Vorteil, dass auf jeden Block parallel zugegriffen werden kann. Dadurch ist eine wesentlich höhere Parallelisierung möglich als bei Verwendung eines großen RAM-Blocks. Bei einem großen RAM-Block ist nur der gleichzeitige Zugriff auf 2 verschiedene Speicheradressen möglich, bei Verwendung von 10 seperaten RAM-Blöcken kann hingegen auf 20 Adressen gleichzeitig zugegriffen werden. 
+ 
+
+Aufgrund der einfacheren Verwendung und den wesentlich besseren Parallelisierungmöglichkeiten wird daher Variante 2 gewählt.
+
+\section{Blockschaltbilder}
+
+siehe \ref{fig:tle}
+
+\lipsum{1}
+
+\Figure[width=\textwidth, label={fig:tle}, caption={Struktur der Top-Level-Entity}]{Grafiken/tle}
+
+\lipsum{1}
+
+\Figure[width=\textwidth, label={fig:nn-algo}, caption={Struktur der Entity für den Algorithmus}]{Grafiken/nn_algo}
+
+\lipsum{1}
+
+\Figure[width=\textwidth, label={fig:mat-cpu}, caption={Struktur der Matrix-CPU}]{Grafiken/mat_cpu}
+
+\lipsum{1}
+
+\Figure[width=\textwidth, label={fig:mat-alu}, caption={Struktur der Matrix-ALU}]{Grafiken/mat_alu}
+
+\lipsum{1}
+
+\Figure[width=\textwidth, label={fig:mat-mul}, caption={Struktur der Einheit zur Matrixmultiplikation}]{Grafiken/mat_mul}
+
+\lipsum{1}
+
+\Figure[width=\textwidth, label={fig:ix-gen}, caption={Struktur des Indexgenerators}]{Grafiken/ix_gen}
+
+\section{Schnittstellenbeschreibung}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Implementierung}
+
+\section{Erklärung wesentlicher Design-Teile}
+
+\begin{mylisting}
+	\caption{VHDL Test Listing}
+	\label{listing:vhdl-test}
+	\begin{minted}{vhdl}
+	proc_change_state : PROCESS(p_clk_i, p_rst_i)
+	BEGIN
+		IF p_rst_i = '1' THEN 
+			s_cur_state <= st_init;
+		ELSIF rising_edge(p_clk_i) THEN
+			s_cur_state <= s_next_state;
+		END IF;
+	END PROCESS proc_change_state;
+	\end{minted}
+\end{mylisting} 
+
+\section{Beschreibung der Zustandsautomaten}
+
+\lipsum{1}
+
+\Figure[width=0.82\textwidth, label={fig:tle-statemachine}, caption={Zustandsautomat der Top-Level-Entity}]{Grafiken/tle_statemachine}
+
+\lipsum{1}
+
+\Figure[width=\textwidth, label={fig:nn-algo-statemachine}, caption={Zustandsautomat zur Ausführung des Algorithmus}]{Grafiken/nn_algo_statemachine}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Simulation}
+
+\section{Beschreibung der Testfälle}
+
+\section{Beschreibung der Testergebnisse}
+
+\end{document}

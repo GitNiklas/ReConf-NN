@@ -40,3 +40,12 @@ src/ReConf-NN.flow.rpt
 *.summary
 src_py/
 ecdsa.pdf
+doc/_minted-ReConf_Doku/
+doc/ReConf_Doku.synctex.gz
+doc/ReConf_Doku.toc
+doc/ReConf_Doku.out
+doc/ReConf_Doku.lot
+doc/ReConf_Doku.lol
+doc/ReConf_Doku.log
+doc/ReConf_Doku.lof
+doc/ReConf_Doku.aux
