@@ -33,6 +33,8 @@
 --      p_mat_c_data_o          : Zu schreibende Daten Matrix C
 --      p_mat_c_row_by_row_i    : Orientierung Matrix A, B und C
 --      p_mat_c_size_o          : Groesse Matrix C
+--
+--  Autor: Niklas Kuehl
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;

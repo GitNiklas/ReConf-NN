@@ -19,6 +19,8 @@
 --      p_mat_ix_t0_o       : Leseposition
 --      p_mat_ix_t4_o       : Schreibposition (= Leseposition um 4 Takte verzoegert)
 --      p_first_elem_t1_o   : Gibt an, dass aktuell das erste Matrix-Element gelesen wird
+--
+--  Autor: Niklas Kuehl
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;

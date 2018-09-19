@@ -1,6 +1,8 @@
 ----------------------------------------------------------------------------------------------------
--- Package pkg_test_matrices
--- Enthaelt Prozeduren zur Initialisierung der Matrixregister der Matrix-CPU mit Testwerten
+--  Package pkg_test_matrices
+--  Enthaelt Prozeduren zur Initialisierung der Matrixregister der Matrix-CPU mit Testwerten
+--
+--  Autor: Niklas Kuehl
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;

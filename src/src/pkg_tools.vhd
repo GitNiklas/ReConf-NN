@@ -1,6 +1,8 @@
 ----------------------------------------------------------------------------------------------------
 -- Package pkg_tools
 -- Enthaelt Typen, Hilfsfunktionen und Konstanten zur Verwendung an mehreren Stellen.
+--
+--  Autor: Niklas Kuehl
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;

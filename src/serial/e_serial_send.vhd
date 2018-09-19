@@ -16,6 +16,8 @@
 --      p_data_i        : Zu sendende Daten
 --      p_send_i        : Signalisiert, dass die Daten gesendet werden sollen
 --      p_busy_send_o   : Signalisiert, dass gerade Daten gesendet werden
+--
+--  Autor: Niklas Kuehl
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;

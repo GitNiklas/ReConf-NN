@@ -26,6 +26,8 @@
 --      p_row_by_row_a0_i       : Orientierung Matrix A (OpCore0), Schreibend
 --      p_size_a0_o             : Groesse Matrix A (OpCore0), Lesend 
 --      p_row_by_row_a0_o       : Orientierung Matrix A (OpCore0), Lesend
+--
+--  Autor: Niklas Kuehl
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;

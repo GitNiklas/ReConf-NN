@@ -1,6 +1,9 @@
 ----------------------------------------------------------------------------------------------------
 --  Testbench fuer e_mat_cpu
+--  Enthaelt Testfaelle fuer alle Matrixoperationen
 --  Simulationszeit: 6 ms
+--
+--  Autor: Niklas Kuehl
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;

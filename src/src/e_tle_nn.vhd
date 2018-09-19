@@ -21,6 +21,8 @@
 --      p_ser_err_o     : Zeigt einen Fehler in der seriellen Kommunikation an
 --
 --      p_state_7ss0_o  : Zur Ausgabe des internen Zustandes auf 7-Segment-Anzeige
+--
+--  Autor: Niklas Kuehl
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;

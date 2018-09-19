@@ -24,6 +24,8 @@
 --
 --      p_word_i        : Zu schreibendes Matrix-Wort
 --      p_word_o        : Gelesenes Matrix-Wort
+--
+--  Autor: Niklas Kuehl
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;

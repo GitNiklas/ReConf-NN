@@ -22,6 +22,8 @@
 --      p_row_by_row_a0_i       : Orientierung Matrix A (OpCore0), Schreibend
 --      p_size_a0_o             : Groesse Matrix A (OpCore0), Lesend 
 --      p_row_by_row_a0_o       : Orientierung Matrix A (OpCore0), Lesend
+--
+--  Autor: Niklas Kuehl
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
@@ -129,9 +131,9 @@ CONSTANT d2 : t_mat_reg_ix := to_mat_reg_ix(8);
 CONSTANT scores : t_mat_reg_ix := to_mat_reg_ix(8);
 CONSTANT dhidden : t_mat_reg_ix := to_mat_reg_ix(6);
 
-CONSTANT tmp0 : t_mat_reg_ix := to_mat_reg_ix(9);
-CONSTANT tmp1 : t_mat_reg_ix := to_mat_reg_ix(8); 
-CONSTANT tmp2 : t_mat_reg_ix := to_mat_reg_ix(8);
+CONSTANT scores2 : t_mat_reg_ix := to_mat_reg_ix(9);
+CONSTANT w1_reg : t_mat_reg_ix := to_mat_reg_ix(8); 
+CONSTANT w2_reg : t_mat_reg_ix := to_mat_reg_ix(8);
 
 CONSTANT dummy : t_mat_reg_ix := to_mat_reg_ix(0);
 
@@ -145,12 +147,12 @@ CONSTANT s_program : t_program(0 TO 18) := (
     (c_noop_instr,                                  (ScalarSubIx, scores, dummy, scores, '1')),
     (c_noop_instr,                                  (ScalarDiv, scores, dummy, scores, '1')),
     ((MatMul, scores, w2_t, dhidden, '0'),          c_noop_instr),
-    ((MatTrans, scores, dummy, tmp0, '0'),          (ScalarMax, dhidden, dummy, dhidden, '0')),    
-    ((MatMul, x_train_t, dhidden, dw1, '0'),        (ScalarMul, w1, dummy, tmp1, '0')),
-    ((MatAdd, dw1, tmp1, dw1, '0'),                 (ColSum, dhidden, dummy, db1, '1')),   
-    ((MatMul, hl_ReLu, tmp0, dw2, '0'),             (ScalarMul, dw1, dummy, dw1, '0')),
-    ((MatAdd, w1, dw1, w1, '0'),                    (ScalarMul, w2, dummy, tmp2, '0')),   
-    ((MatAdd, dw2, tmp2, dw2, '0'),                 (ColSum, tmp0, dummy, db2, '1')),
+    ((MatTrans, scores, dummy, scores2, '0'),       (ScalarMax, dhidden, dummy, dhidden, '0')),    
+    ((MatMul, x_train_t, dhidden, dw1, '0'),        (ScalarMul, w1, dummy, w1_reg, '0')),
+    ((MatAdd, dw1, w1_reg, dw1, '0'),               (ColSum, dhidden, dummy, db1, '1')),   
+    ((MatMul, hl_ReLu, scores2, dw2, '0'),          (ScalarMul, dw1, dummy, dw1, '0')),
+    ((MatAdd, w1, dw1, w1, '0'),                    (ScalarMul, w2, dummy, w2_reg, '0')),   
+    ((MatAdd, dw2, w2_reg, dw2, '0'),               (ColSum, scores2, dummy, db2, '1')),
     (c_noop_instr,                                  (ScalarMul, dw2, dummy, dw2, '0')),
     ((MatAdd, w2, dw2, w2, '0'),                    (ScalarMul, db2, dummy, db2, '1')),
     ((MatAdd, b2, db2, b2, '1'),                    (ScalarMul, db1, dummy, db1, '1')),

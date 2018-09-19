@@ -7,6 +7,8 @@
 --    
 --    p_async_i  : Asynchrones Eingangssignal
 --    p_sync_o   : Synchronisiertes Ausgangssignal
+--
+--  Autor: Niklas Kuehl
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;

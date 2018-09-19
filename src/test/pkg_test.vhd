@@ -1,6 +1,8 @@
 ----------------------------------------------------------------------------------------------------
--- Package pkg_test
--- Enthaelt Typen, Hilfsfunktionen und Konstanten zur Verwendung in den Testbenches.
+--  Package pkg_test
+--  Enthaelt Typen, Hilfsfunktionen und Konstanten zur Verwendung in den Testbenches.
+--
+--  Autor: Niklas Kuehl
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;

@@ -17,6 +17,8 @@
 --      p_load_data_i   : Bei '1' werden die Daten, die an p_data_i anliegen, gespeichert
 --      p_shift_data_i  : Bei '1' wird das aktuelle Datum um 1 nach rechts verschoben.
 --                        Nachgeschoben wird mit p_data_shift_i    
+--
+--  Autor: Niklas Kuehl
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;

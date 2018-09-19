@@ -29,6 +29,8 @@
 --      p_ytrain_wren_o         : Schreiberlaubnis y_train
 --      p_ytrain_wraddress_o    : Schreibadresse y_train
 --      p_ytrain_data_o         : Zu schreibende Daten y_train
+--
+--  Autor: Niklas Kuehl
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;

@@ -17,6 +17,8 @@
 --      p_new_data_o    : Signalisiert, dass neue Daten vorliegen
 --      p_d_data_read_o : Signalisiert, dass die Daten geleseen worden sind
 --      p_rx_err_o      : Signalisiert, dass beim Empfangen ein Fehler aufgetreten ist
+--
+--  Autor: Niklas Kuehl
 ----------------------------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE ieee.std_logic_1164.ALL;
