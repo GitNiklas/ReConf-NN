@@ -30,10 +30,11 @@ COMPONENT e_tle_nn
         p_rx_i              : IN STD_LOGIC;
         p_tx_o              : OUT STD_LOGIC;
         
+        p_exec_algo_o       : OUT STD_LOGIC;
         p_prot_err_o        : OUT STD_LOGIC;
         p_ser_err_o         : OUT STD_LOGIC;
         
-        p_state_7ss0_o      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0) := "1111111"
+        p_state_7ss0_o      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0)
     );
 END COMPONENT;
 
@@ -63,6 +64,7 @@ PORT MAP(
     p_rx_i                  => s_tx,
     p_tx_o                  => s_rx,
     
+    p_exec_algo_o           => OPEN,
     p_prot_err_o            => OPEN,
     p_ser_err_o             => OPEN,
         
@@ -105,7 +107,7 @@ BEGIN
     serial_send(x"E0", s_tx);  
     REPORT infomsg("Initialisiere w1...");
     
-    FOR i IN 1 TO 4096 LOOP --16 LOOP --4096 LOOP
+    FOR i IN 1 TO 4096 LOOP 
         --REPORT infomsg("Sende Byte " & INTEGER'IMAGE(i));
         random_elem(-1.0, 1.0, seed1, seed2, tmp);
         serial_send(to_slv(to_mat_elem(tmp)), s_tx);
@@ -114,7 +116,7 @@ BEGIN
       
     serial_send(x"E1", s_tx);  
     REPORT infomsg("Initialisiere w2...");
-    FOR i IN 1 TO 640 LOOP -- 8 LOOP --640 LOOP
+    FOR i IN 1 TO 640 LOOP 
         random_elem(-1.0, 1.0, seed1, seed2, tmp);
         serial_send(to_slv(to_mat_elem(tmp)), s_tx);
     END LOOP;
@@ -141,15 +143,6 @@ BEGIN
     serial_receive(v_byte, s_rx);
     REPORT infomsg("Trainingsphase beendet: Byte empfangen: " & to_hex(v_byte));
     
-    
---    debug_save_mat_reg_to_file("tb_tle/w1.txt", 0, 4, 4, FALSE, s_tx, s_rx, s_set_debug);
---    debug_save_mat_reg_to_file("tb_tle/b1.txt", 1, 1, 4, TRUE, s_tx, s_rx, s_set_debug);
---    debug_save_mat_reg_to_file("tb_tle/w2.txt", 2, 4, 2, FALSE, s_tx, s_rx, s_set_debug);
---    debug_save_mat_reg_to_file("tb_tle/b2.txt", 3, 1, 2, TRUE, s_tx, s_rx, s_set_debug);
---    debug_save_mat_reg_to_file("tb_tle/x_train.txt", 4, 4, 4, TRUE, s_tx, s_rx, s_set_debug);
---    
---    debug_save_mat_reg_to_file("tb_tle/d.txt", 7, 4, 4, TRUE, s_tx, s_rx, s_set_debug);
-      
 --    debug_save_mat_reg_to_file("tb_tle/09 tmp0.txt", 9, 64, 10, FALSE, s_tx, s_rx, s_set_debug);
 --    debug_save_mat_reg_to_file("tb_tle/12 dw1.txt", 4, 64, 64, FALSE, s_tx, s_rx, s_set_debug);
 --    debug_save_mat_reg_to_file("tb_tle/13 tmp2.txt", 8, 64, 10, FALSE, s_tx, s_rx, s_set_debug);

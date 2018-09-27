@@ -192,9 +192,9 @@ PACKAGE BODY pkg_tools IS
                 WHEN x"9"   => res := "0010000";
                 WHEN x"A"   => res := "0001000";
                 WHEN x"B"   => res := "0000011";
-                WHEN x"C"   => res := "0000110";
+                WHEN x"C"   => res := "1000110";
                 WHEN x"D"   => res := "0100001";
-                WHEN x"E"   => res := "1000110";
+                WHEN x"E"   => res := "0000110";
                 WHEN x"F"   => res := "0001110";
                 WHEN OTHERS => res := "0110110";
         END CASE;

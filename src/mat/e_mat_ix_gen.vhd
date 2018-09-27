@@ -65,6 +65,8 @@ SIGNAL s_low : STD_LOGIC := '0';
 ----------------------------------------------------------------------------------------------------
 BEGIN
 
+s_low <= '0';
+
 p_mat_ix_t0_o       <= s_ix_t0;
 p_mat_ix_t4_o       <= s_ix_t4;
 
@@ -81,7 +83,7 @@ f_reg(p_rst_i, p_clk_i, s_low, s_syn_rst_t2, s_syn_rst_t3);
 --  Prozesse
 ----------------------------------------------------------------------------------------------------
 
-proc_last_rowcol : PROCESS(p_row_by_row_i, p_size_i, s_ix_t1) -- p_size und row by row kommen 2 TAKTE verzögert
+proc_last_rowcol : PROCESS(p_row_by_row_i, p_size_i, s_ix_t1)
 BEGIN
     IF p_row_by_row_i = '1' THEN
         IF inc_by_wordlen THEN    

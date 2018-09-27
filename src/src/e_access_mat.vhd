@@ -211,13 +211,6 @@ p_ytrain_wraddress_o <= STD_LOGIC_VECTOR(s_ix.col);
 --  Prozesse
 ----------------------------------------------------------------------------------------------------
 
---proc_dbg_msg : PROCESS(p_new_data_i)
---BEGIN
---    IF p_new_data_i = '1' THEN
---        REPORT infomsg("Access Mat: Received Byte: " & to_hex(p_data_i));
---    END IF;
---END PROCESS proc_dbg_msg;
-
 proc_last : PROCESS(p_rst_i, p_clk_i)
 BEGIN
     IF p_rst_i = '1' THEN

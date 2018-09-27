@@ -17,6 +17,7 @@
 --      p_rx_i          : Serielle Schnittstelle
 --      p_tx_o          : Serielle Schnittstelle
 --        
+--      p_exec_algo_o   : Signalisiert, dass der Algorithmus ausgeführt wird
 --      p_prot_err_o    : Zeigt einen Fehler beim Kommunikationsprotokoll an
 --      p_ser_err_o     : Zeigt einen Fehler in der seriellen Kommunikation an
 --
@@ -43,10 +44,11 @@ ENTITY e_tle_nn IS
         p_rx_i              : IN STD_LOGIC;
         p_tx_o              : OUT STD_LOGIC;
         
+        p_exec_algo_o       : OUT STD_LOGIC;
         p_prot_err_o        : OUT STD_LOGIC;
         p_ser_err_o         : OUT STD_LOGIC;
         
-        p_state_7ss0_o      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0) := "1111111"
+        p_state_7ss0_o      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0)
     );
 END ENTITY e_tle_nn;
 
@@ -350,6 +352,8 @@ PORT MAP(
     locked          => s_pll_locked
 );
 
+p_exec_algo_o <= s_exec_algo;
+
 ----------------------------------------------------------------------------------------------------
 --  Prozesse
 ----------------------------------------------------------------------------------------------------
@@ -406,15 +410,11 @@ BEGIN
     IF p_rst_i = '1' THEN 
         s_cur_state <= st_init;
     ELSIF rising_edge(s_clk_1) THEN
-        IF s_set_debug_synced = '0' THEN
-            s_cur_state <= s_next_state;
-        ELSE
-            s_cur_state <= st_debug;
-        END IF;
+        s_cur_state <= s_next_state;
     END IF;
 END PROCESS proc_change_state;
   
-proc_calc_next_state : PROCESS(s_cur_state, s_access_finished, s_new_serial_data, s_serial_data_o, s_algo_finished, s_pll_locked)
+proc_calc_next_state : PROCESS(s_cur_state, s_access_finished, s_new_serial_data, s_serial_data_o, s_algo_finished, s_pll_locked, s_set_debug_synced)
 BEGIN
     CASE s_cur_state IS
                      
@@ -549,6 +549,10 @@ BEGIN
                                     END IF; 
         
     END CASE;
+    
+    IF s_set_debug_synced = '1' THEN
+        s_next_state <= st_debug;
+    END IF;
 END PROCESS proc_calc_next_state;
 
 proc_calc_output : PROCESS(s_cur_state, s_new_serial_data, s_serial_data_o, s_dbg_mat_reg, s_mat_data_o, s_send_mat)

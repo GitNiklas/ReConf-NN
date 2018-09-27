@@ -70,7 +70,6 @@ set_location_assignment PIN_AB12 -to p_state_7ss0_o[1]
 set_location_assignment PIN_AF10 -to p_state_7ss0_o[0]
 set_location_assignment PIN_AF23 -to p_prot_err_o
 set_location_assignment PIN_AB21 -to p_ser_err_o
-set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
 set_global_assignment -name VHDL_FILE src/e_tle_nn.vhd
 set_global_assignment -name VHDL_FILE src/e_access_mat.vhd
 set_global_assignment -name VHDL_FILE src/e_nn_algo.vhd
@@ -111,3 +110,5 @@ set_global_assignment -name VHDL_FILE test/pkg_test.vhd
 set_global_assignment -name VHDL_FILE test/pkg_test_matrices.vhd
 set_global_assignment -name VHDL_FILE test/tb_access_mat.vhd
 set_global_assignment -name VHDL_FILE test/tb_tle.vhd
+set_location_assignment PIN_M25 -to p_exec_algo_o
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
