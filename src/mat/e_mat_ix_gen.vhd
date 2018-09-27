@@ -129,10 +129,10 @@ END PROCESS proc_registers;
 
 proc_calc_ix : PROCESS(p_word_done_i, s_first_elem, s_last_col_t1, s_last_row_t1, s_ix_t1, c_inc_ix, p_row_by_row_i)
 BEGIN
-        IF s_first_elem = '1' THEN -- wait for 1. elem to be processed
+        IF s_first_elem = '1' THEN -- warte bis erstes Element verarbeitet wurde
             s_ix_t0             <= c_mat_ix_zero;
         ELSE
-            IF p_word_done_i = '0' THEN -- wait for current word to be finished
+            IF p_word_done_i = '0' THEN -- warte bis aktuelles Element von aeusserer Entity verarbeitet wurde
                 s_ix_t0             <= s_ix_t1; 
             ELSE
                 IF p_row_by_row_i = '1' THEN
@@ -145,7 +145,7 @@ BEGIN
                     ELSE
                         s_ix_t0             <= s_ix_t1; 
                     END IF; 
-                ELSE --swap row/col indizes
+                ELSE -- wie der THEN-Fall, nur sind row und col vertauscht
                     IF s_last_row_t1 = '0' THEN
                         s_ix_t0.col         <= s_ix_t1.col; 
                         s_ix_t0.row         <= s_ix_t1.row + c_inc_ix; 
