@@ -5,7 +5,7 @@
 -- Resultat C:  Gleiche Groesse und Orientierung wie A  
 --
 -- Destruktiver Modus: Ja
--- Geschwindigkeit: 1 Takte pro Matrix-Wort
+-- Geschwindigkeit: 1 Takt pro Matrix-Wort
 --
 --  Port:
 --      p_rst_i                 : Asynchroner Reset
